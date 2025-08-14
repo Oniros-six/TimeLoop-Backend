@@ -1,11 +1,9 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { CancelBookingDto } from '@/interfaces/controllers/booking/dto/cancel-booking.dto';
-import { IActivityLogRepository } from '@/domain/repositories/activityLog.repository';
-import {
-  BOOKING_REPOSITORY,
-  ACTIVITY_LOG_REPOSITORY,
-} from '@/application/constants/providers';
+import { BOOKING_REPOSITORY } from '@/application/constants/providers';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
+import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class CancelBooking {
@@ -13,9 +11,8 @@ export class CancelBooking {
     @Inject(BOOKING_REPOSITORY)
     private readonly bookingRepository: IBookingRepository,
 
-    @Inject(ACTIVITY_LOG_REPOSITORY)
-    private readonly activityLogRepository: IActivityLogRepository,
-  ) {}
+    private readonly activityLogService: ActivityLogService,
+  ) { }
 
   async execute(id: number, data: CancelBookingDto) {
     const { commerceId, customerId } = data;
@@ -51,14 +48,13 @@ export class CancelBooking {
       }
 
       // Activity register
-      await this.activityLogRepository.create({
-        entityTypeId: 1, //Booking
+      await this.activityLogService.cancelled({
+        entityTypeId: ENTITY_TYPES.BOOKING,
         entityId: result.id,
-        changeTypeId: 3, //Cancelled
-        detail: 'Booking cancelled',
         userId: null,
         commerceId: result.commerceId,
         customerId: result.customerId,
+        detail: `Se cancela la reserva`,
       });
 
       //TODO At this point we send notifications to the owner and verification to the customer (depending on commerce config)

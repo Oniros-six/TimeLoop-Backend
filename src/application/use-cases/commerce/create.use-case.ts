@@ -1,12 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
-import { IActivityLogRepository } from '@/domain/repositories/activityLog.repository';
-import {
-    COMMERCE_REPOSITORY,
-    ACTIVITY_LOG_REPOSITORY,
-} from '@/application/constants/providers';
+import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
 import { CreateCommerceDto } from '@/interfaces/controllers/commerces/dto/create-commerce.dto';
 import { Commerce as CommerceDomain } from '@/domain/entities/commerce.entity';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
+import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class CreateCommerce {
@@ -14,8 +12,7 @@ export class CreateCommerce {
         @Inject(COMMERCE_REPOSITORY)
         private readonly commerceRepository: ICommerceRepository,
 
-        @Inject(ACTIVITY_LOG_REPOSITORY)
-        private readonly activityLogRepository: IActivityLogRepository,
+        private readonly activityLogService: ActivityLogService,
     ) { }
 
     async execute(data: CreateCommerceDto) {
@@ -57,14 +54,13 @@ export class CreateCommerce {
                 );
             }
 
-            await this.activityLogRepository.create({
-                entityTypeId: 4, // Commerce
+            await this.activityLogService.created({
+                entityTypeId: ENTITY_TYPES.COMMERCE,
                 entityId: result.id,
                 userId: null,
                 commerceId: result.id,
                 customerId: null,
-                changeTypeId: 1, // Created
-                detail: 'Commerce created',
+                detail: `El comercio "${result.name}" fue creado.`,
             });
 
             return {

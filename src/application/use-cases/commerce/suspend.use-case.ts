@@ -1,10 +1,8 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
-import { IActivityLogRepository } from '@/domain/repositories/activityLog.repository';
-import {
-    COMMERCE_REPOSITORY,
-    ACTIVITY_LOG_REPOSITORY,
-} from '@/application/constants/providers';
+import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
+import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class SuspendCommerce {
@@ -12,8 +10,7 @@ export class SuspendCommerce {
         @Inject(COMMERCE_REPOSITORY)
         private readonly commerceRepository: ICommerceRepository,
 
-        @Inject(ACTIVITY_LOG_REPOSITORY)
-        private readonly activityLogRepository: IActivityLogRepository,
+        private readonly activityLogService: ActivityLogService,
     ) { }
 
     async execute(id: number) {
@@ -37,14 +34,13 @@ export class SuspendCommerce {
             }
 
             // Activity register
-            await this.activityLogRepository.create({
-                entityTypeId: 4, // Commerce
+            await this.activityLogService.suspended({
+                entityTypeId: ENTITY_TYPES.COMMERCE,
                 entityId: result.id,
-                changeTypeId: 3, // Suspended
-                detail: 'Commerce suspended',
                 userId: null,
                 commerceId: result.id,
                 customerId: null,
+                detail: `Se suspende la actividad del comercio`,
             });
 
             return {

@@ -11,14 +11,9 @@ import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-c
 import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
 
 // Tokens
-import {
-  ACTIVITY_LOG_REPOSITORY,
-  BOOKING_REPOSITORY,
-  SERVICE_REPOSITORY,
-} from '@/application/constants/providers';
+import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/constants/providers';
 
 // Repositories
-import { PrismaActivityLogRepository } from '@/infrastructure/prisma/repositories/activityLog.repository';
 import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/booking.repository';
 import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/services.repository';
 
@@ -26,10 +21,6 @@ import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/s
   imports: [PrismaModule],
   controllers: [BookingController],
   providers: [
-    {
-      provide: ACTIVITY_LOG_REPOSITORY,
-      useClass: PrismaActivityLogRepository,
-    },
     {
       provide: BOOKING_REPOSITORY,
       useClass: PrismaBookingRepository,
@@ -48,4 +39,4 @@ import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/s
     CancelBooking,
   ],
 })
-export class BookingModule {}
+export class BookingModule { }

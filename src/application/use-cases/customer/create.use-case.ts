@@ -1,14 +1,11 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICustomerRepository } from '@/domain/repositories/customer.repository';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
-import { IActivityLogRepository } from '@/domain/repositories/activityLog.repository';
 import { CreateCustomerDto } from '@/interfaces/controllers/customer/dto/create-customer.dto';
 import { Customer as CustomerDomain } from '@/domain/entities/customer.entity';
-import {
-  CUSTOMER_REPOSITORY,
-  COMMERCE_REPOSITORY,
-  ACTIVITY_LOG_REPOSITORY,
-} from '@/application/constants/providers';
+import { CUSTOMER_REPOSITORY, COMMERCE_REPOSITORY } from '@/application/constants/providers';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
+import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class CreateCustomer {
@@ -19,9 +16,8 @@ export class CreateCustomer {
     @Inject(COMMERCE_REPOSITORY)
     private readonly commerceRepository: ICommerceRepository,
 
-    @Inject(ACTIVITY_LOG_REPOSITORY)
-    private readonly activityLogRepository: IActivityLogRepository,
-  ) {}
+    private readonly activityLogService: ActivityLogService,
+  ) { }
 
   async execute(data: CreateCustomerDto) {
     // Validate that the commerce exists
@@ -73,15 +69,14 @@ export class CreateCustomer {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-      //TODO mover esto a un use case de activityLog
-      await this.activityLogRepository.create({
-        entityTypeId: 2, // Customer
+
+      await this.activityLogService.created({
+        entityTypeId: ENTITY_TYPES.CUSTOMER,
         entityId: result.id,
         userId: null,
         commerceId: result.commerceId,
         customerId: result.id,
-        changeTypeId: 1, // Created
-        detail: 'Customer created',
+        detail: `El cliente ${result.name} fue creado.`,
       });
 
       return {

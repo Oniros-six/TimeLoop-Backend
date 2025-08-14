@@ -10,13 +10,9 @@ import { SuspendCommerce } from '@/application/use-cases/commerce/suspend.use-ca
 import { ReinstateCommerce } from '@/application/use-cases/commerce/reinstate.use-case';
 
 // Tokens
-import {
-  ACTIVITY_LOG_REPOSITORY,
-  COMMERCE_REPOSITORY,
-} from '@/application/constants/providers';
+import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
 
 // Repositories
-import { PrismaActivityLogRepository } from '@/infrastructure/prisma/repositories/activityLog.repository';
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';
 
 @Module({
@@ -27,10 +23,6 @@ import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/c
       provide: COMMERCE_REPOSITORY,
       useClass: PrismaCommerceRepository,
     },
-    {
-      provide: ACTIVITY_LOG_REPOSITORY,
-      useClass: PrismaActivityLogRepository,
-    },
 
     CreateCommerce,
     FindCommerce,
@@ -39,4 +31,4 @@ import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/c
     ReinstateCommerce
   ],
 })
-export class CommerceModule {}
+export class CommerceModule { }

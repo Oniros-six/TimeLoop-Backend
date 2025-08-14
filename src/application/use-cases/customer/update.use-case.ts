@@ -3,13 +3,16 @@ import { ICustomerRepository } from '@/domain/repositories/customer.repository';
 import { UpdateCustomerDto } from '@/interfaces/controllers/customer/dto/update-customer.dto';
 import { CustomerUpdateData } from '@/domain/common/CustomerUpdateData';
 import { CUSTOMER_REPOSITORY } from '@/application/constants/providers';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
+import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class UpdateCustomer {
   constructor(
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: ICustomerRepository,
-  ) {}
+    private readonly activityLogService: ActivityLogService,
+  ) { }
 
   async execute(id: number, data: UpdateCustomerDto) {
     const customer = await this.customerRepository.findCustomer({ id: id });
@@ -45,6 +48,20 @@ export class UpdateCustomer {
       const result = await this.customerRepository.updateCustomer({
         id: customer.id,
         newCustomerData: newCustomerData,
+      });
+
+      if (!result) {
+        throw new HttpException('Error al actualizar el cliente', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+
+      const updatedFields = Object.keys(newCustomerData).join(', ');
+      await this.activityLogService.updated({
+        entityTypeId: ENTITY_TYPES.CUSTOMER,
+        entityId: result.id,
+        userId: null,
+        commerceId: result.commerceId,
+        customerId: result.id,
+        detail: `Se actualizaron los campos: ${updatedFields}.`,
       });
 
       return {

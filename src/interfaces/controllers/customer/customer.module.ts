@@ -9,14 +9,9 @@ import { FindAllCustomersByCommerce } from '@/application/use-cases/customer/fin
 import { UpdateCustomer } from '@/application/use-cases/customer/update.use-case';
 
 // Tokens
-import {
-  ACTIVITY_LOG_REPOSITORY,
-  COMMERCE_REPOSITORY,
-  CUSTOMER_REPOSITORY,
-} from '@/application/constants/providers';
+import { COMMERCE_REPOSITORY, CUSTOMER_REPOSITORY } from '@/application/constants/providers';
 
 // Repositories
-import { PrismaActivityLogRepository } from '@/infrastructure/prisma/repositories/activityLog.repository';
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';
 import { PrismaCustomerRepository } from '@/infrastructure/prisma/repositories/customer.repository';
 
@@ -32,10 +27,6 @@ import { PrismaCustomerRepository } from '@/infrastructure/prisma/repositories/c
       provide: COMMERCE_REPOSITORY,
       useClass: PrismaCommerceRepository,
     },
-    {
-      provide: ACTIVITY_LOG_REPOSITORY,
-      useClass: PrismaActivityLogRepository,
-    },
 
     CreateCustomer,
     FindCustomer,
@@ -43,4 +34,4 @@ import { PrismaCustomerRepository } from '@/infrastructure/prisma/repositories/c
     UpdateCustomer,
   ],
 })
-export class CustomerModule {}
+export class CustomerModule { }

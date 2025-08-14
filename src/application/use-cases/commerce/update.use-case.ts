@@ -1,12 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
-import { IActivityLogRepository } from '@/domain/repositories/activityLog.repository';
-import {
-    COMMERCE_REPOSITORY,
-    ACTIVITY_LOG_REPOSITORY,
-} from '@/application/constants/providers';
+import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
 import { UpdateCommerceDto } from '@/interfaces/controllers/commerces/dto/update-commerce.dto';
 import { CommerceUpdateData } from '@/domain/common/CommerceUpdateData';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
+import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class UpdateCommerce {
@@ -14,8 +12,7 @@ export class UpdateCommerce {
         @Inject(COMMERCE_REPOSITORY)
         private readonly commerceRepository: ICommerceRepository,
 
-        @Inject(ACTIVITY_LOG_REPOSITORY)
-        private readonly activityLogRepository: IActivityLogRepository,
+        private readonly activityLogService: ActivityLogService,
     ) { }
 
     async execute(id: number, data: UpdateCommerceDto) {
@@ -26,7 +23,7 @@ export class UpdateCommerce {
         if (!found) {
             throw new HttpException('Comercio no encontrado', HttpStatus.NOT_FOUND);
         }
-        
+
         try {
             const newCommerceData: CommerceUpdateData = {};
 
@@ -45,7 +42,7 @@ export class UpdateCommerce {
             if (data.businessCategory && data.businessCategory != found.businessCategory) {
                 newCommerceData.businessCategory = data.businessCategory;
             }
-   
+
 
             if (Object.keys(newCommerceData).length === 0) {
                 return {
@@ -67,14 +64,14 @@ export class UpdateCommerce {
                 );
             }
 
-            await this.activityLogRepository.create({
-                entityTypeId: 4, // Commerce
+            const updatedFields = Object.keys(newCommerceData).join(', ');
+            await this.activityLogService.updated({
+                entityTypeId: ENTITY_TYPES.COMMERCE,
                 entityId: result.id,
                 userId: null,
                 commerceId: result.id,
                 customerId: null,
-                changeTypeId: 2, // Updated
-                detail: 'Commerce updated',
+                detail: `Se actualizaron los campos: ${updatedFields}.`,
             });
 
             return {

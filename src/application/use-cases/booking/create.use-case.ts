@@ -1,16 +1,16 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
-import { IActivityLogRepository } from '@/domain/repositories/activityLog.repository';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
 import { BookingDate } from '@/domain/value-objects/booking/booking-date.vo';
 import { BookingTime } from '@/domain/value-objects/booking/booking-time.vo';
 import { CreateBookingDto } from '@/interfaces/controllers/booking/dto/create-booking.dto';
 import { Booking } from '@/domain/entities/booking.entity';
 import {
-  ACTIVITY_LOG_REPOSITORY,
   BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
 } from '@/application/constants/providers';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
+import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class CreateBooking {
@@ -18,12 +18,11 @@ export class CreateBooking {
     @Inject(BOOKING_REPOSITORY)
     private readonly bookingRepository: IBookingRepository,
 
-    @Inject(ACTIVITY_LOG_REPOSITORY)
-    private readonly activityLogRepository: IActivityLogRepository,
-
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
-  ) {}
+
+    private readonly activityLogService: ActivityLogService,
+  ) { }
 
   async execute(data: CreateBookingDto) {
     try {
@@ -91,14 +90,13 @@ export class CreateBooking {
       }
 
       // Activity register
-      await this.activityLogRepository.create({
-        entityTypeId: 1, //Booking
+      await this.activityLogService.created({
+        entityTypeId: ENTITY_TYPES.BOOKING,
         entityId: result.id,
-        changeTypeId: 1, //Created
-        detail: 'Booking created',
         userId: null,
         commerceId: result.commerceId,
         customerId: result.customerId,
+        detail: `Se crea una nueva reserva`,
       });
 
       //TODO At this point we send notifications to the owner and verification to the client (depending on commerce config)
