@@ -1,0 +1,64 @@
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ICustomerRepository } from '@/domain/repositories/customer.repository';
+import { UpdateCustomerDto } from '@/interfaces/controllers/customer/dto/update-customer.dto';
+import { CustomerUpdateData } from '@/domain/common/CustomerUpdateData';
+import { CUSTOMER_REPOSITORY } from '@/application/constants/providers';
+
+@Injectable()
+export class UpdateCustomer {
+  constructor(
+    @Inject(CUSTOMER_REPOSITORY)
+    private readonly customerRepository: ICustomerRepository,
+  ) {}
+
+  async execute(id: number, data: UpdateCustomerDto) {
+    const customer = await this.customerRepository.findCustomer({ id: id });
+
+    if (!customer) {
+      throw new HttpException('Cliente no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    try {
+      const newCustomerData: CustomerUpdateData = {};
+
+      if (data.email && data.email != customer.email) {
+        newCustomerData.email = data.email;
+      }
+      if (data.name && data.name != customer.name) {
+        newCustomerData.name = data.name;
+      }
+      if (data.phone && data.phone != customer.phone) {
+        newCustomerData.phone = data.phone;
+      }
+      if (data.internalNote && data.internalNote != customer.internalNote) {
+        newCustomerData.internalNote = data.internalNote;
+      }
+
+      if (Object.keys(newCustomerData).length === 0) {
+        return {
+          message: 'Información actualizada con exito',
+          statusCode: HttpStatus.OK,
+          data: customer,
+        };
+      }
+
+      const result = await this.customerRepository.updateCustomer({
+        id: customer.id,
+        newCustomerData: newCustomerData,
+      });
+
+      return {
+        message: 'Información actualizada con éxito',
+        statusCode: HttpStatus.OK,
+        data: result,
+      };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error desconocido';
+      console.error(message);
+      throw new HttpException(
+        'Error al actualizar el cliente',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+}
