@@ -1,0 +1,45 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsDate, IsNumber, IsOptional } from 'class-validator';
+
+export class UpdateBookingDto {
+  @ApiProperty({
+    example: 1,
+    description: 'ID del comercio en el que se reserva',
+  })
+  @Type(() => Number)
+  @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
+  commerceId: number;
+
+  @ApiProperty({ example: 1, description: 'ID del cliente que reserva' })
+  @Type(() => Number)
+  @IsNumber({}, { message: 'El ID del cliente debe ser un número' })
+  customerId: number;
+
+  @ApiProperty({ description: 'Nuevo ID de servicio', example: 3 })
+  @IsOptional()
+  @IsNumber()
+  serviceId?: number;
+
+  @ApiProperty({
+    example: '2025-07-08T17:30:00.000Z',
+    description: 'Dia y hora de inicio de la reserva',
+  })
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'La hora de inicio debe ser una fecha válida' })
+  timeStart?: Date;
+
+  @ApiProperty({
+    example: '2025-07-08T00:00:00.000Z',
+    description: 'En que fecha ser realizo la reserva',
+  })
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'La fecha debe ser una fecha válida' })
+  date?: Date;
+
+  @ApiProperty({ description: 'Notas adicionales' })
+  @IsOptional()
+  notes?: string;
+}

@@ -1,0 +1,51 @@
+import { Module } from '@nestjs/common';
+import { BookingController } from './booking.controller';
+import { PrismaModule } from '@/infrastructure/prisma/prisma.module';
+
+// Use cases
+import { CreateBooking } from '@/application/use-cases/booking/create.use-case';
+import { UpdateBooking } from '@/application/use-cases/booking/update.use-case';
+import { FindAllByCommerceAndDate } from '@/application/use-cases/booking/find-all-by-date-commerce.use-case';
+import { FindBusySlots } from '@/application/use-cases/booking/find-busy-slots.use-case';
+import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-commerce.use-case';
+import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
+
+// Tokens
+import {
+  ACTIVITY_LOG_REPOSITORY,
+  BOOKING_REPOSITORY,
+  SERVICE_REPOSITORY,
+} from '@/application/constants/providers';
+
+// Repositories
+import { PrismaActivityLogRepository } from '@/infrastructure/prisma/repositories/activityLog.repository';
+import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/booking.repository';
+import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/services.repository';
+
+@Module({
+  imports: [PrismaModule],
+  controllers: [BookingController],
+  providers: [
+    {
+      provide: ACTIVITY_LOG_REPOSITORY,
+      useClass: PrismaActivityLogRepository,
+    },
+    {
+      provide: BOOKING_REPOSITORY,
+      useClass: PrismaBookingRepository,
+    },
+    {
+      provide: SERVICE_REPOSITORY,
+      useClass: PrismaServicesRepository,
+    },
+
+    // usesCases
+    CreateBooking,
+    UpdateBooking,
+    FindAllByCommerceAndDate,
+    FindBusySlots,
+    FindAllByCommerce,
+    CancelBooking,
+  ],
+})
+export class BookingModule {}
