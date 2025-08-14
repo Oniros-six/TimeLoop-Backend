@@ -57,6 +57,7 @@ model Commerce {
   phone            String
   address          String
   businessCategory BusinessCategory
+  active           Boolean
 
   users            User[]                    @relation("CommerceUsers")
   customers        Customer[]                @relation("CommerceCustomers")
