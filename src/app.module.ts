@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ActivityLogModule } from './domain/services/activityLog/activity-log.module';
 import { PrismaModule } from './infrastructure/prisma/prisma.module';
 import { CustomerModule } from './interfaces/controllers/customer/customer.module';
 import { BookingModule } from './interfaces/controllers/booking/booking.module';
-import { ActivityLogModule } from './domain/services/activityLog/activity-log.module';
+import { ServicesModule } from './interfaces/controllers/services/services.module';
+import { CommerceModule } from './interfaces/controllers/commerces/commerce.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { ActivityLogModule } from './domain/services/activityLog/activity-log.mo
     CustomerModule,
     BookingModule,
     ActivityLogModule,
+    ServicesModule,
+    CommerceModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
