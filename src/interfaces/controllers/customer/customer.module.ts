@@ -9,7 +9,10 @@ import { FindAllCustomersByCommerce } from '@/application/use-cases/customer/fin
 import { UpdateCustomer } from '@/application/use-cases/customer/update.use-case';
 
 // Tokens
-import { COMMERCE_REPOSITORY, CUSTOMER_REPOSITORY } from '@/application/constants/providers';
+import {
+  COMMERCE_REPOSITORY,
+  CUSTOMER_REPOSITORY,
+} from '@/application/constants/providers';
 
 // Repositories
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';
@@ -34,4 +37,4 @@ import { PrismaCustomerRepository } from '@/infrastructure/prisma/repositories/c
     UpdateCustomer,
   ],
 })
-export class CustomerModule { }
+export class CustomerModule {}

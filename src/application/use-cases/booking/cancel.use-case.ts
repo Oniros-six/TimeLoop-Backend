@@ -12,7 +12,7 @@ export class CancelBooking {
     private readonly bookingRepository: IBookingRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(id: number, data: CancelBookingDto) {
     const { commerceId, customerId } = data;

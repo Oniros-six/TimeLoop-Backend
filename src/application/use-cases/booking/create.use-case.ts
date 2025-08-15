@@ -22,7 +22,7 @@ export class CreateBooking {
     private readonly serviceRepository: IServiceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(data: CreateBookingDto) {
     try {

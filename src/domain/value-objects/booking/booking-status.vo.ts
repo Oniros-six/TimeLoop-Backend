@@ -7,7 +7,6 @@ type StatusValue =
   | 'rescheduled';
 
 export class BookingStatus {
-
   // Mapeo entre Value Objects y IDs de base de datos
   private static readonly STATUS_MAPPING = {
     pending: 1,

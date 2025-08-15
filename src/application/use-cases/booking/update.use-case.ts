@@ -15,7 +15,7 @@ export class UpdateBooking {
     private readonly bookingRepository: IBookingRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(id: number, newData: UpdateBookingDto) {
     const { commerceId, customerId, date, timeStart, serviceId, notes } =

@@ -11,7 +11,10 @@ import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-c
 import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
 
 // Tokens
-import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/constants/providers';
+import {
+  BOOKING_REPOSITORY,
+  SERVICE_REPOSITORY,
+} from '@/application/constants/providers';
 
 // Repositories
 import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/booking.repository';
@@ -39,4 +42,4 @@ import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/s
     CancelBooking,
   ],
 })
-export class BookingModule { }
+export class BookingModule {}

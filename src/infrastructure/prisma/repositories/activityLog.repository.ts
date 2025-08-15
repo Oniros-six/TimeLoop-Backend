@@ -4,7 +4,7 @@ import { IActivityLogRepository } from '@/domain/repositories/activityLog.reposi
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
-export class PrismaActivityLogRepository implements IActivityLogRepository{
+export class PrismaActivityLogRepository implements IActivityLogRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(log: ActivityLog) {

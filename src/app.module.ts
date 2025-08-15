@@ -21,4 +21,4 @@ import { CommerceModule } from './interfaces/controllers/commerces/commerce.modu
     CommerceModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

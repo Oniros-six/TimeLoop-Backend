@@ -5,7 +5,7 @@ export class Service {
     public readonly name: string,
     public readonly price: number,
     public readonly durationMinutes: number,
-  ) { }
+  ) {}
 
   // Factory method
   static create(props: {

@@ -3,7 +3,10 @@ import { ICustomerRepository } from '@/domain/repositories/customer.repository';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { CreateCustomerDto } from '@/interfaces/controllers/customer/dto/create-customer.dto';
 import { Customer as CustomerDomain } from '@/domain/entities/customer.entity';
-import { CUSTOMER_REPOSITORY, COMMERCE_REPOSITORY } from '@/application/constants/providers';
+import {
+  CUSTOMER_REPOSITORY,
+  COMMERCE_REPOSITORY,
+} from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 
@@ -17,7 +20,7 @@ export class CreateCustomer {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(data: CreateCustomerDto) {
     // Validate that the commerce exists

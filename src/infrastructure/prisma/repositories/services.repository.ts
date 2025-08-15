@@ -6,7 +6,7 @@ import { ServiceUpdateData } from '@/domain/common/ServiceUpdateData';
 
 @Injectable()
 export class PrismaServicesRepository implements IServiceRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private toDomain(service: {
     id: number;
@@ -39,7 +39,9 @@ export class PrismaServicesRepository implements IServiceRepository {
     return this.toDomain(result);
   }
 
-  async findAllServices(data: { commerceId: number }): Promise<DomainClient[] | null> {
+  async findAllServices(data: {
+    commerceId: number;
+  }): Promise<DomainClient[] | null> {
     const result = await this.prisma.service.findMany({
       where: {
         commerceId: data.commerceId,
@@ -58,7 +60,11 @@ export class PrismaServicesRepository implements IServiceRepository {
 
     return this.toDomain(result);
   }
-  async updateService(data: { serviceId: number, commerceId: number, data: ServiceUpdateData }): Promise<DomainClient | null> {
+  async updateService(data: {
+    serviceId: number;
+    commerceId: number;
+    data: ServiceUpdateData;
+  }): Promise<DomainClient | null> {
     const result = await this.prisma.service.update({
       where: { id: data.serviceId, commerceId: data.commerceId },
       data: data.data,
@@ -68,7 +74,10 @@ export class PrismaServicesRepository implements IServiceRepository {
 
     return this.toDomain(result);
   }
-  async deleteService(data: { serviceId: number, commerceId: number }): Promise<DomainClient | null> {
+  async deleteService(data: {
+    serviceId: number;
+    commerceId: number;
+  }): Promise<DomainClient | null> {
     const result = await this.prisma.service.delete({
       where: { id: data.serviceId, commerceId: data.commerceId },
     });

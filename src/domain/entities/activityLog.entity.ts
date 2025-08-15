@@ -1,4 +1,7 @@
-import { CHANGE_TYPES, ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import {
+  CHANGE_TYPES,
+  ENTITY_TYPES,
+} from '@/application/constants/activity-log.constants';
 
 export class ActivityLog {
   constructor(
@@ -22,7 +25,7 @@ export class ActivityLog {
       userId?: number | null;
       commerceId?: number | null;
       customerId?: number | null;
-    }
+    },
   ): ActivityLog {
     return new ActivityLog(
       0,
@@ -37,23 +40,33 @@ export class ActivityLog {
     );
   }
 
-  static createLog(props: Parameters<typeof ActivityLog.create>[1]): ActivityLog {
+  static createLog(
+    props: Parameters<typeof ActivityLog.create>[1],
+  ): ActivityLog {
     return this.create(CHANGE_TYPES.CREATED, props);
   }
 
-  static updateLog(props: Parameters<typeof ActivityLog.create>[1]): ActivityLog {
+  static updateLog(
+    props: Parameters<typeof ActivityLog.create>[1],
+  ): ActivityLog {
     return this.create(CHANGE_TYPES.UPDATED, props);
   }
 
-  static cancelLog(props: Parameters<typeof ActivityLog.create>[1]): ActivityLog {
+  static cancelLog(
+    props: Parameters<typeof ActivityLog.create>[1],
+  ): ActivityLog {
     return this.create(CHANGE_TYPES.CANCELLED, props);
   }
 
-  static suspendLog(props: Parameters<typeof ActivityLog.create>[1]): ActivityLog {
+  static suspendLog(
+    props: Parameters<typeof ActivityLog.create>[1],
+  ): ActivityLog {
     return this.create(CHANGE_TYPES.SUSPENDED, props);
   }
 
-  static reinstateLog(props: Parameters<typeof ActivityLog.create>[1]): ActivityLog {
+  static reinstateLog(
+    props: Parameters<typeof ActivityLog.create>[1],
+  ): ActivityLog {
     return this.create(CHANGE_TYPES.REINSTATED, props);
   }
 }

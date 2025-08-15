@@ -10,7 +10,10 @@ import { UpdateService } from '@/application/use-cases/services/update.use-case'
 import { DeleteService } from '@/application/use-cases/services/delete.use-case';
 
 // Tokens
-import { COMMERCE_REPOSITORY, SERVICE_REPOSITORY } from '@/application/constants/providers';
+import {
+  COMMERCE_REPOSITORY,
+  SERVICE_REPOSITORY,
+} from '@/application/constants/providers';
 
 // Repositories
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';
@@ -36,4 +39,4 @@ import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/s
     DeleteService,
   ],
 })
-export class ServicesModule { }
+export class ServicesModule {}

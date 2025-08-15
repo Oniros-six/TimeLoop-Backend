@@ -5,14 +5,14 @@ import { PrismaActivityLogRepository } from '@/infrastructure/prisma/repositorie
 import { ACTIVITY_LOG_REPOSITORY } from '@/application/constants/providers';
 
 @Module({
-    providers: [
-        ActivityLogService,
-        PrismaService,
-        {
-            provide: ACTIVITY_LOG_REPOSITORY,
-            useClass: PrismaActivityLogRepository,
-        },
-    ],
-    exports: [ActivityLogService],
+  providers: [
+    ActivityLogService,
+    PrismaService,
+    {
+      provide: ACTIVITY_LOG_REPOSITORY,
+      useClass: PrismaActivityLogRepository,
+    },
+  ],
+  exports: [ActivityLogService],
 })
-export class ActivityLogModule { }
+export class ActivityLogModule {}

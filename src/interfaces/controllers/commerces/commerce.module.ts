@@ -28,7 +28,7 @@ import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/c
     FindCommerce,
     UpdateCommerce,
     SuspendCommerce,
-    ReinstateCommerce
+    ReinstateCommerce,
   ],
 })
-export class CommerceModule { }
+export class CommerceModule {}

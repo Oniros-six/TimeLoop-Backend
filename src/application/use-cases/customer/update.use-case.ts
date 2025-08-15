@@ -12,7 +12,7 @@ export class UpdateCustomer {
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: ICustomerRepository,
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(id: number, data: UpdateCustomerDto) {
     const customer = await this.customerRepository.findCustomer({ id: id });
@@ -51,7 +51,10 @@ export class UpdateCustomer {
       });
 
       if (!result) {
-        throw new HttpException('Error al actualizar el cliente', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'Error al actualizar el cliente',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       const updatedFields = Object.keys(newCustomerData).join(', ');
