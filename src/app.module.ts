@@ -6,6 +6,7 @@ import { CustomerModule } from './interfaces/controllers/customer/customer.modul
 import { BookingModule } from './interfaces/controllers/booking/booking.module';
 import { ServicesModule } from './interfaces/controllers/services/services.module';
 import { CommerceModule } from './interfaces/controllers/commerces/commerce.module';
+import { UserModule } from './interfaces/controllers/user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CommerceModule } from './interfaces/controllers/commerces/commerce.modu
       envFilePath: '.env',
     }),
     PrismaModule,
+    UserModule,
     CustomerModule,
     BookingModule,
     ActivityLogModule,

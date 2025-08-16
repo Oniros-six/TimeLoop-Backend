@@ -5,6 +5,7 @@ import { PrismaCommerceRepository } from './repositories/commerce.repository';
 import { PrismaActivityLogRepository } from './repositories/activityLog.repository';
 import { PrismaServicesRepository } from './repositories/services.repository';
 import { PrismaBookingRepository } from './repositories/booking.repository';
+import { PrismaUserRepository } from './repositories/user.repository';
 
 @Global()
 @Module({
@@ -30,6 +31,10 @@ import { PrismaBookingRepository } from './repositories/booking.repository';
       provide: 'IBookingRepository',
       useClass: PrismaBookingRepository,
     },
+    {
+      provide: 'IUserRepository',
+      useClass: PrismaUserRepository,
+    },
   ],
   exports: [
     'ICustomerRepository',
@@ -37,6 +42,7 @@ import { PrismaBookingRepository } from './repositories/booking.repository';
     'IActivityLogRepository',
     'IServicesRepository',
     'IBookingRepository',
+    'IUserRepository',
   ],
 })
 export class PrismaModule {}
