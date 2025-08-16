@@ -7,6 +7,7 @@ import { BookingModule } from './interfaces/controllers/booking/booking.module';
 import { ServicesModule } from './interfaces/controllers/services/services.module';
 import { CommerceModule } from './interfaces/controllers/commerces/commerce.module';
 import { UserModule } from './interfaces/controllers/user/user.module';
+import { UserConfigModule } from './interfaces/controllers/userConfig/userConfig.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UserModule } from './interfaces/controllers/user/user.module';
     ActivityLogModule,
     ServicesModule,
     CommerceModule,
+    UserConfigModule,
   ],
 })
 export class AppModule {}

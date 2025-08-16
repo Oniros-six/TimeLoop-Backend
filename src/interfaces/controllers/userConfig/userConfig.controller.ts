@@ -1,0 +1,60 @@
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Put,
+  UsePipes,
+  ValidationPipe,
+  ParseIntPipe,
+  Param,
+} from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+
+import { CreateUserConfig } from '@/application/use-cases/userConfig/create.use-case';
+import { UpdateUserConfig } from '@/application/use-cases/userConfig/update.use-case';
+import { FindUserConfig } from '@/application/use-cases/userConfig/find.use-case';
+import { CreateUserConfigDto } from './dto/create-userConfig.dto';
+import { UpdateUserConfigDto } from './dto/update-userConfig.dto';
+
+@ApiTags('User Config')
+@Controller('user-config')
+export class UserConfigController {
+  constructor(
+    private readonly createUserConfigUseCase: CreateUserConfig,
+    private readonly updateUserConfigUseCase: UpdateUserConfig,
+    private readonly findUserConfigUseCase: FindUserConfig,
+  ) {}
+
+  // Create a user
+  @ApiOperation({ summary: 'Crear la configuración de un usuario' })
+  @ApiBody({ type: CreateUserConfigDto })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Post()
+  create(@Body() dto: CreateUserConfigDto) {
+    return this.createUserConfigUseCase.execute(dto.userId, dto);
+  }
+
+  // Get a user
+  @ApiOperation({ summary: 'Obtener la configuración de un usuario' })
+  @ApiParam({
+    name: 'userId',
+    type: Number,
+    required: true,
+    description: 'ID del usuario',
+  })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Get(':userId')
+  find(@Param('userId', ParseIntPipe) userId: number) {
+    return this.findUserConfigUseCase.execute(userId);
+  }
+
+  // Update a user
+  @ApiOperation({ summary: 'Actualizar la información de un usuario' })
+  @ApiBody({ type: UpdateUserConfigDto })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Put()
+  update(@Body() dto: UpdateUserConfigDto) {
+    return this.updateUserConfigUseCase.execute(dto.userId, dto);
+  }
+}

@@ -149,7 +149,6 @@ model UserConfig {
   id                Int     @id @default(autoincrement())
   userId            Int     @unique
   darkMode          Boolean
-  notificationsMail Boolean
   reminder          Boolean
   reminderFrequency Int
 
@@ -162,6 +161,7 @@ model UserConfig {
 // User Working Pattern Models
 // =========================================
 
+//* Se tiene un working pattern por cada dia de la semana
 model UserWorkingPattern {
   id               Int                  @id @default(autoincrement())
   userId           Int
@@ -177,6 +177,7 @@ model UserWorkingPattern {
   @@map("user_working_patterns")
 }
 
+//* Esto define un horario especifico para un dia particular
 model UserWorkingOverride {
   id           Int              @id @default(autoincrement())
   userId       Int
