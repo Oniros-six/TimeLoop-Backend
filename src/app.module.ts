@@ -8,6 +8,7 @@ import { ServicesModule } from './interfaces/controllers/services/services.modul
 import { CommerceModule } from './interfaces/controllers/commerces/commerce.module';
 import { UserModule } from './interfaces/controllers/user/user.module';
 import { UserConfigModule } from './interfaces/controllers/userConfig/userConfig.module';
+import { CommerceConfigModule } from './interfaces/controllers/commerceConfig/commerceConfig.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserConfigModule } from './interfaces/controllers/userConfig/userConfig
     ServicesModule,
     CommerceModule,
     UserConfigModule,
+    CommerceConfigModule,
   ],
 })
 export class AppModule {}

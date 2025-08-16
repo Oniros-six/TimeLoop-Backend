@@ -7,6 +7,7 @@ import { PrismaServicesRepository } from './repositories/services.repository';
 import { PrismaBookingRepository } from './repositories/booking.repository';
 import { PrismaUserRepository } from './repositories/user.repository';
 import { PrismaUserConfigRepository } from './repositories/userConfig.repository';
+import { PrismaCommerceConfigRepository } from './repositories/commerceConfig.repository';
 
 @Global()
 @Module({
@@ -40,6 +41,10 @@ import { PrismaUserConfigRepository } from './repositories/userConfig.repository
       provide: 'IUserConfigRepository',
       useClass: PrismaUserConfigRepository,
     },
+    {
+      provide: 'ICommerceConfigRepository',
+      useClass: PrismaCommerceConfigRepository,
+    },
   ],
   exports: [
     'ICustomerRepository',
@@ -49,6 +54,7 @@ import { PrismaUserConfigRepository } from './repositories/userConfig.repository
     'IBookingRepository',
     'IUserRepository',
     'IUserConfigRepository',
+    'ICommerceConfigRepository',
   ],
 })
 export class PrismaModule {}
