@@ -9,6 +9,7 @@ import { CommerceModule } from './interfaces/controllers/commerces/commerce.modu
 import { UserModule } from './interfaces/controllers/user/user.module';
 import { UserConfigModule } from './interfaces/controllers/userConfig/userConfig.module';
 import { CommerceConfigModule } from './interfaces/controllers/commerceConfig/commerceConfig.module';
+import { UserWorkingPatternModule } from './interfaces/controllers/userWorkingPattern/userWorkingPattern.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CommerceConfigModule } from './interfaces/controllers/commerceConfig/co
     CommerceModule,
     UserConfigModule,
     CommerceConfigModule,
+    UserWorkingPatternModule,
   ],
 })
 export class AppModule {}
