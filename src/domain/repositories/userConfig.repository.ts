@@ -7,6 +7,6 @@ export interface IUserConfigRepository {
 
   updateUserConfig(data: {
     userId: number;
-    newUserData: UserConfig;
+    newUserConfigData: UserConfig;
   }): Promise<UserConfig | null>;
 }

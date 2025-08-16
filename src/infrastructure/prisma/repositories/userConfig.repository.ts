@@ -41,11 +41,11 @@ export class PrismaUserConfigRepository implements IUserConfigRepository {
 
   async updateUserConfig(data: {
     userId: number;
-    newUserData: DomainClient;
+    newUserConfigData: DomainClient;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.userConfig.update({
       where: { userId: data.userId },
-      data: data.newUserData,
+      data: data.newUserConfigData,
     });
     if (!result) return null;
     return this.toDomain(result);
