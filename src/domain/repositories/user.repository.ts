@@ -2,7 +2,7 @@ import { UserUpdateData } from '../common/UserUpdateData';
 import { User } from '../entities/user.entity';
 
 export interface IUserRepository {
-  findUser(data: { commerceId: number; userId: number }): Promise<User | null>;
+  findUser(data: { userId: number }): Promise<User | null>;
 
   findUserByName(data: {
     commerceId: number;

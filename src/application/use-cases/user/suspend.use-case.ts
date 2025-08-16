@@ -17,7 +17,6 @@ export class SuspendUser {
   async execute(data: StateUserDto) {
     const user = await this.userRepository.findUser({
       userId: data.userId,
-      commerceId: data.commerceId,
     });
 
     if (!user) {

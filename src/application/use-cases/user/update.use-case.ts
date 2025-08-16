@@ -1,12 +1,8 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from '@/domain/repositories/user.repository';
-import {
-  USER_REPOSITORY,
-  COMMERCE_REPOSITORY,
-} from '@/application/constants/providers';
+import { USER_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
-import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { UpdateUserDto } from '@/interfaces/controllers/user/dto/update-user.dto';
 import { UserUpdateData } from '@/domain/common/UserUpdateData';
 import { ROLES } from '@/application/constants/user-roles.constants';
@@ -17,24 +13,12 @@ export class UpdateUser {
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
 
-    @Inject(COMMERCE_REPOSITORY)
-    private readonly commerceRepository: ICommerceRepository,
-
     private readonly activityLogService: ActivityLogService,
   ) {}
 
-  async execute(id: number, commerceId: number, data: UpdateUserDto) {
-    const commerce = await this.commerceRepository.findCommerce({
-      commerceId: commerceId,
-    });
-
-    if (!commerce) {
-      throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
-    }
-
+  async execute(id: number, data: UpdateUserDto) {
     const user = await this.userRepository.findUser({
       userId: id,
-      commerceId: commerceId,
     });
 
     if (!user) {
@@ -43,7 +27,7 @@ export class UpdateUser {
 
     if (data.email && data.email !== user.email) {
       const emailExists = await this.userRepository.findUserByEmail({
-        commerceId: commerceId,
+        commerceId: user.commerceId,
         email: data.email,
       });
       if (emailExists) {
@@ -85,7 +69,7 @@ export class UpdateUser {
     try {
       const result = await this.userRepository.updateUser({
         userId: id,
-        commerceId: commerceId,
+        commerceId: user.commerceId,
         newUserData: newUserData,
       });
 
@@ -101,7 +85,7 @@ export class UpdateUser {
         entityTypeId: ENTITY_TYPES.USER,
         entityId: result.id,
         userId: null,
-        commerceId: result.commerceId,
+        commerceId: user.commerceId,
         customerId: null,
         detail: `Se actualizaron los campos: ${updatedFields}.`,
       });

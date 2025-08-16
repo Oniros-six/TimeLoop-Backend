@@ -9,8 +9,15 @@ import {
   ParseIntPipe,
   Patch,
   Query,
+  Param,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { CreateUser } from '@/application/use-cases/user/create.use-case';
 import { FindUser } from '@/application/use-cases/user/find.use-case';
@@ -53,32 +60,26 @@ export class UserController {
     required: true,
     description: 'ID del usuario',
   })
-  @ApiQuery({
-    name: 'commerceId',
-    type: Number,
-    required: true,
-    description: 'ID del comercio',
-  })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get()
   find(@Query() dto: FindUserDto) {
-    return this.findUserUseCase.execute(dto.userId, dto.commerceId);
+    return this.findUserUseCase.execute(dto.userId);
   }
 
   // Get a all users
   @ApiOperation({
     summary: 'Obtener todos los usuarios de un comercio en base a su ID',
   })
-  @ApiQuery({
+  @ApiParam({
     name: 'commerceId',
     type: Number,
     required: true,
     description: 'ID del comercio',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Get('all')
-  findAll(@Query() dto: FindUserDto) {
-    return this.findAllUsersUseCase.execute(dto.commerceId);
+  @Get('all/:commerceId')
+  findAll(@Param('commerceId', ParseIntPipe) commerceId: number) {
+    return this.findAllUsersUseCase.execute(commerceId);
   }
 
   // Update a user
