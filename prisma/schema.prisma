@@ -197,6 +197,8 @@ model UserWorkingOverride {
 // Commerce Working Pattern Models
 // =========================================
 
+//* Lo que hace es definir un horario de apertura y cierre por dia
+//* Se tiene un working pattern por cada dia de la semana
 model CommerceWorkingPattern {
   id               Int              @id @default(autoincrement())
   commerceId       Int
@@ -212,6 +214,7 @@ model CommerceWorkingPattern {
   @@map("commerce_working_patterns")
 }
 
+//* Esto define un horario especifico para un dia particular
 model CommerceWorkingOverride {
   id           Int          @id @default(autoincrement())
   commerceId   Int

@@ -7,3 +7,5 @@ export const USER_REPOSITORY = 'IUserRepository';
 export const USER_CONFIG_REPOSITORY = 'IUserConfigRepository';
 export const COMMERCE_CONFIG_REPOSITORY = 'ICommerceConfigRepository';
 export const USER_WORKING_PATTERN_REPOSITORY = 'IUserWorkingPatternRepository';
+export const COMMERCE_WORKING_PATTERN_REPOSITORY =
+  'ICommerceWorkingPatternRepository';

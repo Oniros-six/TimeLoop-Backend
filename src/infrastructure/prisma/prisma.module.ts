@@ -9,6 +9,7 @@ import { PrismaUserRepository } from './repositories/user.repository';
 import { PrismaUserConfigRepository } from './repositories/userConfig.repository';
 import { PrismaCommerceConfigRepository } from './repositories/commerceConfig.repository';
 import { PrismaUserWorkingPatternRepository } from './repositories/userWorkingPattern.repository';
+import { PrismaCommerceWorkingPatternRepository } from './repositories/commerceWorkingPattern.repository';
 
 @Global()
 @Module({
@@ -50,6 +51,10 @@ import { PrismaUserWorkingPatternRepository } from './repositories/userWorkingPa
       provide: 'IUserWorkingPatternRepository',
       useClass: PrismaUserWorkingPatternRepository,
     },
+    {
+      provide: 'ICommerceWorkingPatternRepository',
+      useClass: PrismaCommerceWorkingPatternRepository,
+    },
   ],
   exports: [
     'ICustomerRepository',
@@ -61,6 +66,7 @@ import { PrismaUserWorkingPatternRepository } from './repositories/userWorkingPa
     'IUserConfigRepository',
     'ICommerceConfigRepository',
     'IUserWorkingPatternRepository',
+    'ICommerceWorkingPatternRepository',
   ],
 })
 export class PrismaModule {}

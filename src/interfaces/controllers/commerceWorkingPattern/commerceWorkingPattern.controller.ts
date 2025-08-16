@@ -1,0 +1,69 @@
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Put,
+  UsePipes,
+  ValidationPipe,
+  ParseIntPipe,
+  Param,
+} from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+
+import { CreateCommerceWorkingPattern } from '@/application/use-cases/commerceWorkingPattern/create.use-case';
+import { UpdateCommerceWorkingPattern } from '@/application/use-cases/commerceWorkingPattern/update.use-case';
+import { FindAllCommerceWorkingPattern } from '@/application/use-cases/commerceWorkingPattern/findAll.use-case';
+
+import { CreateCommercePatternDto } from './dto/create-commercePattern.dto';
+import { UpdateCommercePatternDto } from './dto/update-commercePattern.dto';
+
+@ApiTags('Commerce Working Pattern')
+@Controller('commerce-working-pattern')
+export class CommerceWorkingPatternController {
+  constructor(
+    private readonly createCommerceWorkingPatternUseCase: CreateCommerceWorkingPattern,
+    private readonly updateCommerceWorkingPatternUseCase: UpdateCommerceWorkingPattern,
+    private readonly findAllCommerceWorkingPatternUseCase: FindAllCommerceWorkingPattern,
+  ) {}
+
+  @ApiOperation({ summary: 'Crear un patrón de trabajo para un comercio' })
+  @ApiBody({ type: CreateCommercePatternDto })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Post()
+  create(@Body() dto: CreateCommercePatternDto) {
+    return this.createCommerceWorkingPatternUseCase.execute(dto);
+  }
+
+  @ApiOperation({
+    summary: 'Obtener todos los patrones de trabajo de un comercio',
+  })
+  @ApiParam({
+    name: 'commerceId',
+    type: Number,
+    required: true,
+    description: 'ID del comercio',
+  })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Get(':commerceId')
+  findAll(@Param('commerceId', ParseIntPipe) commerceId: number) {
+    return this.findAllCommerceWorkingPatternUseCase.execute(commerceId);
+  }
+
+  @ApiOperation({ summary: 'Actualizar un patrón de trabajo de un comercio' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    required: true,
+    description: 'ID del patrón de trabajo',
+  })
+  @ApiBody({ type: UpdateCommercePatternDto })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Put(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCommercePatternDto,
+  ) {
+    return this.updateCommerceWorkingPatternUseCase.execute(id, dto);
+  }
+}
