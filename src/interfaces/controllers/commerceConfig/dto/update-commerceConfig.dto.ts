@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 
 export class UpdateCommerceConfigDto {
   @ApiProperty({
@@ -45,7 +51,7 @@ export class UpdateCommerceConfigDto {
   standardDurationMinutes?: number;
 
   @ApiProperty({
-    example: "Bienvenidos a ...",
+    example: 'Bienvenidos a ...',
     description: 'Mensaje de bienvenida en la pagina',
   })
   @IsString({ message: 'El welcomeMessage debe ser un string' })

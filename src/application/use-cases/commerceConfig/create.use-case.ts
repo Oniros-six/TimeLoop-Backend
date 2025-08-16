@@ -20,7 +20,7 @@ export class CreateCommerceConfig {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(commerceId: number, data: CreateCommerceConfigDto) {
     const commerce = await this.commerceRepository.findCommerce({
@@ -44,7 +44,9 @@ export class CreateCommerceConfig {
 
     try {
       const result =
-        await this.commerceConfigRepository.createCommerceConfig(commerceConfig);
+        await this.commerceConfigRepository.createCommerceConfig(
+          commerceConfig,
+        );
 
       if (result === null) {
         throw new HttpException(

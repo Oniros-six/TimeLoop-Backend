@@ -1,7 +1,9 @@
 import { CommerceConfig } from '../entities/commerceConfig.entity';
 
 export interface ICommerceConfigRepository {
-  findCommerceConfig(data: { commerceId: number }): Promise<CommerceConfig | null>;
+  findCommerceConfig(data: {
+    commerceId: number;
+  }): Promise<CommerceConfig | null>;
 
   createCommerceConfig(data: CommerceConfig): Promise<CommerceConfig | null>;
 

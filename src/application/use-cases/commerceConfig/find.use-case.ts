@@ -25,9 +25,10 @@ export class FindCommerceConfig {
       throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
     }
 
-    const commerceConfig = await this.commerceConfigRepository.findCommerceConfig({
-      commerceId: commerceId,
-    });
+    const commerceConfig =
+      await this.commerceConfigRepository.findCommerceConfig({
+        commerceId: commerceId,
+      });
 
     return {
       message: 'Configuración del comercio encontrada',

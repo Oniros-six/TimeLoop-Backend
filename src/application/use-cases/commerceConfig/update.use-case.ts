@@ -8,7 +8,6 @@ import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { CommerceConfig as CommerceConfigDomain } from '@/domain/entities/commerceConfig.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
-import { CreateCommerceConfigDto } from '@/interfaces/controllers/commerceConfig/dto/create-commerceConfig.dto';
 import { UpdateCommerceConfigDto } from '@/interfaces/controllers/commerceConfig/dto/update-commerceConfig.dto';
 
 @Injectable()
@@ -32,9 +31,10 @@ export class UpdateCommerceConfig {
       throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
     }
 
-    const commerceConfig = await this.commerceConfigRepository.findCommerceConfig({
-      commerceId,
-    });
+    const commerceConfig =
+      await this.commerceConfigRepository.findCommerceConfig({
+        commerceId,
+      });
 
     if (!commerceConfig) {
       throw new HttpException(
@@ -45,10 +45,12 @@ export class UpdateCommerceConfig {
 
     const updatedConfigData = CommerceConfigDomain.create({
       commerceId: commerceId,
-      standardDurationMinutes: data.standardDurationMinutes ?? commerceConfig.standardDurationMinutes,
+      standardDurationMinutes:
+        data.standardDurationMinutes ?? commerceConfig.standardDurationMinutes,
       allowCancel: data.allowCancel ?? commerceConfig.allowCancel,
       allowReschedule: data.allowReschedule ?? commerceConfig.allowReschedule,
-      allowNotifications: data.allowNotifications ?? commerceConfig.allowNotifications,
+      allowNotifications:
+        data.allowNotifications ?? commerceConfig.allowNotifications,
       openTime: data.openTime ?? commerceConfig.openTime,
       closeTime: data.closeTime ?? commerceConfig.closeTime,
       welcomeMessage: data.welcomeMessage ?? commerceConfig.welcomeMessage,
