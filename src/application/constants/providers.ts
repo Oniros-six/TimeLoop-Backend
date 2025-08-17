@@ -9,3 +9,5 @@ export const COMMERCE_CONFIG_REPOSITORY = 'ICommerceConfigRepository';
 export const USER_WORKING_PATTERN_REPOSITORY = 'IUserWorkingPatternRepository';
 export const COMMERCE_WORKING_PATTERN_REPOSITORY =
   'ICommerceWorkingPatternRepository';
+export const USER_WORKING_OVERRIDE_REPOSITORY =
+  'IUserWorkingOverrideRepository';
