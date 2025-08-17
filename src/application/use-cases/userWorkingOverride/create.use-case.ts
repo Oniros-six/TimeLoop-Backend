@@ -39,6 +39,18 @@ export class CreateUserWorkingOverride {
       throw new HttpException('El usuario no existe.', HttpStatus.NOT_FOUND);
     }
 
+    const existingOverride = await this.userWorkingOverrideRepository.verifyUserWorkingOverride({
+      userId: data.userId,
+      date: data.date
+    });
+    
+    if (existingOverride) {
+      throw new HttpException(
+        'Ya existe un override para este usuario en la fecha especificada.',
+        HttpStatus.CONFLICT
+      );
+    }
+
     const userWorkingOverride = UserWorkingOverrideDomain.create({
       userId: data.userId,
       date: data.date,
