@@ -1,4 +1,4 @@
-import { AvailabilityType  } from '@/domain/common/AvailabilityType';
+import { AvailabilityType } from '@/domain/common/AvailabilityType';
 
 export class CommerceWorkingPattern {
   constructor(

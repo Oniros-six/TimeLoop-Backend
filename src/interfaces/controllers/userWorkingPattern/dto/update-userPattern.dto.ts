@@ -10,14 +10,9 @@ export class UpdateUserPatternDto {
   })
   @Type(() => String)
   @IsString({ message: 'El rango horario debe ser una cadena de texto' })
-  @IsIn(
-    [
-      AvailabilityType.full,
-      AvailabilityType.half,
-      AvailabilityType.off,
-    ],
-    { message: 'El rango horario debe ser un rango válido' },
-  )
+  @IsIn([AvailabilityType.full, AvailabilityType.half, AvailabilityType.off], {
+    message: 'El rango horario debe ser un rango válido',
+  })
   availabilityType: AvailabilityType;
 
   @ApiProperty({

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ICommerceWorkingPatternRepository } from '@/domain/repositories/commerceWorkingPattern.repository';
 import { CommerceWorkingPattern as DomainClient } from '@/domain/entities/commerceWorkingPattern.entity';
-import { AvailabilityType  } from '@/domain/common/AvailabilityType';
+import { AvailabilityType } from '@/domain/common/AvailabilityType';
 
 @Injectable()
 export class PrismaCommerceWorkingPatternRepository

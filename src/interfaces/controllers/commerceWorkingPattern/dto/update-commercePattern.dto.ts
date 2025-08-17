@@ -1,4 +1,4 @@
-import { AvailabilityType  } from '@/domain/common/AvailabilityType';
+import { AvailabilityType } from '@/domain/common/AvailabilityType';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsIn, IsString, IsOptional, IsMilitaryTime } from 'class-validator';
@@ -10,14 +10,9 @@ export class UpdateCommercePatternDto {
   })
   @Type(() => String)
   @IsString({ message: 'El rango horario debe ser una cadena de texto' })
-  @IsIn(
-    [
-      AvailabilityType.full,
-      AvailabilityType.half,
-      AvailabilityType.off,
-    ],
-    { message: 'El rango horario debe ser un rango válido' },
-  )
+  @IsIn([AvailabilityType.full, AvailabilityType.half, AvailabilityType.off], {
+    message: 'El rango horario debe ser un rango válido',
+  })
   availabilityType: AvailabilityType;
 
   @ApiProperty({
