@@ -1,24 +1,24 @@
-import { UserAvailabilityType } from '@/domain/common/UserAvailabilityType';
+import { AvailabilityType } from '@/domain/common/AvailabilityType';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsIn, IsString, IsOptional, IsMilitaryTime } from 'class-validator';
 
 export class UpdateUserPatternDto {
   @ApiProperty({
-    example: 'workFull',
+    example: 'full',
     description: 'Rango horario trabajado',
   })
   @Type(() => String)
   @IsString({ message: 'El rango horario debe ser una cadena de texto' })
   @IsIn(
     [
-      UserAvailabilityType.workFull,
-      UserAvailabilityType.workHalf,
-      UserAvailabilityType.off,
+      AvailabilityType.full,
+      AvailabilityType.half,
+      AvailabilityType.off,
     ],
     { message: 'El rango horario debe ser un rango válido' },
   )
-  availabilityType: UserAvailabilityType;
+  availabilityType: AvailabilityType;
 
   @ApiProperty({
     example: '09:00',

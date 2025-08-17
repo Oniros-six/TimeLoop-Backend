@@ -24,27 +24,9 @@ enum BusinessCategory {
 
 
 enum AvailabilityType {
-  openFull
-  openHalf
-  closed
-}
-
-enum OverrideType {
-  forceOpen
-  customHours
-  forceClose
-}
-
-enum UserAvailabilityType {
-  workFull
-  workHalf
+  full
+  half
   off
-}
-
-enum UserOverrideType {
-  forceOnFull
-  customHours
-  forceOff
 }
 
 // =========================================
@@ -167,7 +149,7 @@ model UserWorkingPattern {
   id               Int                  @id @default(autoincrement())
   userId           Int
   weekday          Int
-  availabilityType UserAvailabilityType
+  availabilityType AvailabilityType
   morningStart     DateTime?
   morningEnd       DateTime?
   afternoonStart   DateTime?
@@ -183,9 +165,11 @@ model UserWorkingOverride {
   id           Int              @id @default(autoincrement())
   userId       Int
   date         DateTime
-  overrideType UserOverrideType
-  customStart  DateTime
-  customEnd    DateTime
+  overrideType AvailabilityType
+  morningStart     DateTime?
+  morningEnd       DateTime?
+  afternoonStart   DateTime?
+  afternoonEnd     DateTime?
   notes        String
 
   user User @relation(fields: [userId], references: [id], name: "UserOverridePatterns")
@@ -219,9 +203,11 @@ model CommerceWorkingOverride {
   id           Int          @id @default(autoincrement())
   commerceId   Int
   date         DateTime
-  overrideType OverrideType
-  customStart  DateTime
-  customEnd    DateTime
+  overrideType AvailabilityType
+  morningStart     DateTime?
+  morningEnd       DateTime?
+  afternoonStart   DateTime?
+  afternoonEnd     DateTime?
   notes        String
 
   commerce Commerce @relation(fields: [commerceId], references: [id], name: "CommerceOverridePatterns")

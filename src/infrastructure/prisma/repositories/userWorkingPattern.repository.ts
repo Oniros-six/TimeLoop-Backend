@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IUserWorkingPatternRepository } from '@/domain/repositories/userWorkingPattern.repository';
 import { UserWorkingPattern as DomainClient } from '@/domain/entities/userWorkingPattern.entity';
-import { UserAvailabilityType } from '@/domain/common/UserAvailabilityType';
+import { AvailabilityType } from '@/domain/common/AvailabilityType';
 
 @Injectable()
 export class PrismaUserWorkingPatternRepository
@@ -14,7 +14,7 @@ export class PrismaUserWorkingPatternRepository
     id: number;
     userId: number;
     weekday: number;
-    availabilityType: UserAvailabilityType;
+    availabilityType: AvailabilityType;
     morningStart: Date | null;
     morningEnd: Date | null;
     afternoonStart: Date | null;

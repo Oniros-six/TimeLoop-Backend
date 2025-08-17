@@ -1,24 +1,24 @@
-import { AvailabilityType as CommerceAvailabilityType } from '@/domain/common/CommerceAvailabilityType';
+import { AvailabilityType  } from '@/domain/common/AvailabilityType';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsIn, IsString, IsOptional, IsMilitaryTime } from 'class-validator';
 
 export class UpdateCommercePatternDto {
   @ApiProperty({
-    example: 'openFull',
+    example: 'full',
     description: 'Rango horario abierto',
   })
   @Type(() => String)
   @IsString({ message: 'El rango horario debe ser una cadena de texto' })
   @IsIn(
     [
-      CommerceAvailabilityType.openFull,
-      CommerceAvailabilityType.openHalf,
-      CommerceAvailabilityType.closed,
+      AvailabilityType.full,
+      AvailabilityType.half,
+      AvailabilityType.off,
     ],
     { message: 'El rango horario debe ser un rango válido' },
   )
-  availabilityType: CommerceAvailabilityType;
+  availabilityType: AvailabilityType;
 
   @ApiProperty({
     example: '09:00',

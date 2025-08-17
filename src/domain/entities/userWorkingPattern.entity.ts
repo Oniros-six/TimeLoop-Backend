@@ -1,11 +1,11 @@
-import { UserAvailabilityType } from '@/domain/common/UserAvailabilityType';
+import { AvailabilityType } from '@/domain/common/AvailabilityType';
 
 export class UserWorkingPattern {
   constructor(
     public readonly id: number,
     public readonly userId: number,
     public readonly weekday: number,
-    public readonly availabilityType: UserAvailabilityType,
+    public readonly availabilityType: AvailabilityType,
     public readonly morningStart: Date | null,
     public readonly morningEnd: Date | null,
     public readonly afternoonStart: Date | null,
@@ -16,7 +16,7 @@ export class UserWorkingPattern {
   static create(props: {
     userId: number;
     weekday: number;
-    availabilityType: UserAvailabilityType;
+    availabilityType: AvailabilityType;
     morningStart: Date | null;
     morningEnd: Date | null;
     afternoonStart: Date | null;
@@ -32,36 +32,36 @@ export class UserWorkingPattern {
 
     if (
       !props.availabilityType ||
-      (props.availabilityType !== UserAvailabilityType.workFull &&
-        props.availabilityType !== UserAvailabilityType.off &&
-        props.availabilityType !== UserAvailabilityType.workHalf)
+      (props.availabilityType !== AvailabilityType.full &&
+        props.availabilityType !== AvailabilityType.off &&
+        props.availabilityType !== AvailabilityType.half)
     ) {
       throw new Error(
-        'El valor de availabilityType debe ser workFull, off o workHalf.',
+        'El valor de availabilityType debe ser full, off o half.',
       );
     }
 
     if (
-      props.availabilityType === UserAvailabilityType.workFull &&
+      props.availabilityType === AvailabilityType.full &&
       (!props.morningStart ||
         !props.morningEnd ||
         !props.afternoonStart ||
         !props.afternoonEnd)
     ) {
       throw new Error(
-        'La hora de inicio y fin de la mañana y la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es workFull.',
+        'La hora de inicio y fin de la mañana y la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es full.',
       );
     }
 
     if (
-      props.availabilityType === UserAvailabilityType.workHalf &&
+      props.availabilityType === AvailabilityType.half &&
       (!props.morningStart ||
         !props.morningEnd ||
         !props.afternoonStart ||
         !props.afternoonEnd)
     ) {
       throw new Error(
-        'La hora de inicio y fin de la mañana o la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es workHalf.',
+        'La hora de inicio y fin de la mañana o la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es half.',
       );
     }
 

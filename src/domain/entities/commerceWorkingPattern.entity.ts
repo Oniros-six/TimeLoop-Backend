@@ -1,11 +1,11 @@
-import { AvailabilityType as CommerceAvailabilityType } from '@/domain/common/CommerceAvailabilityType';
+import { AvailabilityType  } from '@/domain/common/AvailabilityType';
 
 export class CommerceWorkingPattern {
   constructor(
     public readonly id: number,
     public readonly commerceId: number,
     public readonly weekday: number,
-    public readonly availabilityType: CommerceAvailabilityType,
+    public readonly availabilityType: AvailabilityType,
     public readonly morningStart: Date | null,
     public readonly morningEnd: Date | null,
     public readonly afternoonStart: Date | null,
@@ -16,7 +16,7 @@ export class CommerceWorkingPattern {
   static create(props: {
     commerceId: number;
     weekday: number;
-    availabilityType: CommerceAvailabilityType;
+    availabilityType: AvailabilityType;
     morningStart: Date | null;
     morningEnd: Date | null;
     afternoonStart: Date | null;
@@ -32,36 +32,36 @@ export class CommerceWorkingPattern {
 
     if (
       !props.availabilityType ||
-      (props.availabilityType !== CommerceAvailabilityType.openFull &&
-        props.availabilityType !== CommerceAvailabilityType.closed &&
-        props.availabilityType !== CommerceAvailabilityType.openHalf)
+      (props.availabilityType !== AvailabilityType.full &&
+        props.availabilityType !== AvailabilityType.off &&
+        props.availabilityType !== AvailabilityType.half)
     ) {
       throw new Error(
-        'El valor de availabilityType debe ser openFull, closed o openHalf.',
+        'El valor de availabilityType debe ser full, off o half.',
       );
     }
 
     if (
-      props.availabilityType === CommerceAvailabilityType.openFull &&
+      props.availabilityType === AvailabilityType.full &&
       (!props.morningStart ||
         !props.morningEnd ||
         !props.afternoonStart ||
         !props.afternoonEnd)
     ) {
       throw new Error(
-        'La hora de inicio y fin de la mañana y la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es openFull.',
+        'La hora de inicio y fin de la mañana y la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es full.',
       );
     }
 
     if (
-      props.availabilityType === CommerceAvailabilityType.openHalf &&
+      props.availabilityType === AvailabilityType.half &&
       (!props.morningStart ||
         !props.morningEnd ||
         !props.afternoonStart ||
         !props.afternoonEnd)
     ) {
       throw new Error(
-        'La hora de inicio y fin de la mañana o la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es openHalf.',
+        'La hora de inicio y fin de la mañana o la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es half.',
       );
     }
 
