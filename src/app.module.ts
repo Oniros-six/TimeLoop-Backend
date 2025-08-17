@@ -12,6 +12,7 @@ import { CommerceConfigModule } from './interfaces/controllers/commerceConfig/co
 import { UserWorkingPatternModule } from './interfaces/controllers/userWorkingPattern/userWorkingPattern.module';
 import { CommerceWorkingPatternModule } from './interfaces/controllers/commerceWorkingPattern/commerceWorkingPattern.module';
 import { UserWorkingOverrideModule } from './interfaces/controllers/userWorkingOverride/userWorkingOverride.module';
+import { CommerceWorkingOverrideModule } from './interfaces/controllers/commerceWorkingOverride/commerceWorkingOverride.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UserWorkingOverrideModule } from './interfaces/controllers/userWorkingO
     UserWorkingPatternModule,
     CommerceWorkingPatternModule,
     UserWorkingOverrideModule,
+    CommerceWorkingOverrideModule,
   ],
 })
 export class AppModule {}

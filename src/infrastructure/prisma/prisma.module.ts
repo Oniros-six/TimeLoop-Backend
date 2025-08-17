@@ -11,6 +11,7 @@ import { PrismaCommerceConfigRepository } from './repositories/commerceConfig.re
 import { PrismaUserWorkingPatternRepository } from './repositories/userWorkingPattern.repository';
 import { PrismaCommerceWorkingPatternRepository } from './repositories/commerceWorkingPattern.repository';
 import { PrismaUserWorkingOverrideRepository } from './repositories/userWorkingOverride.repository';
+import { PrismaCommerceWorkingOverrideRepository } from './repositories/commerceWorkingOverride.repository';
 
 @Global()
 @Module({
@@ -60,6 +61,10 @@ import { PrismaUserWorkingOverrideRepository } from './repositories/userWorkingO
       provide: 'IUserWorkingOverrideRepository',
       useClass: PrismaUserWorkingOverrideRepository,
     },
+    {
+      provide: 'ICommerceWorkingOverrideRepository',
+      useClass: PrismaCommerceWorkingOverrideRepository,
+    },
   ],
   exports: [
     'ICustomerRepository',
@@ -73,6 +78,7 @@ import { PrismaUserWorkingOverrideRepository } from './repositories/userWorkingO
     'IUserWorkingPatternRepository',
     'ICommerceWorkingPatternRepository',
     'IUserWorkingOverrideRepository',
+    'ICommerceWorkingOverrideRepository',
   ],
 })
 export class PrismaModule {}

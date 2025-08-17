@@ -11,3 +11,5 @@ export const COMMERCE_WORKING_PATTERN_REPOSITORY =
   'ICommerceWorkingPatternRepository';
 export const USER_WORKING_OVERRIDE_REPOSITORY =
   'IUserWorkingOverrideRepository';
+export const COMMERCE_WORKING_OVERRIDE_REPOSITORY =
+  'ICommerceWorkingOverrideRepository';
