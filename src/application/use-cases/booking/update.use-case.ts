@@ -7,6 +7,9 @@ import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { BOOKING_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { BookingRescheduledEvent } from '@/domain/common/booking.events';
+import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
 
 @Injectable()
 export class UpdateBooking {
@@ -15,6 +18,7 @@ export class UpdateBooking {
     private readonly bookingRepository: IBookingRepository,
 
     private readonly activityLogService: ActivityLogService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(id: number, newData: UpdateBookingDto) {
@@ -35,12 +39,16 @@ export class UpdateBooking {
     }
 
     const dataToUpdate: BookingUpdateData = {};
+    let isRescheduled = false;
+    let newBookingDate: Date | undefined;
 
     // Use Value Object to validate the date, if one is provided
     if (date) {
       try {
         const bookingDate = new BookingDate(date);
-        dataToUpdate.date = bookingDate.value;
+        newBookingDate = bookingDate.value;
+        dataToUpdate.date = newBookingDate;
+        isRescheduled = true;
       } catch (err: unknown) {
         const message =
           err instanceof Error ? err.message : 'Error desconocido';
@@ -98,10 +106,16 @@ export class UpdateBooking {
         detail: `Se actualizaron los campos: ${updatedFields}.`,
       });
 
-      //TODO At this point we send notifications to the owner and verification to the customer (depending on commerce config)
+      // Si la reserva fue reprogramada, emitir evento
+      if (isRescheduled && newBookingDate) {
+        this.eventEmitter.emit(
+          BOOKING_EVENTS.RESCHEDULED,
+          new BookingRescheduledEvent(result, newBookingDate),
+        );
+      }
 
       return {
-        message: 'Reserva actualizada con exito',
+        message: 'Reserva actualizada exitosamente',
         statusCode: HttpStatus.OK,
         data: result,
       };

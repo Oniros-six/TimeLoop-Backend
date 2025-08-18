@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BookingController } from './booking.controller';
 import { PrismaModule } from '@/infrastructure/prisma/prisma.module';
+import { NotificationModule } from '@/domain/services/notifications/notifications.module';
 
 // Use cases
 import { CreateBooking } from '@/application/use-cases/booking/create.use-case';
@@ -21,7 +22,7 @@ import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/bo
 import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/services.repository';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, NotificationModule],
   controllers: [BookingController],
   providers: [
     {

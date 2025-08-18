@@ -39,18 +39,21 @@ export class CreateCommerceWorkingOverride {
       throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
     }
 
-    const existingOverride = await this.commerceWorkingOverrideRepository.verifyCommerceWorkingOverride({
-      commerceId: data.commerceId,
-      date: data.date
-    });
-    
+    const existingOverride =
+      await this.commerceWorkingOverrideRepository.verifyCommerceWorkingOverride(
+        {
+          commerceId: data.commerceId,
+          date: data.date,
+        },
+      );
+
     if (existingOverride) {
       throw new HttpException(
         'Ya existe un override para este comercio en la fecha especificada.',
-        HttpStatus.CONFLICT
+        HttpStatus.CONFLICT,
       );
     }
-    
+
     const commerceWorkingOverride = CommerceWorkingOverrideDomain.create({
       commerceId: data.commerceId,
       date: data.date,

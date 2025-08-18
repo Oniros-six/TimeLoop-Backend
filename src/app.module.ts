@@ -13,6 +13,8 @@ import { UserWorkingPatternModule } from './interfaces/controllers/userWorkingPa
 import { CommerceWorkingPatternModule } from './interfaces/controllers/commerceWorkingPattern/commerceWorkingPattern.module';
 import { UserWorkingOverrideModule } from './interfaces/controllers/userWorkingOverride/userWorkingOverride.module';
 import { CommerceWorkingOverrideModule } from './interfaces/controllers/commerceWorkingOverride/commerceWorkingOverride.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { NotificationModule } from './domain/services/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { CommerceWorkingOverrideModule } from './interfaces/controllers/commerce
       isGlobal: true,
       envFilePath: '.env',
     }),
+    EventEmitterModule.forRoot(),
     PrismaModule,
     UserModule,
     CustomerModule,
@@ -33,6 +36,7 @@ import { CommerceWorkingOverrideModule } from './interfaces/controllers/commerce
     CommerceWorkingPatternModule,
     UserWorkingOverrideModule,
     CommerceWorkingOverrideModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

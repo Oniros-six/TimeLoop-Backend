@@ -11,6 +11,9 @@ import {
 } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { BookingCreatedEvent } from '@/domain/common/booking.events';
+import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
 
 @Injectable()
 export class CreateBooking {
@@ -22,6 +25,8 @@ export class CreateBooking {
     private readonly serviceRepository: IServiceRepository,
 
     private readonly activityLogService: ActivityLogService,
+
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async execute(data: CreateBookingDto) {
@@ -99,7 +104,10 @@ export class CreateBooking {
         detail: `Se crea una nueva reserva`,
       });
 
-      //TODO At this point we send notifications to the owner and verification to the client (depending on commerce config)
+      this.eventEmitter.emit(
+        BOOKING_EVENTS.CREATED,
+        new BookingCreatedEvent(result),
+      );
 
       return {
         message: 'Su reserva ha sido agendada con éxito.',

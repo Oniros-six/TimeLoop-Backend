@@ -4,6 +4,9 @@ import { CancelBookingDto } from '@/interfaces/controllers/booking/dto/cancel-bo
 import { BOOKING_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { BookingCancelledEvent } from '@/domain/common/booking.events';
+import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
 
 @Injectable()
 export class CancelBooking {
@@ -12,6 +15,8 @@ export class CancelBooking {
     private readonly bookingRepository: IBookingRepository,
 
     private readonly activityLogService: ActivityLogService,
+
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(id: number, data: CancelBookingDto) {
@@ -57,10 +62,14 @@ export class CancelBooking {
         detail: `Se cancela la reserva`,
       });
 
-      //TODO At this point we send notifications to the owner and verification to the customer (depending on commerce config)
+      // Emitir evento de cancelación
+      this.eventEmitter.emit(
+        BOOKING_EVENTS.CANCELLED,
+        new BookingCancelledEvent(result),
+      );
 
       return {
-        message: 'Reserva cancelada con exito',
+        message: 'La reserva ha sido cancelada exitosamente.',
         statusCode: HttpStatus.OK,
         data: result,
       };
