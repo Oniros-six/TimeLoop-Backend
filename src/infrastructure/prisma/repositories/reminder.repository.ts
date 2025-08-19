@@ -27,7 +27,7 @@ export class PrismaReminderRepository implements IReminderRepository {
     );
   }
 
-  async create(reminder: DomainClient): Promise<DomainClient | null> {
+  async create(reminder: DomainClient): Promise<null> {
     const result = await this.prisma.reminder.create({
       data: reminder,
     });

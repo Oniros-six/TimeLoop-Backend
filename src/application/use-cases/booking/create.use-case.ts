@@ -1,19 +1,22 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { IBookingRepository } from '@/domain/repositories/booking.repository';
-import { IServiceRepository } from '@/domain/repositories/services.repository';
-import { BookingDate } from '@/domain/value-objects/booking/booking-date.vo';
-import { BookingTime } from '@/domain/value-objects/booking/booking-time.vo';
-import { CreateBookingDto } from '@/interfaces/controllers/booking/dto/create-booking.dto';
-import { Booking } from '@/domain/entities/booking.entity';
+import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 import {
   BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
 } from '@/application/constants/providers';
-import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
+import { ReminderChannel, ReminderStatus } from '@/domain/common/ReminderConstants';
+import { Booking } from '@/domain/entities/booking.entity';
+import { Reminder } from '@/domain/entities/reminder.entity';
+import { IBookingRepository } from '@/domain/repositories/booking.repository';
+import { IServiceRepository } from '@/domain/repositories/services.repository';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
+import { RemindersService } from '@/domain/services/reminders/reminders.service';
+import { BookingDate } from '@/domain/value-objects/booking/booking-date.vo';
+import { BookingTime } from '@/domain/value-objects/booking/booking-time.vo';
+import { CreateBookingDto } from '@/interfaces/controllers/booking/dto/create-booking.dto';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CreateBooking {
@@ -26,8 +29,10 @@ export class CreateBooking {
 
     private readonly activityLogService: ActivityLogService,
 
+    private readonly remindersService: RemindersService,
+
     private eventEmitter: EventEmitter2,
-  ) {}
+  ) { }
 
   async execute(data: CreateBookingDto) {
     try {
@@ -104,6 +109,22 @@ export class CreateBooking {
         detail: `Se crea una nueva reserva`,
       });
 
+      // Reminder creation
+      const scheduledAt = new Date(bookingDate.value.getTime() + startTime.value.getTime());
+
+      //TODO en un futuro agregar un parametro extra, para definir en este momento como pretende recibir el recordatorio el cliente
+      const reminder = Reminder.create({
+        bookingId: result.id,
+        customerId: result.customerId,
+        commerceId: result.commerceId,
+        scheduledAt: scheduledAt,
+        sentAt: null,
+        channel: ReminderChannel.email,
+        status: ReminderStatus.pending,
+      });
+      await this.remindersService.create(reminder);
+
+      // Creation event emitter
       this.eventEmitter.emit(
         BOOKING_EVENTS.CREATED,
         new BookingCreatedEvent(result),

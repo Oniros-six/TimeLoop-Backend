@@ -14,7 +14,7 @@ import {
 } from '@/application/constants/providers';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';
-import { IReminderRepository } from '@/domain/repositories/reminder.repository';
+import { RemindersService } from '../reminders/reminders.service';
 
 export const BOOKING_EVENTS = {
   CREATED: 'booking.created',
@@ -39,7 +39,7 @@ export class NotificationService {
     @Inject(COMMERCE_REPOSITORY)
     private readonly commerceRepository: ICommerceRepository,
     @Inject(REMINDER_REPOSITORY)
-    private readonly reminderRepository: IReminderRepository,
+    private readonly remindersService: RemindersService,
   ) {}
 
   @OnEvent(BOOKING_EVENTS.CREATED)
@@ -138,7 +138,7 @@ export class NotificationService {
 
       if (result) {
         this.logger.log(`Email sent: ${data.customerEmail}`);
-        await this.reminderRepository.update(data.id);
+        await this.remindersService.update(data.id);
       }
     }
 

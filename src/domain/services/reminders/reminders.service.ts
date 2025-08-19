@@ -1,12 +1,12 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { NotificationService } from '@/domain/services/notifications/notifications.service';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 import { REMINDER_REPOSITORY } from '@/application/constants/providers';
+import { Reminder } from '@/domain/entities/reminder.entity';
 
 @Injectable()
 export class RemindersService {
-  private readonly logger = new Logger(RemindersService.name);
 
   constructor(
     private notifications: NotificationService,
@@ -16,7 +16,6 @@ export class RemindersService {
 
   @Cron(process.env.REMINDERS_SCHEDULE || '*/30 * * * *') // cada 30 min
   async handleReminders() {
-    this.logger.log('Checking for upcoming bookings...');
 
     //establecemos la ventana
     const now = new Date();
@@ -30,5 +29,13 @@ export class RemindersService {
     for (const reminder of reminders) {
       await this.notifications.notifyBookingReminder(reminder);
     }
+  }
+
+  async create(reminder: Reminder) {
+    return this.reminderRepository.create(reminder);
+  }
+
+  async update(reminderId: number) {
+    return this.reminderRepository.update(reminderId);
   }
 }
