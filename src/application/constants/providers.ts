@@ -13,4 +13,5 @@ export const USER_WORKING_OVERRIDE_REPOSITORY =
   'IUserWorkingOverrideRepository';
 export const COMMERCE_WORKING_OVERRIDE_REPOSITORY =
   'ICommerceWorkingOverrideRepository';
+export const REMINDER_REPOSITORY = 'IReminderRepository';
 export const RESEND_PROVIDER = 'RESEND_PROVIDER';

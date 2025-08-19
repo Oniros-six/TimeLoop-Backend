@@ -12,7 +12,7 @@ export class ResendNotificationProvider implements INotificationProvider {
 
   async sendEmail(to: string, subject: string, body: string) {
     try {
-      await this.resend.emails.send({
+      const result = await this.resend.emails.send({
         from: process.env.FROM_EMAIL!,
         to,
         subject,
@@ -20,6 +20,7 @@ export class ResendNotificationProvider implements INotificationProvider {
         text: body,
       });
       this.logger.log(`Email sent: ${subject} → ${to}`);
+      return result;
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Failed to send email: ${msg}`);
@@ -27,8 +28,7 @@ export class ResendNotificationProvider implements INotificationProvider {
     }
   }
 
-  async sendWhatsApp(to: string, message: string) {
-    // todavía no implementado
-    this.logger.warn(`WhatsApp not implemented: ${to}`);
+  sendWhatsApp(to: string, message: string): Promise<void> {
+    throw new Error('Method not implemented. ', { cause: { to, message } });
   }
 }

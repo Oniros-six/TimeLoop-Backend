@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { Booking } from '@/domain/entities/booking.entity';
 import { NotificationService } from '../notifications.service';
@@ -12,7 +13,12 @@ import { BookingStatus } from '@/domain/value-objects/booking/booking-status.vo'
 import { INotificationProvider } from '../notification-provider.interface';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { Commerce } from '@/domain/entities/commerce.entity';
-import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
+import {
+  COMMERCE_REPOSITORY,
+  REMINDER_REPOSITORY,
+} from '@/application/constants/providers';
+import { BusinessCategory } from '@/domain/common/BusinessCategory';
+import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 
 describe('NotificationService', () => {
   let service: NotificationService;
@@ -39,8 +45,8 @@ describe('NotificationService', () => {
     'test@commerce.com',
     '123456789',
     'Test Address',
-    'RESTAURANT' as any,
-    true
+    BusinessCategory.Peluqueria,
+    true,
   );
 
   beforeEach(async () => {
@@ -52,7 +58,12 @@ describe('NotificationService', () => {
 
     mockCommerceRepository = {
       findCommerce: jest.fn().mockResolvedValue(mockCommerce),
-    } as any;
+      suspendCommerce: jest.fn(),
+      reinstateCommerce: jest.fn(),
+      createCommerce: jest.fn(),
+      updateCommerce: jest.fn(),
+      findCommerceByName: jest.fn(),
+    } as jest.Mocked<ICommerceRepository>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -64,6 +75,14 @@ describe('NotificationService', () => {
         {
           provide: COMMERCE_REPOSITORY,
           useValue: mockCommerceRepository,
+        },
+        {
+          provide: REMINDER_REPOSITORY,
+          useValue: {
+            create: jest.fn(),
+            update: jest.fn(),
+            findMany: jest.fn(),
+          } as jest.Mocked<IReminderRepository>,
         },
       ],
     }).compile();
@@ -124,11 +143,13 @@ describe('NotificationService', () => {
       expect(loggerSpy).toHaveBeenCalledWith(
         expect.stringContaining(`Notifying booking created: ${mockBooking.id}`),
       );
-      expect(mockCommerceRepository.findCommerce).toHaveBeenCalledWith({ commerceId: mockBooking.commerceId });
+      expect(mockCommerceRepository.findCommerce).toHaveBeenCalledWith({
+        commerceId: mockBooking.commerceId,
+      });
       expect(mockNotificationProvider.sendEmail).toHaveBeenCalledWith(
         mockCommerce.email,
         'Nueva reserva',
-        expect.stringContaining('Se ha creado una reserva')
+        expect.stringContaining('Se ha creado una reserva'),
       );
     });
 
@@ -142,11 +163,13 @@ describe('NotificationService', () => {
           `Notifying booking cancelled: ${mockBooking.id}`,
         ),
       );
-      expect(mockCommerceRepository.findCommerce).toHaveBeenCalledWith({ commerceId: mockBooking.commerceId });
+      expect(mockCommerceRepository.findCommerce).toHaveBeenCalledWith({
+        commerceId: mockBooking.commerceId,
+      });
       expect(mockNotificationProvider.sendEmail).toHaveBeenCalledWith(
         mockCommerce.email,
         'Reserva cancelada',
-        expect.stringContaining('Se ha cancelado una reserva')
+        expect.stringContaining('Se ha cancelado una reserva'),
       );
     });
 
@@ -161,18 +184,22 @@ describe('NotificationService', () => {
           `Notifying booking rescheduled: ${mockBooking.id} to ${newDate.toISOString()}`,
         ),
       );
-      expect(mockCommerceRepository.findCommerce).toHaveBeenCalledWith({ commerceId: mockBooking.commerceId });
+      expect(mockCommerceRepository.findCommerce).toHaveBeenCalledWith({
+        commerceId: mockBooking.commerceId,
+      });
       expect(mockNotificationProvider.sendEmail).toHaveBeenCalledWith(
         mockCommerce.email,
         'Reserva reprogramada',
-        expect.stringContaining('Se ha reprogramado una reserva')
+        expect.stringContaining('Se ha reprogramado una reserva'),
       );
     });
 
     it('debería lanzar error si no encuentra el commerce', async () => {
       mockCommerceRepository.findCommerce.mockResolvedValue(null);
 
-      await expect(service.notifyBookingCreated(mockBooking)).rejects.toThrow('Commerce not found');
+      await expect(service.notifyBookingCreated(mockBooking)).rejects.toThrow(
+        'Commerce not found',
+      );
     });
   });
 
@@ -189,11 +216,15 @@ describe('NotificationService', () => {
       const event = new BookingCreatedEvent(mockBooking);
 
       // El manejador de eventos debe capturar el error y no re-lanzarlo
-      await expect(service.handleBookingCreated(event)).resolves.toBeUndefined();
+      await expect(
+        service.handleBookingCreated(event),
+      ).resolves.toBeUndefined();
 
       // Verificar que se registró el error
       expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to handle BookingCreatedEvent for booking'),
+        expect.stringContaining(
+          'Failed to handle BookingCreatedEvent for booking',
+        ),
         expect.anything(),
       );
     });
@@ -205,16 +236,22 @@ describe('NotificationService', () => {
         .mockImplementation(() => {});
 
       // Mock para que falle el método notifyBookingCancelled
-      jest.spyOn(service, 'notifyBookingCancelled').mockRejectedValueOnce(error);
+      jest
+        .spyOn(service, 'notifyBookingCancelled')
+        .mockRejectedValueOnce(error);
 
       const event = new BookingCancelledEvent(mockBooking);
 
       // El manejador de eventos debe capturar el error y no re-lanzarlo
-      await expect(service.handleBookingCancelled(event)).resolves.toBeUndefined();
+      await expect(
+        service.handleBookingCancelled(event),
+      ).resolves.toBeUndefined();
 
       // Verificar que se registró el error
       expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to handle BookingCancelledEvent for booking'),
+        expect.stringContaining(
+          'Failed to handle BookingCancelledEvent for booking',
+        ),
         expect.anything(),
       );
     });
@@ -226,16 +263,22 @@ describe('NotificationService', () => {
         .mockImplementation(() => {});
 
       // Mock para que falle el método notifyBookingRescheduled
-      jest.spyOn(service, 'notifyBookingRescheduled').mockRejectedValueOnce(error);
+      jest
+        .spyOn(service, 'notifyBookingRescheduled')
+        .mockRejectedValueOnce(error);
 
       const event = new BookingRescheduledEvent(mockBooking, new Date());
 
       // El manejador de eventos debe capturar el error y no re-lanzarlo
-      await expect(service.handleBookingRescheduled(event)).resolves.toBeUndefined();
+      await expect(
+        service.handleBookingRescheduled(event),
+      ).resolves.toBeUndefined();
 
       // Verificar que se registró el error
       expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to handle BookingRescheduledEvent for booking'),
+        expect.stringContaining(
+          'Failed to handle BookingRescheduledEvent for booking',
+        ),
         expect.anything(),
       );
     });

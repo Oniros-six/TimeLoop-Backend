@@ -15,6 +15,7 @@ import { UserWorkingOverrideModule } from './interfaces/controllers/userWorkingO
 import { CommerceWorkingOverrideModule } from './interfaces/controllers/commerceWorkingOverride/commerceWorkingOverride.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './domain/services/notifications/notifications.module';
+import { RemindersModule } from './domain/services/reminders/reminders.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { NotificationModule } from './domain/services/notifications/notification
     UserWorkingOverrideModule,
     CommerceWorkingOverrideModule,
     NotificationModule,
+    RemindersModule,
   ],
 })
 export class AppModule {}

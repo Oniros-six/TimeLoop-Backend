@@ -23,7 +23,9 @@ describe('NotificationModule', () => {
     }).compile();
 
     notificationService = module.get<NotificationService>(NotificationService);
-    notificationProvider = module.get<INotificationProvider>('INotificationProvider');
+    notificationProvider = module.get<INotificationProvider>(
+      'INotificationProvider',
+    );
     prismaService = module.get<PrismaService>(PrismaService);
     commerceRepository = module.get<ICommerceRepository>(COMMERCE_REPOSITORY);
   });
@@ -42,7 +44,9 @@ describe('NotificationModule', () => {
     expect(notificationService).toBeDefined();
     expect(typeof notificationService.notifyBookingCreated).toBe('function');
     expect(typeof notificationService.notifyBookingCancelled).toBe('function');
-    expect(typeof notificationService.notifyBookingRescheduled).toBe('function');
+    expect(typeof notificationService.notifyBookingRescheduled).toBe(
+      'function',
+    );
   });
 
   it('debería proporcionar INotificationProvider', () => {
@@ -62,7 +66,8 @@ describe('NotificationModule', () => {
   });
 
   it('debería exportar NotificationService', () => {
-    const exportedService = module.get<NotificationService>(NotificationService);
+    const exportedService =
+      module.get<NotificationService>(NotificationService);
     expect(exportedService).toBeDefined();
   });
 

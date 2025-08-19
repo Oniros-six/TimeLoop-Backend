@@ -22,11 +22,22 @@ enum BusinessCategory {
   Otros
 }
 
-
 enum AvailabilityType {
   full
   half
   off
+}
+
+enum ReminderChannel {
+  email
+  whatsapp
+  sms
+}
+
+enum ReminderStatus {
+  pending
+  sent
+  failed
 }
 
 // =========================================
@@ -45,6 +56,7 @@ model Commerce {
   users            User[]                    @relation("CommerceUsers")
   customers        Customer[]                @relation("CommerceCustomers")
   bookings         Booking[]                 @relation("CommerceBookings")
+  reminders        Reminder[]                @relation("CommerceReminders")
   services         Service[]                 @relation("CommerceServices")
   workingPatterns  CommerceWorkingPattern[]  @relation("CommerceWorkingPatterns")
   overridePatterns CommerceWorkingOverride[] @relation("CommerceOverridePatterns")
@@ -62,9 +74,10 @@ model Customer {
   internalNote String
   commerceId   Int
 
-  commerce Commerce      @relation("CommerceCustomers", fields: [commerceId], references: [id])
-  bookings Booking[]     @relation("CustomerBookings")
-  logs     ActivityLog[] @relation("CustomerLogs")
+  commerce  Commerce      @relation("CommerceCustomers", fields: [commerceId], references: [id])
+  bookings  Booking[]     @relation("CustomerBookings")
+  reminders Reminder[]    @relation("CustomerReminders")
+  logs      ActivityLog[] @relation("CustomerLogs")
 
   @@map("customers")
 }
@@ -109,6 +122,26 @@ model User {
 }
 
 // =========================================
+// Notifications Models
+// =========================================
+
+model Reminder {
+  id          Int             @id @default(autoincrement())
+  bookingId   Int
+  customerId  Int
+  commerceId  Int
+  channel     ReminderChannel
+  status      ReminderStatus
+  scheduledAt DateTime
+  sentAt      DateTime?
+
+  customer Customer @relation(name: "CustomerReminders", fields: [customerId], references: [id])
+  commerce Commerce @relation(name: "CommerceReminders", fields: [commerceId], references: [id])
+
+  @@map("reminders")
+}
+
+// =========================================
 // Configuration Models
 // =========================================
 
@@ -146,7 +179,7 @@ model UserConfig {
 
 //* Se tiene un working pattern por cada dia de la semana
 model UserWorkingPattern {
-  id               Int                  @id @default(autoincrement())
+  id               Int              @id @default(autoincrement())
   userId           Int
   weekday          Int
   availabilityType AvailabilityType
@@ -162,15 +195,15 @@ model UserWorkingPattern {
 
 //* Esto define un horario especifico para un dia particular
 model UserWorkingOverride {
-  id           Int              @id @default(autoincrement())
-  userId       Int
-  date         DateTime
-  overrideType AvailabilityType
-  morningStart     DateTime?
-  morningEnd       DateTime?
-  afternoonStart   DateTime?
-  afternoonEnd     DateTime?
-  notes        String
+  id             Int              @id @default(autoincrement())
+  userId         Int
+  date           DateTime
+  overrideType   AvailabilityType
+  morningStart   DateTime?
+  morningEnd     DateTime?
+  afternoonStart DateTime?
+  afternoonEnd   DateTime?
+  notes          String
 
   user User @relation(fields: [userId], references: [id], name: "UserOverridePatterns")
 
@@ -200,15 +233,15 @@ model CommerceWorkingPattern {
 
 //* Esto define un horario especifico para un dia particular
 model CommerceWorkingOverride {
-  id           Int          @id @default(autoincrement())
-  commerceId   Int
-  date         DateTime
-  overrideType AvailabilityType
-  morningStart     DateTime?
-  morningEnd       DateTime?
-  afternoonStart   DateTime?
-  afternoonEnd     DateTime?
-  notes        String
+  id             Int              @id @default(autoincrement())
+  commerceId     Int
+  date           DateTime
+  overrideType   AvailabilityType
+  morningStart   DateTime?
+  morningEnd     DateTime?
+  afternoonStart DateTime?
+  afternoonEnd   DateTime?
+  notes          String
 
   commerce Commerce @relation(fields: [commerceId], references: [id], name: "CommerceOverridePatterns")
 
