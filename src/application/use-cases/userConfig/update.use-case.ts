@@ -52,7 +52,7 @@ export class UpdateUserConfig {
     try {
       const result = await this.userConfigRepository.updateUserConfig({
         userId,
-        newUserData: updatedConfigData,
+        newUserConfigData: updatedConfigData,
       });
 
       if (result === null) {

@@ -6,6 +6,7 @@ import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 import { UpdateUserDto } from '@/interfaces/controllers/user/dto/update-user.dto';
 import { UserUpdateData } from '@/domain/common/UserUpdateData';
 import { ROLES } from '@/application/constants/user-roles.constants';
+import { AuthService } from '@/domain/services/auth/auth.service';
 
 @Injectable()
 export class UpdateUser {
@@ -14,7 +15,9 @@ export class UpdateUser {
     private readonly userRepository: IUserRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
+
+    private readonly authService: AuthService,
+  ) { }
 
   async execute(id: number, data: UpdateUserDto) {
     const user = await this.userRepository.findUser({
@@ -27,7 +30,6 @@ export class UpdateUser {
 
     if (data.email && data.email !== user.email) {
       const emailExists = await this.userRepository.findUserByEmail({
-        commerceId: user.commerceId,
         email: data.email,
       });
       if (emailExists) {
@@ -50,9 +52,9 @@ export class UpdateUser {
     if (data.email) {
       newUserData.email = data.email;
     }
-    // TODO: La contraseña debe ser hasheada antes de guardarse en la base de datos.
+
     if (data.password) {
-      newUserData.password = data.password;
+      newUserData.password = await this.authService.hashPassword(data.password);
     }
     if (data.role) {
       newUserData.roleId = data.role;

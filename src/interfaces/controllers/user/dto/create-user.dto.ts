@@ -52,7 +52,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: 'securePass123',
-    description: 'Duración del servicio en minutos',
+    description: 'Contraseña del usuario',
   })
   @IsNotEmpty({ message: 'La contraseña es requerida' })
   @MinLength(10)

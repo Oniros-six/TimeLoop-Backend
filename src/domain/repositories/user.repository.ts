@@ -10,7 +10,6 @@ export interface IUserRepository {
   }): Promise<User | null>;
 
   findUserByEmail(data: {
-    commerceId: number;
     email: string;
   }): Promise<User | null>;
 

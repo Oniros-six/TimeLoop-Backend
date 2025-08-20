@@ -10,6 +10,7 @@ import {
   Patch,
   Query,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -17,6 +18,7 @@ import {
   ApiQuery,
   ApiParam,
   ApiTags,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 
 import { CreateUser } from '@/application/use-cases/user/create.use-case';
@@ -31,8 +33,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
 import { StateUserDto } from './dto/state-user.dto';
 
+// Auth guards and decorators
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+import { RolesGuard } from '@/infrastructure/auth/roles.guard';
+// import { RequireAdmin, RequireAdminOrEmployee } from '@/infrastructure/auth/roles.decorator';
+
 @ApiTags('Users')
+@ApiBearerAuth()
 @Controller('user')
+@UseGuards(AuthGuard, RolesGuard)
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUser,
@@ -101,10 +110,9 @@ export class UserController {
   @Put()
   update(
     @Query('userId', ParseIntPipe) userId: number,
-    @Query('commerceId', ParseIntPipe) commerceId: number,
     @Body() dto: UpdateUserDto,
   ) {
-    return this.updateUserUseCase.execute(userId, commerceId, dto);
+    return this.updateUserUseCase.execute(userId, dto);
   }
 
   // Suspend a user

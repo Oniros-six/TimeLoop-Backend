@@ -120,12 +120,10 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async findUserByEmail(data: {
-    commerceId: number;
     email: string;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.user.findFirst({
       where: {
-        commerceId: data.commerceId,
         email: data.email,
       },
     });

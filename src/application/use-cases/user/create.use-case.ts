@@ -10,6 +10,7 @@ import { ActivityLogService } from '@/domain/services/activityLog/activity-log.s
 import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { ROLES } from '@/application/constants/user-roles.constants';
+import { AuthService } from '@/domain/services/auth/auth.service';
 
 @Injectable()
 export class CreateUser {
@@ -21,6 +22,8 @@ export class CreateUser {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
+
+    private readonly authService: AuthService,
   ) {}
 
   async execute(data: CreateUserDto) {
@@ -33,7 +36,6 @@ export class CreateUser {
     }
 
     const userExists = await this.userRepository.findUserByEmail({
-      commerceId: data.commerceId,
       email: data.email,
     });
 
@@ -48,10 +50,12 @@ export class CreateUser {
       throw new HttpException('Rol inexistente.', HttpStatus.BAD_REQUEST);
     }
 
+    const hashedPassword = await this.authService.hashPassword(data.password);
+
     const user = UserDomain.create({
       name: data.name,
       email: data.email,
-      password: data.password,
+      password: hashedPassword,
       roleId: data.role,
       commerceId: data.commerceId,
     });
