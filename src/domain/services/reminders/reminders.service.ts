@@ -35,7 +35,15 @@ export class RemindersService {
     return this.reminderRepository.create(reminder);
   }
 
-  async update(reminderId: number) {
-    return this.reminderRepository.update(reminderId);
+  async updateSent(reminderId: number) {
+    return this.reminderRepository.updateSent(reminderId);
+  }
+
+  async updateReminder(reminder: Reminder) {
+    return this.reminderRepository.updateReminder(reminder);
+  }
+
+  async cancelReminder(id: number) {
+    return this.reminderRepository.cancelReminder(id);
   }
 }

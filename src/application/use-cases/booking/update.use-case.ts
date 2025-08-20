@@ -10,6 +10,9 @@ import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
+import { RemindersService } from '@/domain/services/reminders/reminders.service';
+import { ReminderChannel, ReminderStatus } from '@/domain/common/ReminderConstants';
+import { Reminder } from '@/domain/entities/reminder.entity';
 
 @Injectable()
 export class UpdateBooking {
@@ -19,7 +22,8 @@ export class UpdateBooking {
 
     private readonly activityLogService: ActivityLogService,
     private readonly eventEmitter: EventEmitter2,
-  ) {}
+    private readonly remindersService: RemindersService,
+  ) { }
 
   async execute(id: number, newData: UpdateBookingDto) {
     const { commerceId, customerId, date, timeStart, serviceId, notes } =
@@ -41,6 +45,7 @@ export class UpdateBooking {
     const dataToUpdate: BookingUpdateData = {};
     let isRescheduled = false;
     let newBookingDate: Date | undefined;
+    let newBookingTime: Date | undefined;
 
     // Use Value Object to validate the date, if one is provided
     if (date) {
@@ -61,7 +66,8 @@ export class UpdateBooking {
     if (timeStart) {
       try {
         const bookingTime = new BookingTime(timeStart);
-        dataToUpdate.timeStart = bookingTime.value;
+        newBookingTime = bookingTime.value;
+        dataToUpdate.timeStart = newBookingTime
       } catch (err: unknown) {
         const message =
           err instanceof Error ? err.message : 'Error desconocido';
@@ -105,6 +111,38 @@ export class UpdateBooking {
         customerId: result.customerId,
         detail: `Se actualizaron los campos: ${updatedFields}.`,
       });
+
+      let schedule: Date;
+      // Old value in case of not being modificated
+      schedule = new Date(booking.date.value.getTime() + booking.timeStart.value.getTime())
+      // Reminder creation
+      if (isRescheduled && (newBookingDate || newBookingTime)) {
+        if (newBookingDate && newBookingTime) {
+          // New full date in case of modification
+          schedule = new Date(newBookingDate.getTime() + newBookingTime.getTime());
+        }
+        if (newBookingDate) {
+          // New date in case of modification with old time
+          schedule = new Date(newBookingDate.getTime() + booking.timeStart.value.getTime());
+        }
+        if (newBookingTime) {
+          // New time in case of modification with old date
+          schedule = new Date(booking.date.value.getTime() + newBookingTime.getTime());
+        }
+      }
+
+      //TODO en un futuro agregar un parametro extra, para definir en este momento como pretende recibir el recordatorio el cliente
+      const reminder = Reminder.update({
+        bookingId: result.id,
+        customerId: result.customerId,
+        commerceId: result.commerceId,
+        scheduledAt: schedule,
+        sentAt: null,
+        channel: ReminderChannel.email,
+        status: ReminderStatus.pending,
+      });
+
+      await this.remindersService.updateReminder(reminder);
 
       // Si la reserva fue reprogramada, emitir evento
       if (isRescheduled && newBookingDate) {

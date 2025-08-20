@@ -12,7 +12,7 @@ type ReminderWithRelations = DomainClient & {
 
 @Injectable()
 export class PrismaReminderRepository implements IReminderRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private toDTO(reminder: ReminderWithRelations): ReminderDTO {
     return new ReminderDTO(
@@ -35,7 +35,7 @@ export class PrismaReminderRepository implements IReminderRepository {
     return null;
   }
 
-  async update(reminderId: number): Promise<void> {
+  async updateSent(reminderId: number): Promise<void> {
     await this.prisma.reminder.update({
       where: {
         id: reminderId,
@@ -44,6 +44,20 @@ export class PrismaReminderRepository implements IReminderRepository {
         status: ReminderStatus.sent,
         sentAt: new Date(),
       },
+    });
+  }
+
+  async updateReminder(reminder: DomainClient): Promise<void> {
+    const data: Partial<DomainClient> = {
+      channel: reminder.channel,
+      status: ReminderStatus.pending,
+    };
+    
+    if (reminder.scheduledAt) data.scheduledAt = reminder.scheduledAt;
+    
+    await this.prisma.reminder.update({
+      where: { id: reminder.id },
+      data,
     });
   }
 
@@ -59,5 +73,14 @@ export class PrismaReminderRepository implements IReminderRepository {
       },
     });
     return result.map((reminder) => this.toDTO(reminder));
+  }
+
+  async cancelReminder(id: number): Promise<void> {
+    await this.prisma.reminder.update({
+      where: { id },
+      data: {
+        status: ReminderStatus.canceled,
+      },
+    });
   }
 }

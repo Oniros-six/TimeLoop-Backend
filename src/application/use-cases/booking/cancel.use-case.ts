@@ -7,6 +7,7 @@ import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BookingCancelledEvent } from '@/domain/common/booking.events';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
+import { RemindersService } from '@/domain/services/reminders/reminders.service';
 
 @Injectable()
 export class CancelBooking {
@@ -17,6 +18,8 @@ export class CancelBooking {
     private readonly activityLogService: ActivityLogService,
 
     private readonly eventEmitter: EventEmitter2,
+
+    private readonly remindersService: RemindersService,
   ) {}
 
   async execute(id: number, data: CancelBookingDto) {
@@ -62,6 +65,7 @@ export class CancelBooking {
         detail: `Se cancela la reserva`,
       });
 
+      await this.remindersService.cancelReminder(result.id);
       // Emitir evento de cancelación
       this.eventEmitter.emit(
         BOOKING_EVENTS.CANCELLED,
