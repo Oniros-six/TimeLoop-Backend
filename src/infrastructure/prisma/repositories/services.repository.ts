@@ -52,14 +52,16 @@ export class PrismaServicesRepository implements IServiceRepository {
   }
 
   async createService(data: DomainClient): Promise<DomainClient | null> {
+    const { id, ...rest } = data; // removing id
     const result = await this.prisma.service.create({
-      data: data,
+      data: rest,
     });
 
     if (!result) return null;
 
     return this.toDomain(result);
   }
+
   async updateService(data: {
     serviceId: number;
     commerceId: number;

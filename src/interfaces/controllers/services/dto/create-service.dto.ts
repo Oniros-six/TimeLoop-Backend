@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Min, MinLength } from 'class-validator';
 
 export class CreateServiceDto {
   @ApiProperty({
@@ -25,7 +25,7 @@ export class CreateServiceDto {
   @Type(() => Number)
   @IsNumber({}, { message: 'El precio debe ser un número' })
   @IsNotEmpty({ message: 'El precio es requerido' })
-  @MinLength(3, { message: 'El precio debe tener al menos 3 dígitos' })
+  @Min(100, { message: 'El precio debe tener al menos 3 dígitos' })
   price: number;
 
   @ApiProperty({
@@ -35,6 +35,6 @@ export class CreateServiceDto {
   @Type(() => Number)
   @IsNumber({}, { message: 'La duración debe ser un número' })
   @IsNotEmpty({ message: 'La duración es requerida' })
-  @MinLength(2, { message: 'La duración debe tener al menos 2 dígitos' })
+  @Min(10, { message: 'La duración debe ser mas de 10 minutos' })
   durationMinutes: number;
 }
