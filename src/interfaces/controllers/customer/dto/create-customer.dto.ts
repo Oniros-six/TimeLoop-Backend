@@ -8,7 +8,6 @@ import {
   IsString,
   Matches,
   MaxLength,
-  MinLength,
 } from 'class-validator';
 
 export class CreateCustomerDto {
@@ -29,7 +28,6 @@ export class CreateCustomerDto {
     example: 'usuario@dominio.com',
     description: 'Email del cliente',
   })
-  @IsOptional()
   @IsEmail(
     {
       allow_display_name: false,
@@ -52,7 +50,6 @@ export class CreateCustomerDto {
     example: '099123456',
     description: 'Número de telefono del cliente',
   })
-  @IsOptional()
   @Matches(/^09\d{7}$/, {
     message: 'El número debe comenzar con 09 y tener 9 dígitos',
   })
@@ -64,7 +61,6 @@ export class CreateCustomerDto {
   })
   @IsOptional()
   @IsString({ message: 'Las notas deben ser texto' })
-  @MinLength(10, { message: 'Las notas deben tener al menos 10 caracteres' })
   @MaxLength(500, { message: 'Las notas no pueden exceder los 500 caracteres' })
   internalNote?: string;
 }

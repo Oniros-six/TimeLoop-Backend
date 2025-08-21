@@ -12,7 +12,7 @@ export class UpdateCustomerDto {
   @ApiProperty({ example: 'Leandro', description: 'Nombre del cliente' })
   @IsOptional()
   @IsString({ message: 'El nombre tiene que contener solo letras' })
-  name: string;
+  name?: string;
 
   @ApiProperty({
     example: 'usuario@dominio.com',
@@ -35,7 +35,7 @@ export class UpdateCustomerDto {
   @Matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
     message: 'El correo debe tener un formato válido (ej. usuario@dominio.com)',
   })
-  email: string;
+  email?: string;
 
   @ApiProperty({
     example: '099123456',
@@ -45,7 +45,7 @@ export class UpdateCustomerDto {
   @Matches(/^09\d{7}$/, {
     message: 'El número debe comenzar con 09 y tener 9 dígitos',
   })
-  phone: string;
+  phone?: string;
 
   @ApiProperty({
     example: 'El es temperamental, e impuntual...',
@@ -53,7 +53,6 @@ export class UpdateCustomerDto {
   })
   @IsOptional()
   @IsString({ message: 'Las notas deben ser texto' })
-  @MinLength(10, { message: 'Las notas deben tener al menos 10 caracteres' })
   @MaxLength(500, { message: 'Las notas no pueden exceder los 500 caracteres' })
-  internalNote: string;
+  internalNote?: string;
 }
