@@ -9,7 +9,7 @@ import {
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/application/constants/activity-log.constants';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
-import { ROLES } from '@/application/constants/user-roles.constants';
+import { Roles } from '@/application/constants/user-roles.constants';
 import { AuthService } from '@/domain/services/auth/auth.service';
 
 @Injectable()
@@ -46,7 +46,7 @@ export class CreateUser {
       );
     }
 
-    if (!Object.values(ROLES).includes(data.role)) {
+    if (!Object.values(Roles).includes(data.role)) {
       throw new HttpException('Rol inexistente.', HttpStatus.BAD_REQUEST);
     }
 
@@ -56,7 +56,7 @@ export class CreateUser {
       name: data.name,
       email: data.email,
       password: hashedPassword,
-      roleId: data.role,
+      role: data.role,
       commerceId: data.commerceId,
     });
 

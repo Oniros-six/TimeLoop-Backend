@@ -3,17 +3,18 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { IUserRepository } from '@/domain/repositories/user.repository';
 import { User as DomainClient } from '@/domain/entities/user.entity';
 import { UserUpdateData } from '@/domain/common/UserUpdateData';
+import { Roles } from '@/application/constants/user-roles.constants'
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private toDomain(user: {
     id: number;
     name: string;
     email: string;
     password: string;
-    roleId: number;
+    role: Roles;
     commerceId: number;
     active: boolean;
   }): DomainClient {
@@ -22,7 +23,7 @@ export class PrismaUserRepository implements IUserRepository {
       user.name,
       user.email,
       user.password,
-      user.roleId,
+      user.role,
       user.commerceId,
       user.active,
     );
@@ -84,7 +85,7 @@ export class PrismaUserRepository implements IUserRepository {
         name: data.name,
         email: data.email,
         password: data.password,
-        roleId: data.roleId,
+        role: data.role,
         commerceId: data.commerceId,
         active: data.active,
       },

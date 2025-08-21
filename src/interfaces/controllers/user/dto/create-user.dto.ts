@@ -1,8 +1,9 @@
+import { Roles } from '@/application/constants/user-roles.constants'
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
-  IsIn,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -62,8 +63,7 @@ export class CreateUserDto {
     example: 1,
     description: 'Rol del usuario (1: Admin, 2: Empleado)',
   })
-  @IsNumber()
+  @IsEnum(Roles, { message: 'El rol debe ser Admin o Empleado' })
   @IsNotEmpty({ message: 'El rol es requerido' })
-  @IsIn([1, 2], { message: 'El rol no es válido' })
-  role: number;
+  role: Roles;
 }

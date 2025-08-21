@@ -1,10 +1,12 @@
+import { Roles } from '@/application/constants/user-roles.constants'
+
 export class User {
   constructor(
     public readonly id: number,
     public name: string,
     public email: string,
     public password: string,
-    public readonly roleId: number,
+    public readonly role: Roles,
     public readonly commerceId: number,
     public active: boolean,
   ) {}
@@ -15,7 +17,7 @@ export class User {
     name: string;
     email: string;
     password: string;
-    roleId: number;
+    role: Roles;
     commerceId: number;
     active?: boolean;
   }): User {
@@ -24,7 +26,7 @@ export class User {
       props.name,
       props.email,
       props.password,
-      props.roleId,
+      props.role,
       props.commerceId,
       true,
     );

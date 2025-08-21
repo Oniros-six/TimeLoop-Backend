@@ -26,7 +26,7 @@ export class SessionSerializer extends PassportSerializer {
         commerceId: user.commerceId,
         email: user.email,
         name: user.name,
-        role: user.roleId,
+        role: user.role,
         active: user.active,
       };
 

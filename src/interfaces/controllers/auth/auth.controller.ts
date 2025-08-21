@@ -32,7 +32,7 @@ export class AuthController {
         id: req.user.id,
         name: req.user.name,
         email: req.user.email,
-        role: req.user.roleId,
+        role: req.user.role,
         commerceId: req.user.commerceId,
         active: req.user.active,
       },

@@ -1,13 +1,13 @@
+import { Roles } from '@/application/constants/user-roles.constants'
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
-  IsNumber,
+  IsEnum,
   IsOptional,
   IsString,
   Matches,
   MaxLength,
   MinLength,
-  IsIn,
 } from 'class-validator';
 
 export class UpdateUserDto {
@@ -53,8 +53,7 @@ export class UpdateUserDto {
     example: 1,
     description: 'Rol del usuario (1: Admin, 2: Empleado)',
   })
-  @IsNumber()
-  @IsIn([1, 2], { message: 'El rol no es válido' })
+  @IsEnum(Roles, { message: 'El rol debe ser Admin o Empleado' })
   @IsOptional()
-  role: number;
+  role: Roles;
 }

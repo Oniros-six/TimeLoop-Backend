@@ -92,7 +92,7 @@ Cierra la sesión del usuario.
 ## Roles Disponibles
 
 ```typescript
-enum ROLES {
+enum Roles {
   ADMIN = 1,    // Administrador
   EMPLOYEE = 2  // Empleado
 }
@@ -132,7 +132,7 @@ async adminOEmpleado() {
 ### 4. Roles Específicos
 ```typescript
 @UseGuards(AuthGuard, RolesGuard)
-@Roles(ROLES.ADMIN, ROLES.EMPLOYEE)
+@Roles(Roles.ADMIN, Roles.EMPLOYEE)
 @Get('roles-especificos')
 async rolesEspecificos() {
   // Solo los roles especificados pueden acceder

@@ -5,7 +5,7 @@ import { ActivityLogService } from '@/domain/services/activityLog/activity-log.s
 import { EntityType } from '@/application/constants/activity-log.constants';
 import { UpdateUserDto } from '@/interfaces/controllers/user/dto/update-user.dto';
 import { UserUpdateData } from '@/domain/common/UserUpdateData';
-import { ROLES } from '@/application/constants/user-roles.constants';
+import { Roles } from '@/application/constants/user-roles.constants';
 import { AuthService } from '@/domain/services/auth/auth.service';
 
 @Injectable()
@@ -40,7 +40,7 @@ export class UpdateUser {
       }
     }
 
-    if (data.role && !Object.values(ROLES).includes(data.role)) {
+    if (data.role && !Object.values(Roles).includes(data.role)) {
       throw new HttpException('Rol inexistente.', HttpStatus.BAD_REQUEST);
     }
 
@@ -57,7 +57,7 @@ export class UpdateUser {
       newUserData.password = await this.authService.hashPassword(data.password);
     }
     if (data.role) {
-      newUserData.roleId = data.role;
+      newUserData.role = data.role;
     }
 
     if (Object.keys(newUserData).length === 0) {
@@ -86,7 +86,7 @@ export class UpdateUser {
       await this.activityLogService.updated({
         entityType: EntityType.USER,
         entityId: result.id,
-        userId: null,
+        userId: result.id,
         commerceId: user.commerceId,
         customerId: null,
         detail: `Se actualizaron los campos: ${updatedFields}.`,

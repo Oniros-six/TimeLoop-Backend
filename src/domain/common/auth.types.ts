@@ -1,11 +1,12 @@
 import { Request } from 'express';
+import { Roles } from '@/application/constants/user-roles.constants';
 
 export interface User {
   id: number;
   commerceId: number;
   email: string;
   name: string;
-  roleId: number;
+  role: Roles;
   active: boolean;
 }
 
@@ -14,7 +15,7 @@ export interface SafeUser {
   commerceId: number;
   email: string;
   name: string;
-  role: number; // Note: this is roleId mapped to role
+  role: Roles; 
   active: boolean;
 }
 
