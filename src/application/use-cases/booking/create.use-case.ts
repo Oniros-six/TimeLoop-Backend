@@ -4,7 +4,10 @@ import {
   SERVICE_REPOSITORY,
 } from '@/application/constants/providers';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
-import { ReminderChannel, ReminderStatus } from '@/domain/common/ReminderConstants';
+import {
+  ReminderChannel,
+  ReminderStatus,
+} from '@/domain/common/ReminderConstants';
 import { Booking } from '@/domain/entities/booking.entity';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
@@ -32,7 +35,7 @@ export class CreateBooking {
     private readonly remindersService: RemindersService,
 
     private eventEmitter: EventEmitter2,
-  ) { }
+  ) {}
 
   async execute(data: CreateBookingDto) {
     try {
@@ -110,7 +113,9 @@ export class CreateBooking {
       });
 
       // Reminder creation
-      const scheduledAt = new Date(bookingDate.value.getTime() + startTime.value.getTime());
+      const scheduledAt = new Date(
+        bookingDate.value.getTime() + startTime.value.getTime(),
+      );
 
       //TODO en un futuro agregar un parametro extra, para definir en este momento como pretende recibir el recordatorio el cliente
       const reminder = Reminder.create({
