@@ -13,13 +13,17 @@ import {
   REMINDER_REPOSITORY,
 } from '@/application/constants/providers';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
+import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';
-import { RemindersService } from '../reminders/reminders.service';
 
 export const BOOKING_EVENTS = {
   CREATED: 'booking.created',
   CANCELLED: 'booking.cancelled',
   RESCHEDULED: 'booking.rescheduled',
+} as const;
+
+export const REMINDER_EVENTS = {
+  SEND: 'reminder.send',
 } as const;
 
 export const NOTIFICATION_SERVICE = 'NOTIFICATION_SERVICE';
@@ -39,7 +43,7 @@ export class NotificationService {
     @Inject(COMMERCE_REPOSITORY)
     private readonly commerceRepository: ICommerceRepository,
     @Inject(REMINDER_REPOSITORY)
-    private readonly remindersService: RemindersService,
+    private readonly reminderRepository: IReminderRepository,
   ) {}
 
   @OnEvent(BOOKING_EVENTS.CREATED)
@@ -66,6 +70,15 @@ export class NotificationService {
       await this.notifyBookingRescheduled(event.booking, event.newDate);
     } catch (err: unknown) {
       this.logError(err, event.booking.id, 'BookingRescheduledEvent');
+    }
+  }
+
+  @OnEvent(REMINDER_EVENTS.SEND)
+  async handleReminderSend(reminder: ReminderDTO) {
+    try {
+      await this.notifyBookingReminder(reminder);
+    } catch (err: unknown) {
+      this.logError(err, reminder.id, 'ReminderSendEvent');
     }
   }
 
@@ -138,7 +151,7 @@ export class NotificationService {
 
       if (result) {
         this.logger.log(`Email sent: ${data.customerEmail}`);
-        await this.remindersService.updateSent(data.id);
+        await this.reminderRepository.updateSent(data.id);
       }
     }
 

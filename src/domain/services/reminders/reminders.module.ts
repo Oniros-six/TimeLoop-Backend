@@ -1,11 +1,13 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { RemindersService } from './reminders.service';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
-import { NotificationModule } from '@/domain/services/notifications/notifications.module';
 
+@Global()
 @Module({
-  imports: [ScheduleModule.forRoot(), NotificationModule],
+  imports: [ScheduleModule.forRoot(), EventEmitterModule],
   providers: [RemindersService, PrismaService],
+  exports: [RemindersService],
 })
 export class RemindersModule {}

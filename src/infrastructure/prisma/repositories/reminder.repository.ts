@@ -12,7 +12,7 @@ type ReminderWithRelations = DomainClient & {
 
 @Injectable()
 export class PrismaReminderRepository implements IReminderRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private toDTO(reminder: ReminderWithRelations): ReminderDTO {
     return new ReminderDTO(
@@ -52,9 +52,9 @@ export class PrismaReminderRepository implements IReminderRepository {
       channel: reminder.channel,
       status: ReminderStatus.pending,
     };
-    
+
     if (reminder.scheduledAt) data.scheduledAt = reminder.scheduledAt;
-    
+
     await this.prisma.reminder.update({
       where: { id: reminder.id },
       data,

@@ -72,6 +72,7 @@ import { PrismaReminderRepository } from './repositories/reminder.repository';
     },
   ],
   exports: [
+    PrismaService,
     'ICustomerRepository',
     'ICommerceRepository',
     'IActivityLogRepository',

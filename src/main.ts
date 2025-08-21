@@ -33,7 +33,6 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  
   const config = new DocumentBuilder()
     .setTitle('TimeLoop API')
     .setDescription('Documentación de TimeLoop')

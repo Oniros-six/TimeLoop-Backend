@@ -9,9 +9,7 @@ export interface IUserRepository {
     name: string;
   }): Promise<User | null>;
 
-  findUserByEmail(data: {
-    email: string;
-  }): Promise<User | null>;
+  findUserByEmail(data: { email: string }): Promise<User | null>;
 
   findAllUsers(data: { commerceId: number }): Promise<User[] | null>;
 
