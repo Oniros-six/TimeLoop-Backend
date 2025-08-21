@@ -14,18 +14,18 @@ export class SessionSerializer extends PassportSerializer {
 
   async deserializeUser(userId: number, done: Function) {
     try {
-      const data = await this.authService.findUserById(userId);
-      if (!data) return done(null, false); 
-      const user = data.data
+      const user = await this.authService.findUserById(userId);
+      if (!user) return done(null, false);
+
       const safeUser = {
         id: user.id,
         commerceId: user.commerceId,
         email: user.email,
         name: user.name,
         role: user.roleId,
-        active: user.active
+        active: user.active,
       };
-  
+
       done(null, safeUser);
     } catch (err) {
       done(err);

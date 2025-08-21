@@ -20,6 +20,10 @@ import {
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';
 import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';
 
+// Auth components
+import { AuthService } from '@/domain/services/auth/auth.service';
+import { BcryptPasswordHasher } from '@/infrastructure/auth/bcrypt-password-hasher';
+
 @Module({
   imports: [PrismaModule],
   controllers: [UserController],
@@ -32,7 +36,11 @@ import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.
       provide: COMMERCE_REPOSITORY,
       useClass: PrismaCommerceRepository,
     },
-
+    {
+      provide: 'IPasswordHasher',
+      useClass: BcryptPasswordHasher,
+    },
+    AuthService,
     CreateUser,
     FindUser,
     FindAllUsers,

@@ -1,32 +1,49 @@
 import { Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { LoginUser } from '@/application/use-cases/user/login.use-case';
-import { FindUser } from '@/application/use-cases/user/find.use-case';
+import { IUserRepository } from '@/domain/repositories/user.repository';
+import { USER_REPOSITORY } from '@/application/constants/providers';
+import { Inject } from '@nestjs/common';
 import { LoginUserDto } from '@/interfaces/controllers/auth/dto/login-user.dto';
+
+export interface IPasswordHasher {
+  hash(password: string): Promise<string>;
+  compare(password: string, hashedPassword: string): Promise<boolean>;
+}
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly loginUser: LoginUser,
-    private readonly findUser: FindUser
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
+    @Inject('IPasswordHasher')
+    private readonly passwordHasher: IPasswordHasher,
   ) {}
 
-  async hashPassword(password: string) {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    return hashedPassword;
-  }
-
-  async validatePassword(password: string, hashedPassword: string) {
-    return await bcrypt.compare(password, hashedPassword);
-  }
-
   async validateUser(data: LoginUserDto) {
-    return this.loginUser.execute(data);
+    const user = await this.userRepository.findUserByEmail({
+      email: data.email,
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    const isValidPassword = await this.passwordHasher.compare(
+      data.password,
+      user.password,
+    );
+
+    if (!isValidPassword) {
+      return null;
+    }
+
+    return user;
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    return this.passwordHasher.hash(password);
   }
 
   async findUserById(userId: number) {
-    return this.findUser.execute(userId);
+    return this.userRepository.findUser({ userId });
   }
 }

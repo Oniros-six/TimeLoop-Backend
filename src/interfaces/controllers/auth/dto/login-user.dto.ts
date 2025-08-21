@@ -8,7 +8,6 @@ import {
 } from 'class-validator';
 
 export class LoginUserDto {
-
   @ApiProperty({
     example: 'usuario@dominio.com',
     description: 'Email del usuario',
@@ -38,5 +37,4 @@ export class LoginUserDto {
   @IsNotEmpty({ message: 'La contraseña es requerida' })
   @MinLength(10)
   password: string;
-
 }
