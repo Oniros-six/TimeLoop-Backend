@@ -9,8 +9,9 @@ import {
 } from '@nestjs/common';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+import { AuthenticatedRequest, LoginRequest } from '@/domain/common/auth.types';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -20,7 +21,11 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
   @UseGuards(PassportAuthGuard('local'))
   @Post('login')
-  async login(@Req() req: Request & { user?: any }) {
+  login(@Req() req: LoginRequest) {
+    if (!req.user) {
+      throw new InternalServerErrorException('Usuario no encontrado');
+    }
+
     return {
       message: 'Login exitoso',
       user: {
@@ -39,7 +44,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @UseGuards(AuthGuard)
   @Get('me')
-  async getCurrentUser(@Req() req: Request & { user?: any }) {
+  getCurrentUser(@Req() req: AuthenticatedRequest) {
     return {
       message: 'Usuario autenticado',
       user: req.user,
@@ -49,7 +54,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Cerrar sesión' })
   @ApiResponse({ status: 200, description: 'Logout exitoso' })
   @Post('logout')
-  async logout(@Req() req: Request & { user?: any }, @Res() res: Response) {
+  async logout(@Req() req: AuthenticatedRequest, @Res() res: Response) {
     return new Promise((resolve, reject) => {
       req.logout((err) => {
         if (err) {
