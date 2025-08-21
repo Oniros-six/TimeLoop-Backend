@@ -16,7 +16,7 @@ export class UpdateCommerceDto {
     required: false,
   })
   @IsString({ message: 'El nombre debe ser una cadena de texto' })
-  @MinLength(10, { message: 'El nombre debe tener minimo 10 caracteres' })
+  @MinLength(3, { message: 'El nombre debe tener minimo 3 caracteres' })
   @MaxLength(50, { message: 'El nombre no debe superar los 50 caracteres' })
   @IsOptional()
   name?: string;
@@ -26,8 +26,8 @@ export class UpdateCommerceDto {
     description: 'Correo electrónico del comercio',
     required: false,
   })
-  @IsEmail({}, { message: 'El correo electrónico no es válido' })
-  @MinLength(20, { message: 'El mail debe tener minimo 20 caracteres' })
+  @IsEmail({}, { message: 'El correo electrónico no es valido' })
+  @MinLength(5, { message: 'El mail debe tener minimo 5 caracteres' })
   @MaxLength(100, {
     message: 'El correo electrónico no debe superar los 100 caracteres',
   })
@@ -51,7 +51,7 @@ export class UpdateCommerceDto {
     required: false,
   })
   @IsString({ message: 'La dirección debe ser una cadena de texto' })
-  @MinLength(50, { message: 'El nombre debe tener minimo 50 caracteres' })
+  @MinLength(10, { message: 'La dirección debe tener minimo 10 caracteres' })
   @MaxLength(200, {
     message: 'La dirección no debe superar los 200 caracteres',
   })

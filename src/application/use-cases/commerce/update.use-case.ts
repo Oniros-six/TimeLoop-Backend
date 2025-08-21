@@ -49,7 +49,7 @@ export class UpdateCommerce {
 
       if (Object.keys(newCommerceData).length === 0) {
         return {
-          message: 'Información actualizada con exito',
+          message: 'No hay datos para actualizar.',
           statusCode: HttpStatus.OK,
           data: found,
         };
