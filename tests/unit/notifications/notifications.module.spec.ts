@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotificationModule } from '../notifications.module';
-import { NotificationService } from '../notifications.service';
-import { INotificationProvider } from '../notification-provider.interface';
+import { NotificationModule } from '../../../src/domain/services/notifications/notifications.module';
+import { NotificationService } from '../../../src/domain/services/notifications/notifications.service';
+import { INotificationProvider } from '../../../src/domain/services/notifications/notification-provider.interface';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { COMMERCE_REPOSITORY } from '@/application/constants/providers';

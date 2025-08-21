@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { Booking } from '@/domain/entities/booking.entity';
-import { NotificationService } from '../notifications.service';
+import { NotificationService } from '../../../src/domain/services/notifications/notifications.service';
 import {
   BookingCreatedEvent,
   BookingCancelledEvent,
@@ -10,7 +10,7 @@ import {
 import { BookingDate } from '@/domain/value-objects/booking/booking-date.vo';
 import { BookingTime } from '@/domain/value-objects/booking/booking-time.vo';
 import { BookingStatus } from '@/domain/value-objects/booking/booking-status.vo';
-import { INotificationProvider } from '../notification-provider.interface';
+import { INotificationProvider } from '../../../src/domain/services/notifications/notification-provider.interface';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { Commerce } from '@/domain/entities/commerce.entity';
 import {
