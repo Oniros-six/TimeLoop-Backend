@@ -1,14 +1,14 @@
 import {
-  CHANGE_TYPES,
-  ENTITY_TYPES,
+  ChangeType,
+  EntityType,
 } from '@/application/constants/activity-log.constants';
 
 export class ActivityLog {
   constructor(
     public readonly id: number,
-    public readonly entityTypeId: ENTITY_TYPES,
+    public readonly entityType: EntityType,
     public readonly entityId: number,
-    public readonly changeTypeId: CHANGE_TYPES,
+    public readonly changeType: ChangeType,
     public readonly detail: string,
     public readonly userId: number | null,
     public readonly commerceId: number | null,
@@ -17,9 +17,9 @@ export class ActivityLog {
   ) {}
 
   private static create(
-    changeTypeId: CHANGE_TYPES,
+    changeType: ChangeType,
     props: {
-      entityTypeId: ENTITY_TYPES;
+      entityType: EntityType;
       entityId: number;
       detail: string;
       userId?: number | null;
@@ -29,9 +29,9 @@ export class ActivityLog {
   ): ActivityLog {
     return new ActivityLog(
       0,
-      props.entityTypeId,
+      props.entityType,
       props.entityId,
-      changeTypeId,
+      changeType,
       props.detail,
       props.userId ?? null,
       props.commerceId ?? null,
@@ -43,30 +43,30 @@ export class ActivityLog {
   static createLog(
     props: Parameters<typeof ActivityLog.create>[1],
   ): ActivityLog {
-    return this.create(CHANGE_TYPES.CREATED, props);
+    return this.create(ChangeType.CREATED, props);
   }
 
   static updateLog(
     props: Parameters<typeof ActivityLog.create>[1],
   ): ActivityLog {
-    return this.create(CHANGE_TYPES.UPDATED, props);
+    return this.create(ChangeType.UPDATED, props);
   }
 
   static cancelLog(
     props: Parameters<typeof ActivityLog.create>[1],
   ): ActivityLog {
-    return this.create(CHANGE_TYPES.CANCELLED, props);
+    return this.create(ChangeType.CANCELLED, props);
   }
 
   static suspendLog(
     props: Parameters<typeof ActivityLog.create>[1],
   ): ActivityLog {
-    return this.create(CHANGE_TYPES.SUSPENDED, props);
+    return this.create(ChangeType.SUSPENDED, props);
   }
 
   static reinstateLog(
     props: Parameters<typeof ActivityLog.create>[1],
   ): ActivityLog {
-    return this.create(CHANGE_TYPES.REINSTATED, props);
+    return this.create(ChangeType.REINSTATED, props);
   }
 }

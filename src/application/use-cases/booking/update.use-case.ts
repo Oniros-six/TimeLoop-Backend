@@ -6,7 +6,7 @@ import { UpdateBookingDto } from '@/interfaces/controllers/booking/dto/update-bo
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { BOOKING_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
@@ -107,7 +107,7 @@ export class UpdateBooking {
       const updatedFields = Object.keys(dataToUpdate).join(', ');
       // Activity register
       await this.activityLogService.updated({
-        entityTypeId: ENTITY_TYPES.BOOKING,
+        entityType: EntityType.BOOKING,
         entityId: result.id,
         userId: null,
         commerceId: result.commerceId,

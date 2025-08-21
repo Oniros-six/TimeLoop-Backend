@@ -5,7 +5,7 @@ import {
   SERVICE_REPOSITORY,
 } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 
 @Injectable()
@@ -51,7 +51,7 @@ export class DeleteService {
       }
 
       await this.activityLogService.cancelled({
-        entityTypeId: ENTITY_TYPES.SERVICE,
+        entityType: EntityType.SERVICE,
         entityId: result.id,
         userId: null,
         commerceId: result.commerceId,

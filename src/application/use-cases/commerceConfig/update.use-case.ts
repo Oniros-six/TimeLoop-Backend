@@ -7,7 +7,7 @@ import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { CommerceConfig as CommerceConfigDomain } from '@/domain/entities/commerceConfig.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { UpdateCommerceConfigDto } from '@/interfaces/controllers/commerceConfig/dto/update-commerceConfig.dto';
 
 @Injectable()
@@ -70,7 +70,7 @@ export class UpdateCommerceConfig {
       }
 
       await this.activityLogService.updated({
-        entityTypeId: ENTITY_TYPES.COMMERCE_CONFIG,
+        entityType: EntityType.COMMERCE_CONFIG,
         entityId: result.id,
         userId: null,
         commerceId: commerceId,

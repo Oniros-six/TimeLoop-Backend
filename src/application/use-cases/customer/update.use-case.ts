@@ -4,7 +4,7 @@ import { UpdateCustomerDto } from '@/interfaces/controllers/customer/dto/update-
 import { CustomerUpdateData } from '@/domain/common/CustomerUpdateData';
 import { CUSTOMER_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class UpdateCustomer {
@@ -59,7 +59,7 @@ export class UpdateCustomer {
 
       const updatedFields = Object.keys(newCustomerData).join(', ');
       await this.activityLogService.updated({
-        entityTypeId: ENTITY_TYPES.CUSTOMER,
+        entityType: EntityType.CUSTOMER,
         entityId: result.id,
         userId: null,
         commerceId: result.commerceId,

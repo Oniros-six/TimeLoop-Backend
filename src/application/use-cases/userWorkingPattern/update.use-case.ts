@@ -4,7 +4,7 @@ import { USER_WORKING_PATTERN_REPOSITORY } from '@/application/constants/provide
 
 import { UserWorkingPattern as UserWorkingPatternDomain } from '@/domain/entities/userWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { UpdateUserPatternDto } from '@/interfaces/controllers/userWorkingPattern/dto/update-userPattern.dto';
 
 @Injectable()
@@ -69,7 +69,7 @@ export class UpdateUserWorkingPattern {
       }
 
       await this.activityLogService.updated({
-        entityTypeId: ENTITY_TYPES.USER_WORKING_PATTERN,
+        entityType: EntityType.USER_WORKING_PATTERN,
         entityId: result.id,
         userId: result.userId,
         commerceId: null,

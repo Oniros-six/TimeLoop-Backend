@@ -8,7 +8,7 @@ import { IUserConfigRepository } from '@/domain/repositories/userConfig.reposito
 import { CreateUserConfigDto } from '@/interfaces/controllers/userConfig/dto/create-userConfig.dto';
 import { UserConfig as UserConfigDomain } from '@/domain/entities/userConfig.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class CreateUserConfig {
@@ -50,7 +50,7 @@ export class CreateUserConfig {
       }
 
       await this.activityLogService.created({
-        entityTypeId: ENTITY_TYPES.USER_CONFIG,
+        entityType: EntityType.USER_CONFIG,
         entityId: result.id,
         userId: userId,
         commerceId: user.commerceId,

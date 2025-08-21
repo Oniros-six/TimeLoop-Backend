@@ -4,7 +4,7 @@ import { COMMERCE_WORKING_OVERRIDE_REPOSITORY } from '@/application/constants/pr
 
 import { CommerceWorkingOverride as CommerceWorkingOverrideDomain } from '@/domain/entities/commerceWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { UpdateCommerceOverrideDto } from '@/interfaces/controllers/commerceWorkingOverride/dto/update-commerceOverride.dto';
 
 @Injectable()
@@ -73,7 +73,7 @@ export class UpdateCommerceWorkingOverride {
       }
 
       await this.activityLogService.updated({
-        entityTypeId: ENTITY_TYPES.COMMERCE_WORKING_OVERRIDE,
+        entityType: EntityType.COMMERCE_WORKING_OVERRIDE,
         entityId: result.id,
         commerceId: result.commerceId,
         detail: `El override del comercio fue actualizado para la fecha ${result.date.toISOString()}.`,

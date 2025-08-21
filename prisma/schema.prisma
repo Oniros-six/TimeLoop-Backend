@@ -41,6 +41,28 @@ enum ReminderStatus {
   canceled
 }
 
+enum EntityType {
+  BOOKING
+  CUSTOMER
+  USER
+  COMMERCE
+  SERVICE
+  USER_CONFIG
+  COMMERCE_CONFIG
+  USER_WORKING_OVERRIDE
+  COMMERCE_WORKING_OVERRIDE
+  USER_WORKING_PATTERN
+  COMMERCE_WORKING_PATTERN
+}
+
+enum ChangeType {
+  CREATED
+  UPDATED
+  CANCELLED
+  SUSPENDED
+  REINSTATED
+}
+
 // =========================================
 // Core Models
 // =========================================
@@ -254,43 +276,21 @@ model CommerceWorkingOverride {
 // =========================================
 
 model ActivityLog {
-  id           Int      @id @default(autoincrement())
-  entityTypeId Int
-  entityId     Int
-  userId       Int?
-  commerceId   Int?
-  customerId   Int?
-  changeTypeId Int
-  detail       String
-  timestamp    DateTime @default(now())
+  id         Int        @id @default(autoincrement())
+  entityId   Int
+  userId     Int?
+  commerceId Int?
+  customerId Int?
+  entityType EntityType
+  changeType ChangeType
+  detail     String
+  timestamp  DateTime   @default(now())
 
-  entityType EntityType @relation(fields: [entityTypeId], references: [id], name: "ActivityEntityType")
-  changeType ChangeType @relation(fields: [changeTypeId], references: [id], name: "ActivityChangeType")
-  user       User?      @relation(fields: [userId], references: [id], name: "UserLogs")
-  commerce   Commerce?  @relation(fields: [commerceId], references: [id], name: "CommerceLogs")
-  customer   Customer?  @relation(fields: [customerId], references: [id], name: "CustomerLogs")
+  user     User?     @relation(fields: [userId], references: [id], name: "UserLogs")
+  commerce Commerce? @relation(fields: [commerceId], references: [id], name: "CommerceLogs")
+  customer Customer? @relation(fields: [customerId], references: [id], name: "CustomerLogs")
 
   @@map("activity_logs")
-}
-
-model EntityType {
-  id          Int    @id @default(autoincrement())
-  name        String
-  description String
-
-  logs ActivityLog[] @relation("ActivityEntityType")
-
-  @@map("entity_types")
-}
-
-model ChangeType {
-  id          Int    @id @default(autoincrement())
-  name        String
-  description String
-
-  logs ActivityLog[] @relation("ActivityChangeType")
-
-  @@map("change_types")
 }
 
 // =========================================

@@ -8,7 +8,7 @@ import {
 
 import { UserWorkingOverride as UserWorkingOverrideDomain } from '@/domain/entities/userWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { CreateUserOverrideDto } from '@/interfaces/controllers/userWorkingOverride/dto/create-userOverride.dto';
 
 @Injectable()
@@ -83,7 +83,7 @@ export class CreateUserWorkingOverride {
       }
 
       await this.activityLogService.created({
-        entityTypeId: ENTITY_TYPES.USER_WORKING_OVERRIDE,
+        entityType: EntityType.USER_WORKING_OVERRIDE,
         entityId: result.id,
         userId: data.userId,
         commerceId: user.commerceId,

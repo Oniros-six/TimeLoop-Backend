@@ -4,7 +4,7 @@ import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
 import { CreateCommerceDto } from '@/interfaces/controllers/commerces/dto/create-commerce.dto';
 import { Commerce as CommerceDomain } from '@/domain/entities/commerce.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class CreateCommerce {
@@ -54,7 +54,7 @@ export class CreateCommerce {
       }
 
       await this.activityLogService.created({
-        entityTypeId: ENTITY_TYPES.COMMERCE,
+        entityType: EntityType.COMMERCE,
         entityId: result.id,
         userId: null,
         commerceId: result.id,

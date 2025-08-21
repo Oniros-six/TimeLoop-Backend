@@ -1,4 +1,4 @@
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import {
   BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
@@ -104,7 +104,7 @@ export class CreateBooking {
 
       // Activity register
       await this.activityLogService.created({
-        entityTypeId: ENTITY_TYPES.BOOKING,
+        entityType: EntityType.BOOKING,
         entityId: result.id,
         userId: null,
         commerceId: result.commerceId,

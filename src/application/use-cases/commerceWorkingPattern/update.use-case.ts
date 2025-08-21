@@ -4,7 +4,7 @@ import { COMMERCE_WORKING_PATTERN_REPOSITORY } from '@/application/constants/pro
 
 import { CommerceWorkingPattern as CommerceWorkingPatternDomain } from '@/domain/entities/commerceWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { UpdateCommercePatternDto } from '@/interfaces/controllers/commerceWorkingPattern/dto/update-commercePattern.dto';
 
 @Injectable()
@@ -73,7 +73,7 @@ export class UpdateCommerceWorkingPattern {
       }
 
       await this.activityLogService.updated({
-        entityTypeId: ENTITY_TYPES.COMMERCE_WORKING_PATTERN,
+        entityType: EntityType.COMMERCE_WORKING_PATTERN,
         entityId: result.id,
         commerceId: result.commerceId,
         customerId: null,

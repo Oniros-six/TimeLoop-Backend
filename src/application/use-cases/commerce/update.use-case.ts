@@ -4,7 +4,7 @@ import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
 import { UpdateCommerceDto } from '@/interfaces/controllers/commerces/dto/update-commerce.dto';
 import { CommerceUpdateData } from '@/domain/common/CommerceUpdateData';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class UpdateCommerce {
@@ -69,7 +69,7 @@ export class UpdateCommerce {
 
       const updatedFields = Object.keys(newCommerceData).join(', ');
       await this.activityLogService.updated({
-        entityTypeId: ENTITY_TYPES.COMMERCE,
+        entityType: EntityType.COMMERCE,
         entityId: result.id,
         userId: null,
         commerceId: result.id,

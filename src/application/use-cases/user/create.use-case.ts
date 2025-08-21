@@ -7,7 +7,7 @@ import {
   COMMERCE_REPOSITORY,
 } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { ROLES } from '@/application/constants/user-roles.constants';
 import { AuthService } from '@/domain/services/auth/auth.service';
@@ -71,7 +71,7 @@ export class CreateUser {
       }
 
       await this.activityLogService.created({
-        entityTypeId: ENTITY_TYPES.USER,
+        entityType: EntityType.USER,
         entityId: result.id,
         userId: result.id,
         commerceId: result.commerceId,

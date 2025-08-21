@@ -8,7 +8,7 @@ import {
 
 import { CommerceWorkingPattern as CommerceWorkingPatternDomain } from '@/domain/entities/commerceWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { CreateCommercePatternDto } from '@/interfaces/controllers/commerceWorkingPattern/dto/create-commercePattern.dto';
 
 @Injectable()
@@ -69,7 +69,7 @@ export class CreateCommerceWorkingPattern {
       }
 
       await this.activityLogService.created({
-        entityTypeId: ENTITY_TYPES.COMMERCE_WORKING_PATTERN,
+        entityType: EntityType.COMMERCE_WORKING_PATTERN,
         entityId: result.id,
         commerceId: data.commerceId,
         customerId: null,

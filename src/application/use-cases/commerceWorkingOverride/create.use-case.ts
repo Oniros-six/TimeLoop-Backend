@@ -8,7 +8,7 @@ import {
 
 import { CommerceWorkingOverride as CommerceWorkingOverrideDomain } from '@/domain/entities/commerceWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { CreateCommerceOverrideDto } from '@/interfaces/controllers/commerceWorkingOverride/dto/create-commerceOverride.dto';
 
 @Injectable()
@@ -85,7 +85,7 @@ export class CreateCommerceWorkingOverride {
       }
 
       await this.activityLogService.created({
-        entityTypeId: ENTITY_TYPES.COMMERCE_WORKING_OVERRIDE,
+        entityType: EntityType.COMMERCE_WORKING_OVERRIDE,
         entityId: result.id,
         commerceId: data.commerceId,
         customerId: null,

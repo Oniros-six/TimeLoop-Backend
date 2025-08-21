@@ -10,9 +10,9 @@ export class PrismaActivityLogRepository implements IActivityLogRepository {
   async create(log: ActivityLog) {
     return this.prisma.activityLog.create({
       data: {
-        entityTypeId: log.entityTypeId,
+        entityType: log.entityType,
         entityId: log.entityId,
-        changeTypeId: log.changeTypeId,
+        changeType: log.changeType,
         detail: log.detail,
         userId: log.userId,
         commerceId: log.commerceId,

@@ -10,6 +10,12 @@ CREATE TYPE "public"."ReminderChannel" AS ENUM ('email', 'whatsapp', 'sms');
 -- CreateEnum
 CREATE TYPE "public"."ReminderStatus" AS ENUM ('pending', 'sent', 'failed', 'canceled');
 
+-- CreateEnum
+CREATE TYPE "public"."EntityType" AS ENUM ('BOOKING', 'CUSTOMER', 'USER', 'COMMERCE', 'SERVICE', 'USER_CONFIG', 'COMMERCE_CONFIG', 'USER_WORKING_OVERRIDE', 'COMMERCE_WORKING_OVERRIDE', 'USER_WORKING_PATTERN', 'COMMERCE_WORKING_PATTERN');
+
+-- CreateEnum
+CREATE TYPE "public"."ChangeType" AS ENUM ('CREATED', 'UPDATED', 'CANCELLED', 'SUSPENDED', 'REINSTATED');
+
 -- CreateTable
 CREATE TABLE "public"."commerces" (
     "id" SERIAL NOT NULL,
@@ -165,34 +171,16 @@ CREATE TABLE "public"."commerce_working_overrides" (
 -- CreateTable
 CREATE TABLE "public"."activity_logs" (
     "id" SERIAL NOT NULL,
-    "entityTypeId" INTEGER NOT NULL,
     "entityId" INTEGER NOT NULL,
     "userId" INTEGER,
     "commerceId" INTEGER,
     "customerId" INTEGER,
-    "changeTypeId" INTEGER NOT NULL,
+    "entityType" "public"."EntityType" NOT NULL,
+    "changeType" "public"."ChangeType" NOT NULL,
     "detail" TEXT NOT NULL,
     "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "activity_logs_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."entity_types" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-
-    CONSTRAINT "entity_types_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."change_types" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-
-    CONSTRAINT "change_types_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -299,12 +287,6 @@ ALTER TABLE "public"."commerce_working_patterns" ADD CONSTRAINT "commerce_workin
 
 -- AddForeignKey
 ALTER TABLE "public"."commerce_working_overrides" ADD CONSTRAINT "commerce_working_overrides_commerceId_fkey" FOREIGN KEY ("commerceId") REFERENCES "public"."commerces"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."activity_logs" ADD CONSTRAINT "activity_logs_entityTypeId_fkey" FOREIGN KEY ("entityTypeId") REFERENCES "public"."entity_types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."activity_logs" ADD CONSTRAINT "activity_logs_changeTypeId_fkey" FOREIGN KEY ("changeTypeId") REFERENCES "public"."change_types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."activity_logs" ADD CONSTRAINT "activity_logs_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE SET NULL ON UPDATE CASCADE;

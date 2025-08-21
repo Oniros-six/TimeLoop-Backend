@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 
 @Injectable()
 export class ReinstateCommerce {
@@ -39,7 +39,7 @@ export class ReinstateCommerce {
 
       // Activity register
       await this.activityLogService.reinstated({
-        entityTypeId: ENTITY_TYPES.COMMERCE,
+        entityType: EntityType.COMMERCE,
         entityId: result.id,
         userId: null,
         commerceId: result.id,

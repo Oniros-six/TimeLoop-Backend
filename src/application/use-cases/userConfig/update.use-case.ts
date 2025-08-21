@@ -7,7 +7,7 @@ import {
 import { IUserConfigRepository } from '@/domain/repositories/userConfig.repository';
 import { UpdateUserConfigDto } from '@/interfaces/controllers/userConfig/dto/update-userConfig.dto';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { ENTITY_TYPES } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/application/constants/activity-log.constants';
 import { UserConfig as UserConfigDomain } from '@/domain/entities/userConfig.entity';
 
 @Injectable()
@@ -63,7 +63,7 @@ export class UpdateUserConfig {
       }
 
       await this.activityLogService.updated({
-        entityTypeId: ENTITY_TYPES.USER_CONFIG,
+        entityType: EntityType.USER_CONFIG,
         entityId: result.id,
         userId: userId,
         commerceId: user.commerceId,
