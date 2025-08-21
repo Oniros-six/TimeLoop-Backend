@@ -44,8 +44,9 @@ export class PrismaCommerceConfigRepository
   }
 
   async createCommerceConfig(data: DomainClient): Promise<DomainClient | null> {
+    const { id, ...rest } = data; // removing id
     const result = await this.prisma.commerceConfig.create({
-      data: data,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);
@@ -55,9 +56,10 @@ export class PrismaCommerceConfigRepository
     commerceId: number;
     newCommerceConfigData: DomainClient;
   }): Promise<DomainClient | null> {
+    const { id, ...rest } = data.newCommerceConfigData; // removing id
     const result = await this.prisma.commerceConfig.update({
       where: { commerceId: data.commerceId },
-      data: data.newCommerceConfigData,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);

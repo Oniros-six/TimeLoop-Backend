@@ -55,8 +55,9 @@ export class PrismaUserWorkingPatternRepository
   async createUserWorkingPattern(
     data: DomainClient,
   ): Promise<DomainClient | null> {
+    const { id, ...rest } = data; // removing id
     const result = await this.prisma.userWorkingPattern.create({
-      data: data,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);
@@ -77,9 +78,10 @@ export class PrismaUserWorkingPatternRepository
     id: number;
     newUserWorkingPatternData: DomainClient;
   }): Promise<DomainClient | null> {
+    const { id, ...rest } = data.newUserWorkingPatternData;
     const result = await this.prisma.userWorkingPattern.update({
       where: { id: data.id },
-      data: data.newUserWorkingPatternData,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);

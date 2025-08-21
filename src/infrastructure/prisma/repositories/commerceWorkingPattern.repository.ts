@@ -55,8 +55,9 @@ export class PrismaCommerceWorkingPatternRepository
   async createCommerceWorkingPattern(
     data: DomainClient,
   ): Promise<DomainClient | null> {
+    const { id, ...rest } = data; // removing id
     const result = await this.prisma.commerceWorkingPattern.create({
-      data: data,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);
@@ -77,9 +78,10 @@ export class PrismaCommerceWorkingPatternRepository
     id: number;
     newCommerceWorkingPatternData: DomainClient;
   }): Promise<DomainClient | null> {
+    const { id, ...rest } = data.newCommerceWorkingPatternData; // removing id
     const result = await this.prisma.commerceWorkingPattern.update({
       where: { id: data.id },
-      data: data.newCommerceWorkingPatternData,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);

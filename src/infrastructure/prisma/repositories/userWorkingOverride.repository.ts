@@ -66,8 +66,9 @@ export class PrismaUserWorkingOverrideRepository
   async createUserWorkingOverride(
     data: DomainClient,
   ): Promise<DomainClient | null> {
+    const { id, ...rest } = data; // removing id
     const result = await this.prisma.userWorkingOverride.create({
-      data: data,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);
@@ -88,9 +89,10 @@ export class PrismaUserWorkingOverrideRepository
     id: number;
     newUserWorkingOverrideData: DomainClient;
   }): Promise<DomainClient | null> {
+    const { id, ...rest } = data.newUserWorkingOverrideData;
     const result = await this.prisma.userWorkingOverride.update({
       where: { id: data.id },
-      data: data.newUserWorkingOverrideData,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);

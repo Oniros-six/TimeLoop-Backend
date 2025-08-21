@@ -66,8 +66,9 @@ export class PrismaCommerceWorkingOverrideRepository
   async createCommerceWorkingOverride(
     data: DomainClient,
   ): Promise<DomainClient | null> {
+    const { id, ...rest } = data; // removing id
     const result = await this.prisma.commerceWorkingOverride.create({
-      data: data,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);
@@ -88,9 +89,10 @@ export class PrismaCommerceWorkingOverrideRepository
     id: number;
     newCommerceWorkingOverrideData: DomainClient;
   }): Promise<DomainClient | null> {
+    const { id, ...rest } = data.newCommerceWorkingOverrideData; // removing id
     const result = await this.prisma.commerceWorkingOverride.update({
       where: { id: data.id },
-      data: data.newCommerceWorkingOverrideData,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);
