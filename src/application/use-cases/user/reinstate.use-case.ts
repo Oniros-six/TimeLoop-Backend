@@ -29,7 +29,6 @@ export class ReinstateUser {
     try {
       const result = await this.userRepository.reinstateUser({
         userId: data.userId,
-        commerceId: data.commerceId,
       });
 
       if (result === null) {

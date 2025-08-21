@@ -71,7 +71,6 @@ export class UpdateUser {
     try {
       const result = await this.userRepository.updateUser({
         userId: id,
-        commerceId: user.commerceId,
         newUserData: newUserData,
       });
 

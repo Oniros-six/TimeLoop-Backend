@@ -94,12 +94,6 @@ export class UserController {
     required: true,
     description: 'ID del usuario',
   })
-  @ApiQuery({
-    name: 'commerceId',
-    type: Number,
-    required: true,
-    description: 'ID del comercio',
-  })
   @ApiBody({ type: UpdateUserDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Put()
@@ -118,12 +112,6 @@ export class UserController {
     required: true,
     description: 'ID del usuario',
   })
-  @ApiQuery({
-    name: 'commerceId',
-    type: Number,
-    required: true,
-    description: 'ID del comercio',
-  })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Patch('suspend')
   suspend(@Query() dto: StateUserDto) {
@@ -137,12 +125,6 @@ export class UserController {
     type: Number,
     required: true,
     description: 'ID del usuario',
-  })
-  @ApiQuery({
-    name: 'commerceId',
-    type: Number,
-    required: true,
-    description: 'ID del comercio',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Patch('reinstate')

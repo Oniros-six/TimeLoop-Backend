@@ -14,12 +14,10 @@ export interface IUserRepository {
   findAllUsers(data: { commerceId: number }): Promise<User[] | null>;
 
   suspendUser(data: {
-    commerceId: number;
     userId: number;
   }): Promise<User | null>;
 
   reinstateUser(data: {
-    commerceId: number;
     userId: number;
   }): Promise<User | null>;
 
@@ -27,7 +25,6 @@ export interface IUserRepository {
 
   updateUser(data: {
     userId: number;
-    commerceId: number;
     newUserData: UserUpdateData;
   }): Promise<User | null>;
 }

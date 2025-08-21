@@ -29,7 +29,6 @@ export class SuspendUser {
     try {
       const result = await this.userRepository.suspendUser({
         userId: data.userId,
-        commerceId: data.commerceId,
       });
 
       if (result === null) {

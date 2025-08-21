@@ -50,7 +50,6 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async suspendUser(data: {
-    commerceId: number;
     userId: number;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.user.update({
@@ -65,7 +64,6 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async reinstateUser(data: {
-    commerceId: number;
     userId: number;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.user.update({
