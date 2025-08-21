@@ -32,8 +32,9 @@ export class PrismaUserConfigRepository implements IUserConfigRepository {
   }
 
   async createUserConfig(data: DomainClient): Promise<DomainClient | null> {
+    const { id, ...rest } = data; // removing id
     const result = await this.prisma.userConfig.create({
-      data: data,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);
@@ -43,9 +44,10 @@ export class PrismaUserConfigRepository implements IUserConfigRepository {
     userId: number;
     newUserConfigData: DomainClient;
   }): Promise<DomainClient | null> {
+    const { id, ...rest } = data.newUserConfigData; // removing id
     const result = await this.prisma.userConfig.update({
       where: { userId: data.userId },
-      data: data.newUserConfigData,
+      data: rest,
     });
     if (!result) return null;
     return this.toDomain(result);
