@@ -3,9 +3,9 @@ import { Type } from 'class-transformer';
 import { IsNumber, IsString, Min, MinLength } from 'class-validator';
 
 export class UpdateServiceDto {
-  @ApiProperty({ example: 1, description: 'ID del comercio', }) 
-  @Type(() => Number) 
-  @IsNumber({}, { message: 'El ID del comercio debe ser un número' }) 
+  @ApiProperty({ example: 1, description: 'ID del comercio' })
+  @Type(() => Number)
+  @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
   commerceId: number;
 
   @ApiProperty({ example: 'Corte de pelo', description: 'Nombre del servicio' })

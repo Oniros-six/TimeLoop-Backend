@@ -15,7 +15,7 @@ export interface SafeUser {
   commerceId: number;
   email: string;
   name: string;
-  role: Roles; 
+  role: Roles;
   active: boolean;
 }
 

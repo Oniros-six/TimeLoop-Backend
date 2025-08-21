@@ -1,4 +1,4 @@
-import { Roles } from '@/application/constants/user-roles.constants'
+import { Roles } from '@/application/constants/user-roles.constants';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {

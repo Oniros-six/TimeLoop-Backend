@@ -1,4 +1,4 @@
-import { Roles } from '@/application/constants/user-roles.constants'
+import { Roles } from '@/application/constants/user-roles.constants';
 
 export class User {
   constructor(
