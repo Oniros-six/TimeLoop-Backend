@@ -138,7 +138,7 @@ export class NotificationService {
 
       if (result) {
         this.logger.log(`Email sent: ${data.customerEmail}`);
-        await this.remindersService.update(data.id);
+        await this.remindersService.updateSent(data.id);
       }
     }
 
