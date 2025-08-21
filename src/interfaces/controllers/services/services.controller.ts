@@ -30,7 +30,6 @@ import { FindAllServices } from '@/application/use-cases/services/find-all.use-c
 // DTOs
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
-import { FindServiceDto } from './dto/find-service.dto';
 import { DeleteServiceDto } from './dto/delete-service.dto';
 
 @ApiTags('Services')
@@ -54,12 +53,12 @@ export class ServicesController {
   }
 
   // Get a Service
-  @ApiOperation({ summary: 'Obtener un Service por su ID' })
-  @ApiQuery({
+  @ApiOperation({ summary: 'Obtener un servicio por su ID' })
+  @ApiParam({
     name: 'id',
     type: Number,
     required: true,
-    description: 'ID del Service',
+    description: 'ID del servicio',
   })
   @ApiQuery({
     name: 'commerceId',
@@ -68,23 +67,38 @@ export class ServicesController {
     description: 'ID del comercio',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Get()
-  find(@Query() dto: FindServiceDto) {
-    return this.findServiceUseCase.execute(dto.id, dto.commerceId);
+  @Get(':id')
+  async find(@Param('id', ParseIntPipe) id: number, @Query('commerceId', ParseIntPipe) commerceId: number) {
+    const res = await this.findServiceUseCase.execute(id, commerceId);
+  
+    if (!res.data) {
+      return { message: 'Servicio no encontrado', statusCode: 404, data: null };
+    }
+  
+    return {
+      message: res.message,
+      statusCode: res.statusCode,
+      data: res.data,
+    };
   }
 
   // Get all Services
-  @ApiOperation({ summary: 'Obtener todos los servicios' })
-  @ApiParam({
-    name: 'id',
+  @ApiOperation({ summary: 'Obtener todos los servicios de un comercio' })
+  @ApiQuery({
+    name: 'commerceId',
     type: Number,
     required: true,
     description: 'ID del comercio',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Get(':id')
-  findAll(@Param('id', ParseIntPipe) id: number) {
-    return this.findAllServicesUseCase.execute(id);
+  @Get()
+  async findAll(@Query('commerceId', ParseIntPipe) commerceId: number) {
+    const res = await this.findAllServicesUseCase.execute(commerceId);
+    return {
+      message: res.message,
+      statusCode: res.statusCode,
+      data: res.data,
+    };
   }
 
   // Update a Service
