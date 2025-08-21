@@ -4,15 +4,16 @@ import { AuthService } from '@/domain/services/auth/auth.service';
 
 @Injectable()
 export class LoginUser {
-  constructor(
-    private readonly authService: AuthService,
-  ) { }
+  constructor(private readonly authService: AuthService) {}
 
   async execute(data: LoginUserDto) {
     const user = await this.authService.validateUser(data);
 
     if (!user) {
-      throw new HttpException('Credenciales inválidas.', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        'Credenciales inválidas.',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     return user;
