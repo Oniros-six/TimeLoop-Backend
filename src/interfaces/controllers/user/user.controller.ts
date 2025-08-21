@@ -31,9 +31,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
 import { StateUserDto } from './dto/state-user.dto';
 
-// Auth guards and decorators
-import { AuthGuard } from '@/infrastructure/auth/auth.guard';
-import { RolesGuard } from '@/infrastructure/auth/roles.guard';
+// // Auth guards and decorators
+// import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+// import { RolesGuard } from '@/infrastructure/auth/roles.guard';
 
 @ApiTags('Users')
 @Controller('user')
@@ -45,15 +45,22 @@ export class UserController {
     private readonly updateUserUseCase: UpdateUser,
     private readonly suspendUserUseCase: SuspendUser,
     private readonly reinstateUserUseCase: ReinstateUser,
-  ) {}
+  ) { }
 
   // Create a user
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
   @ApiBody({ type: CreateUserDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Post()
-  create(@Body() dto: CreateUserDto) {
-    return this.createUserUseCase.execute(dto);
+  async create(@Body() dto: CreateUserDto) {
+    const res = await this.createUserUseCase.execute(dto);
+    const { password, role, active, ...data } = res.data;
+
+    return {
+      message: res.message,
+      statusCode: res.statusCode,
+      data: data,
+    };
   }
 
   // Get a user
@@ -66,8 +73,15 @@ export class UserController {
   })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get()
-  find(@Query() dto: FindUserDto) {
-    return this.findUserUseCase.execute(dto.userId);
+  async find(@Query() dto: FindUserDto) {
+    const res = await this.findUserUseCase.execute(dto.userId);
+    const { password, role, active, ...data } = res.data;
+
+    return {
+      message: res.message,
+      statusCode: res.statusCode,
+      data: data,
+    };
   }
 
   // Get a all users
@@ -82,8 +96,15 @@ export class UserController {
   })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get('all/:commerceId')
-  findAll(@Param('commerceId', ParseIntPipe) commerceId: number) {
-    return this.findAllUsersUseCase.execute(commerceId);
+  async findAll(@Param('commerceId', ParseIntPipe) commerceId: number) {
+    const res = await this.findAllUsersUseCase.execute(commerceId);
+    const safeData = res.data?.map(({ password, role, active, ...rest }) => rest) ?? [];
+
+    return {
+      message: res.message,
+      statusCode: res.statusCode,
+      data: safeData,
+    };
   }
 
   // Update a user
@@ -97,11 +118,18 @@ export class UserController {
   @ApiBody({ type: UpdateUserDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Put()
-  update(
+  async update(
     @Query('userId', ParseIntPipe) userId: number,
     @Body() dto: UpdateUserDto,
   ) {
-    return this.updateUserUseCase.execute(userId, dto);
+    const res = await this.updateUserUseCase.execute(userId, dto);
+    const { password, role, active, ...data } = res.data;
+
+    return {
+      message: res.message,
+      statusCode: res.statusCode,
+      data: data,
+    };
   }
 
   // Suspend a user
@@ -114,8 +142,15 @@ export class UserController {
   })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Patch('suspend')
-  suspend(@Query() dto: StateUserDto) {
-    return this.suspendUserUseCase.execute(dto);
+  async suspend(@Query() dto: StateUserDto) {
+    const res = await this.suspendUserUseCase.execute(dto);
+    const { password, role, active, ...data } = res.data;
+
+    return {
+      message: res.message,
+      statusCode: res.statusCode,
+      data: data,
+    };
   }
 
   // Reinstate a user
@@ -128,7 +163,14 @@ export class UserController {
   })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Patch('reinstate')
-  reinstate(@Query() dto: StateUserDto) {
-    return this.reinstateUserUseCase.execute(dto);
+  async reinstate(@Query() dto: StateUserDto) {
+    const res = await this.reinstateUserUseCase.execute(dto);
+    const { password, role, active, ...data } = res.data;
+
+    return {
+      message: res.message,
+      statusCode: res.statusCode,
+      data: data,
+    };
   }
 }
