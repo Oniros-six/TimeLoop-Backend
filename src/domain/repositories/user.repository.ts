@@ -13,13 +13,9 @@ export interface IUserRepository {
 
   findAllUsers(data: { commerceId: number }): Promise<User[] | null>;
 
-  suspendUser(data: {
-    userId: number;
-  }): Promise<User | null>;
+  suspendUser(data: { userId: number }): Promise<User | null>;
 
-  reinstateUser(data: {
-    userId: number;
-  }): Promise<User | null>;
+  reinstateUser(data: { userId: number }): Promise<User | null>;
 
   createUser(data: User): Promise<User | null>;
 

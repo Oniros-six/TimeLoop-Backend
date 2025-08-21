@@ -49,9 +49,7 @@ export class PrismaUserRepository implements IUserRepository {
     return result.map((user) => this.toDomain(user));
   }
 
-  async suspendUser(data: {
-    userId: number;
-  }): Promise<DomainClient | null> {
+  async suspendUser(data: { userId: number }): Promise<DomainClient | null> {
     const result = await this.prisma.user.update({
       where: { id: data.userId },
       data: {
@@ -63,9 +61,7 @@ export class PrismaUserRepository implements IUserRepository {
     return this.toDomain(result);
   }
 
-  async reinstateUser(data: {
-    userId: number;
-  }): Promise<DomainClient | null> {
+  async reinstateUser(data: { userId: number }): Promise<DomainClient | null> {
     const result = await this.prisma.user.update({
       where: { id: data.userId },
       data: {

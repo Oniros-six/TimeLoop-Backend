@@ -28,7 +28,6 @@ import { ReinstateUser } from '@/application/use-cases/user/reinstate.use-case';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { FindUserDto } from './dto/find-user.dto';
 import { StateUserDto } from './dto/state-user.dto';
 
 // // Auth guards and decorators
@@ -45,7 +44,7 @@ export class UserController {
     private readonly updateUserUseCase: UpdateUser,
     private readonly suspendUserUseCase: SuspendUser,
     private readonly reinstateUserUseCase: ReinstateUser,
-  ) { }
+  ) {}
 
   // Create a user
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
@@ -65,22 +64,27 @@ export class UserController {
 
   // Get a user
   @ApiOperation({ summary: 'Obtener un usuario por su ID' })
-  @ApiQuery({
-    name: 'userId',
+  @ApiParam({
+    name: 'id',
     type: Number,
     required: true,
     description: 'ID del usuario',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Get()
-  async find(@Query() dto: FindUserDto) {
-    const res = await this.findUserUseCase.execute(dto.userId);
+  @Get(':id')
+  async find(@Param('id', ParseIntPipe) id: number) {
+    const res = await this.findUserUseCase.execute(id);
+
+    if (!res.data) {
+      return { message: 'Usuario no encontrado', statusCode: 404, data: null };
+    }
+
     const { password, role, active, ...data } = res.data;
 
     return {
       message: res.message,
       statusCode: res.statusCode,
-      data: data,
+      data,
     };
   }
 
@@ -88,17 +92,19 @@ export class UserController {
   @ApiOperation({
     summary: 'Obtener todos los usuarios de un comercio en base a su ID',
   })
-  @ApiParam({
+  @ApiQuery({
     name: 'commerceId',
     type: Number,
     required: true,
     description: 'ID del comercio',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Get('all/:commerceId')
-  async findAll(@Param('commerceId', ParseIntPipe) commerceId: number) {
+  @Get()
+  async findAll(@Query('commerceId', ParseIntPipe) commerceId: number) {
     const res = await this.findAllUsersUseCase.execute(commerceId);
-    const safeData = res.data?.map(({ password, role, active, ...rest }) => rest) ?? [];
+
+    const safeData =
+      res.data?.map(({ password, role, active, ...rest }) => rest) ?? [];
 
     return {
       message: res.message,
