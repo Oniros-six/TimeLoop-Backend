@@ -201,9 +201,6 @@ model CommerceConfig {
 model UserConfig {
   id                Int     @id @default(autoincrement())
   userId            Int     @unique
-  darkMode          Boolean
-  reminder          Boolean
-  reminderFrequency Int
 
   user User @relation(fields: [userId], references: [id], name: "UserConfig")
 

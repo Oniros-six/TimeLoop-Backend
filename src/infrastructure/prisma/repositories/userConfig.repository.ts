@@ -10,16 +10,10 @@ export class PrismaUserConfigRepository implements IUserConfigRepository {
   private toDomain(user: {
     id: number;
     userId: number;
-    darkMode: boolean;
-    reminder: boolean;
-    reminderFrequency: number;
   }): DomainClient {
     return new DomainClient(
       user.id,
       user.userId,
-      user.darkMode,
-      user.reminder,
-      user.reminderFrequency,
     );
   }
 
