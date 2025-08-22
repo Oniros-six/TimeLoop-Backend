@@ -24,7 +24,7 @@ export class CommerceConfigController {
     private readonly createCommerceConfigUseCase: CreateCommerceConfig,
     private readonly updateCommerceConfigUseCase: UpdateCommerceConfig,
     private readonly findCommerceConfigUseCase: FindCommerceConfig,
-  ) {}
+  ) { }
 
   // Create a commerce
   @ApiOperation({ summary: 'Crear la configuración de un comercio' })
@@ -50,11 +50,15 @@ export class CommerceConfigController {
   }
 
   // Update a commerce
-  @ApiOperation({ summary: 'Actualizar la información de un comercio' })
+  @ApiOperation({ summary: 'Actualizar la configuración de un comercio' })
+  @ApiParam({ name: 'commerceId', type: Number, description: 'ID del comercio' })
   @ApiBody({ type: UpdateCommerceConfigDto })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Put()
-  update(@Body() dto: UpdateCommerceConfigDto) {
-    return this.updateCommerceConfigUseCase.execute(dto.commerceId, dto);
+  @Put(':commerceId')
+  update(
+    @Param('commerceId', ParseIntPipe) commerceId: number,
+    @Body() dto: UpdateCommerceConfigDto,
+  ) {
+    return this.updateCommerceConfigUseCase.execute(commerceId, dto);
   }
 }

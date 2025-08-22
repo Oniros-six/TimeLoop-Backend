@@ -10,15 +10,6 @@ import {
 
 export class UpdateCommerceConfigDto {
   @ApiProperty({
-    example: 1,
-    description: 'ID del comercio',
-  })
-  @Type(() => Number)
-  @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
-  @IsNotEmpty({ message: 'El ID del comercio es requerido' })
-  commerceId: number;
-
-  @ApiProperty({
     example: true,
     description: 'Permitir cancelaciones',
   })
