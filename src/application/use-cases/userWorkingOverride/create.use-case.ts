@@ -10,6 +10,7 @@ import { UserWorkingOverride as UserWorkingOverrideDomain } from '@/domain/entit
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/application/constants/activity-log.constants';
 import { CreateUserOverrideDto } from '@/interfaces/controllers/userWorkingOverride/dto/create-userOverride.dto';
+import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 
 @Injectable()
 export class CreateUserWorkingOverride {
@@ -21,14 +22,7 @@ export class CreateUserWorkingOverride {
     private readonly userRepository: IUserRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
-
-  private stringToDate(time: string): Date {
-    const [hours, minutes] = time.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-    return date;
-  }
+  ) { }
 
   async execute(data: CreateUserOverrideDto) {
     const user = await this.userRepository.findUser({
@@ -52,19 +46,27 @@ export class CreateUserWorkingOverride {
       );
     }
 
+    validateAvailabilityTimes({
+      availabilityType: data.availabilityType,
+      morningStart: data.morningStart,
+      morningEnd: data.morningEnd,
+      afternoonStart: data.afternoonStart,
+      afternoonEnd: data.afternoonEnd
+    })
+
     const userWorkingOverride = UserWorkingOverrideDomain.create({
       userId: data.userId,
       date: data.date,
       overrideType: data.availabilityType,
       morningStart: data.morningStart
-        ? this.stringToDate(data.morningStart)
+        ? data.morningStart
         : null,
-      morningEnd: data.morningEnd ? this.stringToDate(data.morningEnd) : null,
+      morningEnd: data.morningEnd ? data.morningEnd : null,
       afternoonStart: data.afternoonStart
-        ? this.stringToDate(data.afternoonStart)
+        ? data.afternoonStart
         : null,
       afternoonEnd: data.afternoonEnd
-        ? this.stringToDate(data.afternoonEnd)
+        ? data.afternoonEnd
         : null,
       notes: data.notes || '',
     });

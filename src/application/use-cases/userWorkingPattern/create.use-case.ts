@@ -10,6 +10,7 @@ import { UserWorkingPattern as UserWorkingPatternDomain } from '@/domain/entitie
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/application/constants/activity-log.constants';
 import { CreateUserPatternDto } from '@/interfaces/controllers/userWorkingPattern/dto/create-userPattern.dto';
+import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 
 @Injectable()
 export class CreateUserWorkingPattern {
@@ -21,37 +22,45 @@ export class CreateUserWorkingPattern {
     private readonly userRepository: IUserRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
-
-  private stringToDate(time: string): Date {
-    const [hours, minutes] = time.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-    return date;
-  }
+  ) { }
 
   async execute(data: CreateUserPatternDto) {
-    const user = await this.userRepository.findUser({
-      userId: data.userId,
-    });
+    const user = await this.userRepository.findUser({ userId: data.userId, });
 
     if (!user) {
       throw new HttpException('El usuario no existe.', HttpStatus.NOT_FOUND);
     }
+
+    const patternExist = await this.userWorkingPatternRepository.verifyUserWorkingPattern({
+      userId: data.userId,
+      weekday: data.weekday
+    })
+
+    if (patternExist) {
+      throw new HttpException('Ya hay una configuración para este día.', HttpStatus.NOT_FOUND);
+    }
+
+    validateAvailabilityTimes({
+      availabilityType: data.availabilityType,
+      morningStart: data.morningStart,
+      morningEnd: data.morningEnd,
+      afternoonStart: data.afternoonStart,
+      afternoonEnd: data.afternoonEnd
+    })
 
     const userWorkingPattern = UserWorkingPatternDomain.create({
       userId: data.userId,
       weekday: data.weekday,
       availabilityType: data.availabilityType,
       morningStart: data.morningStart
-        ? this.stringToDate(data.morningStart)
+        ? data.morningStart
         : null,
-      morningEnd: data.morningEnd ? this.stringToDate(data.morningEnd) : null,
+      morningEnd: data.morningEnd ? data.morningEnd : null,
       afternoonStart: data.afternoonStart
-        ? this.stringToDate(data.afternoonStart)
+        ? data.afternoonStart
         : null,
       afternoonEnd: data.afternoonEnd
-        ? this.stringToDate(data.afternoonEnd)
+        ? data.afternoonEnd
         : null,
     });
 

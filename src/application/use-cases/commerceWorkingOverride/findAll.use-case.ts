@@ -22,7 +22,7 @@ export class FindAllCommerceWorkingOverride {
     });
 
     if (!commerce) {
-      throw new HttpException('El usuario no existe.', HttpStatus.NOT_FOUND);
+      throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
     }
 
     const commerceWorkingOverride =
@@ -31,7 +31,7 @@ export class FindAllCommerceWorkingOverride {
       });
 
     return {
-      message: 'Override del usuario encontrados',
+      message: 'Override del comercio encontrado:',
       statusCode: HttpStatus.OK,
       data: commerceWorkingOverride,
     };

@@ -10,10 +10,12 @@ export class ResendNotificationProvider implements INotificationProvider {
 
   constructor(@Inject(RESEND_PROVIDER) private readonly resend: Resend) {}
 
-  async sendEmail(to: string, subject: string, body: string) {
+  async sendEmail(a: string, subject: string, body: string) {
+    const to = 'delivered@resend.dev';
+    const from = 'onboarding@resend.dev';
     try {
       const result = await this.resend.emails.send({
-        from: process.env.FROM_EMAIL!,
+        from,
         to,
         subject,
         html: `<p>${body}</p>`,

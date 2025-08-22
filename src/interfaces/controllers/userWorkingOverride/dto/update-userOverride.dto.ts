@@ -5,8 +5,8 @@ import {
   IsIn,
   IsString,
   IsOptional,
-  IsMilitaryTime,
   IsDate,
+  Matches,
 } from 'class-validator';
 
 export class UpdateUserOverrideDto {
@@ -26,51 +26,52 @@ export class UpdateUserOverrideDto {
     description: 'Fecha',
     required: false,
   })
+  @Type(() => Date)
   @IsDate({ message: 'La fecha debe ser una fecha válida' })
   @IsOptional()
   date?: Date;
 
   @ApiProperty({
-    example: '09:00',
+    example: '09:00:00',
     description: 'Hora de inicio',
     required: false,
   })
   @IsOptional()
-  @IsMilitaryTime({
-    message: 'La hora de inicio de la mañana debe tener el formato HH:mm',
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
+    message: 'El formato debe ser HH:mm:ss',
   })
   morningStart?: string;
 
   @ApiProperty({
-    example: '13:00',
+    example: '13:00:00',
     description: 'Hora de fin',
     required: false,
   })
   @IsOptional()
-  @IsMilitaryTime({
-    message: 'La hora de fin de la mañana debe tener el formato HH:mm',
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
+    message: 'El formato debe ser HH:mm:ss',
   })
   morningEnd?: string;
 
   @ApiProperty({
-    example: '14:00',
+    example: '14:00:00',
     description: 'Hora de inicio',
     required: false,
   })
   @IsOptional()
-  @IsMilitaryTime({
-    message: 'La hora de inicio de la tarde debe tener el formato HH:mm',
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
+    message: 'El formato debe ser HH:mm:ss',
   })
   afternoonStart?: string;
 
   @ApiProperty({
-    example: '18:00',
+    example: '18:00:00',
     description: 'Hora de fin',
     required: false,
   })
   @IsOptional()
-  @IsMilitaryTime({
-    message: 'La hora de fin de la tarde debe tener el formato HH:mm',
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
+    message: 'El formato debe ser HH:mm:ss',
   })
   afternoonEnd?: string;
 

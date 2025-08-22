@@ -15,10 +15,10 @@ export class PrismaUserWorkingOverrideRepository
     userId: number;
     date: Date;
     overrideType: AvailabilityType;
-    morningStart: Date | null;
-    morningEnd: Date | null;
-    afternoonStart: Date | null;
-    afternoonEnd: Date | null;
+    morningStart: string | null;
+    morningEnd: string | null;
+    afternoonStart: string | null;
+    afternoonEnd: string | null;
     notes: string;
   }): DomainClient {
     return new DomainClient(
@@ -37,14 +37,15 @@ export class PrismaUserWorkingOverrideRepository
   async findUserWorkingOverride(data: {
     userId: number;
   }): Promise<DomainClient[] | null> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // inicio del día
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1); // retrocede un día
+    yesterday.setHours(0, 0, 0, 0); // inicio del día
 
     const result = await this.prisma.userWorkingOverride.findMany({
       where: {
         userId: data.userId,
         date: {
-          gte: today,
+          gte: yesterday,
         },
       },
     });

@@ -10,6 +10,7 @@ import { CommerceWorkingOverride as CommerceWorkingOverrideDomain } from '@/doma
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/application/constants/activity-log.constants';
 import { CreateCommerceOverrideDto } from '@/interfaces/controllers/commerceWorkingOverride/dto/create-commerceOverride.dto';
+import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 
 @Injectable()
 export class CreateCommerceWorkingOverride {
@@ -21,14 +22,7 @@ export class CreateCommerceWorkingOverride {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
-
-  private stringToDate(time: string): Date {
-    const [hours, minutes] = time.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-    return date;
-  }
+  ) { }
 
   async execute(data: CreateCommerceOverrideDto) {
     const commerce = await this.commerceRepository.findCommerce({
@@ -54,19 +48,27 @@ export class CreateCommerceWorkingOverride {
       );
     }
 
+    validateAvailabilityTimes({
+      availabilityType: data.availabilityType,
+      morningStart: data.morningStart,
+      morningEnd: data.morningEnd,
+      afternoonStart: data.afternoonStart,
+      afternoonEnd: data.afternoonEnd
+    })
+
     const commerceWorkingOverride = CommerceWorkingOverrideDomain.create({
       commerceId: data.commerceId,
       date: data.date,
       overrideType: data.availabilityType,
       morningStart: data.morningStart
-        ? this.stringToDate(data.morningStart)
+        ? data.morningStart
         : null,
-      morningEnd: data.morningEnd ? this.stringToDate(data.morningEnd) : null,
+      morningEnd: data.morningEnd ? data.morningEnd : null,
       afternoonStart: data.afternoonStart
-        ? this.stringToDate(data.afternoonStart)
+        ? data.afternoonStart
         : null,
       afternoonEnd: data.afternoonEnd
-        ? this.stringToDate(data.afternoonEnd)
+        ? data.afternoonEnd
         : null,
       notes: data.notes || '',
     });

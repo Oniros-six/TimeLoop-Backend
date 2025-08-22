@@ -6,6 +6,7 @@ import { UserWorkingPattern as UserWorkingPatternDomain } from '@/domain/entitie
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/application/constants/activity-log.constants';
 import { UpdateUserPatternDto } from '@/interfaces/controllers/userWorkingPattern/dto/update-userPattern.dto';
+import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 
 @Injectable()
 export class UpdateUserWorkingPattern {
@@ -13,20 +14,10 @@ export class UpdateUserWorkingPattern {
     @Inject(USER_WORKING_PATTERN_REPOSITORY)
     private readonly userWorkingPatternRepository: IUserWorkingPatternRepository,
     private readonly activityLogService: ActivityLogService,
-  ) {}
-
-  private stringToDate(time: string): Date {
-    const [hours, minutes] = time.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-    return date;
-  }
+  ) { }
 
   async execute(id: number, data: UpdateUserPatternDto) {
-    const existingPattern =
-      await this.userWorkingPatternRepository.findUserWorkingPatternById({
-        id,
-      });
+    const existingPattern = await this.userWorkingPatternRepository.findUserWorkingPatternById({ id });
 
     if (!existingPattern) {
       throw new HttpException(
@@ -35,22 +26,30 @@ export class UpdateUserWorkingPattern {
       );
     }
 
+    validateAvailabilityTimes({
+      availabilityType: data.availabilityType,
+      morningStart: data.morningStart,
+      morningEnd: data.morningEnd,
+      afternoonStart: data.afternoonStart,
+      afternoonEnd: data.afternoonEnd
+    })
+
     const userWorkingPattern = UserWorkingPatternDomain.create({
       userId: existingPattern.userId,
       weekday: existingPattern.weekday,
       availabilityType:
         data.availabilityType ?? existingPattern.availabilityType,
       morningStart: data.morningStart
-        ? this.stringToDate(data.morningStart)
+        ? data.morningStart
         : existingPattern.morningStart,
       morningEnd: data.morningEnd
-        ? this.stringToDate(data.morningEnd)
+        ? data.morningEnd
         : existingPattern.morningEnd,
       afternoonStart: data.afternoonStart
-        ? this.stringToDate(data.afternoonStart)
+        ? data.afternoonStart
         : existingPattern.afternoonStart,
       afternoonEnd: data.afternoonEnd
-        ? this.stringToDate(data.afternoonEnd)
+        ? data.afternoonEnd
         : existingPattern.afternoonEnd,
     });
 

@@ -31,6 +31,14 @@ export class CreateUserConfig {
       throw new HttpException('El usuario no existe.', HttpStatus.NOT_FOUND);
     }
 
+    const configExistence = await this.userConfigRepository.findUserConfig({
+      userId: userId,
+    });
+
+    if (configExistence) {
+      throw new HttpException('El usuario ya tiene una configuración.', HttpStatus.BAD_REQUEST);
+    }
+
     const userConfig = UserConfigDomain.create({
       userId: userId,
     });

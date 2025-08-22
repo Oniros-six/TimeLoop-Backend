@@ -215,10 +215,10 @@ model UserWorkingPattern {
   userId           Int
   weekday          WeekDays
   availabilityType AvailabilityType
-  morningStart     DateTime?
-  morningEnd       DateTime?
-  afternoonStart   DateTime?
-  afternoonEnd     DateTime?
+  morningStart     String?
+  morningEnd       String?
+  afternoonStart   String?
+  afternoonEnd     String?
 
   user User @relation(fields: [userId], references: [id], name: "UserWorkingPatterns")
 
@@ -231,10 +231,10 @@ model UserWorkingOverride {
   userId         Int
   date           DateTime
   overrideType   AvailabilityType
-  morningStart   DateTime?
-  morningEnd     DateTime?
-  afternoonStart DateTime?
-  afternoonEnd   DateTime?
+  morningStart   String?
+  morningEnd     String?
+  afternoonStart String?
+  afternoonEnd   String?
   notes          String
 
   user User @relation(fields: [userId], references: [id], name: "UserOverridePatterns")
@@ -253,10 +253,10 @@ model CommerceWorkingPattern {
   commerceId       Int
   weekday          WeekDays
   availabilityType AvailabilityType
-  morningStart     DateTime?
-  morningEnd       DateTime?
-  afternoonStart   DateTime?
-  afternoonEnd     DateTime?
+  morningStart     String?
+  morningEnd       String?
+  afternoonStart   String?
+  afternoonEnd     String?
 
   commerce Commerce @relation(fields: [commerceId], references: [id], name: "CommerceWorkingPatterns")
 
@@ -269,10 +269,10 @@ model CommerceWorkingOverride {
   commerceId     Int
   date           DateTime
   overrideType   AvailabilityType
-  morningStart   DateTime?
-  morningEnd     DateTime?
-  afternoonStart DateTime?
-  afternoonEnd   DateTime?
+  morningStart   String?
+  morningEnd     String?
+  afternoonStart String?
+  afternoonEnd   String?
   notes          String
 
   commerce Commerce @relation(fields: [commerceId], references: [id], name: "CommerceOverridePatterns")

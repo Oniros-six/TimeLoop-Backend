@@ -16,10 +16,10 @@ export class PrismaUserWorkingPatternRepository
     userId: number;
     weekday: WeekDays;
     availabilityType: AvailabilityType;
-    morningStart: Date | null;
-    morningEnd: Date | null;
-    afternoonStart: Date | null;
-    afternoonEnd: Date | null;
+    morningStart: string | null;
+    morningEnd: string | null;
+    afternoonStart: string | null;
+    afternoonEnd: string | null;
   }): DomainClient {
     return new DomainClient(
       pattern.id,

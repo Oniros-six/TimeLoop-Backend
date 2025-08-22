@@ -6,19 +6,18 @@ import { AvailabilityType } from '@/domain/common/AvailabilityType';
 
 @Injectable()
 export class PrismaCommerceWorkingOverrideRepository
-  implements ICommerceWorkingOverrideRepository
-{
-  constructor(private readonly prisma: PrismaService) {}
+  implements ICommerceWorkingOverrideRepository {
+  constructor(private readonly prisma: PrismaService) { }
 
   private toDomain(pattern: {
     id: number;
     commerceId: number;
     date: Date;
     overrideType: AvailabilityType;
-    morningStart: Date | null;
-    morningEnd: Date | null;
-    afternoonStart: Date | null;
-    afternoonEnd: Date | null;
+    morningStart: string | null;
+    morningEnd: string | null;
+    afternoonStart: string | null;
+    afternoonEnd: string | null;
     notes: string;
   }): DomainClient {
     return new DomainClient(
@@ -37,14 +36,15 @@ export class PrismaCommerceWorkingOverrideRepository
   async findCommerceWorkingOverride(data: {
     commerceId: number;
   }): Promise<DomainClient[] | null> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // inicio del día
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1); // retrocede un día
+    yesterday.setHours(0, 0, 0, 0); // inicio del día
 
     const result = await this.prisma.commerceWorkingOverride.findMany({
       where: {
         commerceId: data.commerceId,
         date: {
-          gte: today,
+          gte: yesterday,
         },
       },
     });

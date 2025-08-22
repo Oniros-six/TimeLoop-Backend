@@ -9,6 +9,7 @@ import { CommerceConfig as CommerceConfigDomain } from '@/domain/entities/commer
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/application/constants/activity-log.constants';
 import { CreateCommerceConfigDto } from '@/interfaces/controllers/commerceConfig/dto/create-commerceConfig.dto';
+import { validateOpenCloseTime } from '@/domain/value-objects/configs/validate-hours';
 
 @Injectable()
 export class CreateCommerceConfig {
@@ -31,15 +32,15 @@ export class CreateCommerceConfig {
       throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
     }
 
-    const [openH, openM] = data.openTime.split(':').map(Number);
-    const [closeH, closeM] = data.closeTime.split(':').map(Number);
+    const configExistence = await this.commerceConfigRepository.findCommerceConfig({
+      commerceId: commerceId,
+    });
 
-    if (openH > closeH || (openH === closeH && openM >= closeM)) {
-      throw new HttpException(
-        'La hora de apertura debe ser menor a la de cierre',
-        HttpStatus.BAD_REQUEST
-      );
+    if (configExistence) {
+      throw new HttpException('El comercio ya tiene una configuración.', HttpStatus.BAD_REQUEST);
     }
+
+    validateOpenCloseTime(data.openTime, data.closeTime)
 
     const commerceConfig = CommerceConfigDomain.create({
       commerceId: commerceId,

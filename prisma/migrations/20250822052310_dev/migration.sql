@@ -117,10 +117,10 @@ CREATE TABLE "public"."user_working_patterns" (
     "userId" INTEGER NOT NULL,
     "weekday" "public"."WeekDays" NOT NULL,
     "availabilityType" "public"."AvailabilityType" NOT NULL,
-    "morningStart" TIMESTAMP(3),
-    "morningEnd" TIMESTAMP(3),
-    "afternoonStart" TIMESTAMP(3),
-    "afternoonEnd" TIMESTAMP(3),
+    "morningStart" TEXT,
+    "morningEnd" TEXT,
+    "afternoonStart" TEXT,
+    "afternoonEnd" TEXT,
 
     CONSTRAINT "user_working_patterns_pkey" PRIMARY KEY ("id")
 );
@@ -131,10 +131,10 @@ CREATE TABLE "public"."user_working_overrides" (
     "userId" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "overrideType" "public"."AvailabilityType" NOT NULL,
-    "morningStart" TIMESTAMP(3),
-    "morningEnd" TIMESTAMP(3),
-    "afternoonStart" TIMESTAMP(3),
-    "afternoonEnd" TIMESTAMP(3),
+    "morningStart" TEXT,
+    "morningEnd" TEXT,
+    "afternoonStart" TEXT,
+    "afternoonEnd" TEXT,
     "notes" TEXT NOT NULL,
 
     CONSTRAINT "user_working_overrides_pkey" PRIMARY KEY ("id")
@@ -146,10 +146,10 @@ CREATE TABLE "public"."commerce_working_patterns" (
     "commerceId" INTEGER NOT NULL,
     "weekday" "public"."WeekDays" NOT NULL,
     "availabilityType" "public"."AvailabilityType" NOT NULL,
-    "morningStart" TIMESTAMP(3),
-    "morningEnd" TIMESTAMP(3),
-    "afternoonStart" TIMESTAMP(3),
-    "afternoonEnd" TIMESTAMP(3),
+    "morningStart" TEXT,
+    "morningEnd" TEXT,
+    "afternoonStart" TEXT,
+    "afternoonEnd" TEXT,
 
     CONSTRAINT "commerce_working_patterns_pkey" PRIMARY KEY ("id")
 );
@@ -160,10 +160,10 @@ CREATE TABLE "public"."commerce_working_overrides" (
     "commerceId" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "overrideType" "public"."AvailabilityType" NOT NULL,
-    "morningStart" TIMESTAMP(3),
-    "morningEnd" TIMESTAMP(3),
-    "afternoonStart" TIMESTAMP(3),
-    "afternoonEnd" TIMESTAMP(3),
+    "morningStart" TEXT,
+    "morningEnd" TEXT,
+    "afternoonStart" TEXT,
+    "afternoonEnd" TEXT,
     "notes" TEXT NOT NULL,
 
     CONSTRAINT "commerce_working_overrides_pkey" PRIMARY KEY ("id")

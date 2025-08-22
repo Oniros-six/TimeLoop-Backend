@@ -6,6 +6,7 @@ import { CommerceWorkingOverride as CommerceWorkingOverrideDomain } from '@/doma
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/application/constants/activity-log.constants';
 import { UpdateCommerceOverrideDto } from '@/interfaces/controllers/commerceWorkingOverride/dto/update-commerceOverride.dto';
+import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 
 @Injectable()
 export class UpdateCommerceWorkingOverride {
@@ -15,20 +16,8 @@ export class UpdateCommerceWorkingOverride {
     private readonly activityLogService: ActivityLogService,
   ) {}
 
-  private stringToDate(time: string): Date {
-    const [hours, minutes] = time.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-    return date;
-  }
-
   async execute(id: number, data: UpdateCommerceOverrideDto) {
-    const existingOverride =
-      await this.commerceWorkingOverrideRepository.findCommerceWorkingOverrideById(
-        {
-          id,
-        },
-      );
+    const existingOverride = await this.commerceWorkingOverrideRepository.findCommerceWorkingOverrideById({id});
 
     if (!existingOverride) {
       throw new HttpException(
@@ -37,21 +26,29 @@ export class UpdateCommerceWorkingOverride {
       );
     }
 
+    validateAvailabilityTimes({
+      availabilityType: data.availabilityType,
+      morningStart: data.morningStart,
+      morningEnd: data.morningEnd,
+      afternoonStart: data.afternoonStart,
+      afternoonEnd: data.afternoonEnd
+    })
+    
     const commerceWorkingOverride = CommerceWorkingOverrideDomain.create({
       commerceId: existingOverride.commerceId,
-      date: existingOverride.date,
+      date: data.date ?? existingOverride.date,
       overrideType: data.availabilityType ?? existingOverride.overrideType,
       morningStart: data.morningStart
-        ? this.stringToDate(data.morningStart)
+        ? data.morningStart
         : existingOverride.morningStart,
       morningEnd: data.morningEnd
-        ? this.stringToDate(data.morningEnd)
+        ? data.morningEnd
         : existingOverride.morningEnd,
       afternoonStart: data.afternoonStart
-        ? this.stringToDate(data.afternoonStart)
+        ? data.afternoonStart
         : existingOverride.afternoonStart,
       afternoonEnd: data.afternoonEnd
-        ? this.stringToDate(data.afternoonEnd)
+        ? data.afternoonEnd
         : existingOverride.afternoonEnd,
       notes: data.notes ?? existingOverride.notes,
     });

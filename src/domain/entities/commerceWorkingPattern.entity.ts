@@ -1,26 +1,27 @@
 import { AvailabilityType } from '@/domain/common/AvailabilityType';
 import { WeekDays } from '@/domain/common/weekdays';
+
 export class CommerceWorkingPattern {
   constructor(
     public readonly id: number,
     public readonly commerceId: number,
     public readonly weekday: WeekDays,
     public readonly availabilityType: AvailabilityType,
-    public readonly morningStart: Date | null,
-    public readonly morningEnd: Date | null,
-    public readonly afternoonStart: Date | null,
-    public readonly afternoonEnd: Date | null,
-  ) {}
+    public morningStart: string | null,
+    public morningEnd: string | null,
+    public afternoonStart: string | null,
+    public afternoonEnd: string | null,
+  ) { }
 
   // Factory method
   static create(props: {
     commerceId: number;
     weekday: WeekDays;
     availabilityType: AvailabilityType;
-    morningStart: Date | null;
-    morningEnd: Date | null;
-    afternoonStart: Date | null;
-    afternoonEnd: Date | null;
+    morningStart: string | null;
+    morningEnd: string | null;
+    afternoonStart: string | null;
+    afternoonEnd: string | null;
   }): CommerceWorkingPattern {
     if (!props.commerceId || props.commerceId <= 0) {
       throw new Error('El ID de usuario no es válido.');
@@ -32,59 +33,38 @@ export class CommerceWorkingPattern {
       );
     }
 
-    if (
-      !props.availabilityType ||
-      (props.availabilityType !== AvailabilityType.full &&
-        props.availabilityType !== AvailabilityType.off &&
-        props.availabilityType !== AvailabilityType.half)
-    ) {
+    if (!props.availabilityType || !Object.values(AvailabilityType).includes(props.availabilityType)) {
       throw new Error(
         'El valor de availabilityType debe ser full, off o half.',
       );
     }
 
-    if (
-      props.availabilityType === AvailabilityType.full &&
-      (!props.morningStart ||
-        !props.morningEnd ||
-        !props.afternoonStart ||
-        !props.afternoonEnd)
-    ) {
-      throw new Error(
-        'La hora de inicio y fin de la mañana y la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es full.',
-      );
+    if (props.availabilityType === AvailabilityType.full) {
+      const hasMorning = props.morningStart && props.morningEnd;
+      const hasAfternoon = props.afternoonStart && props.afternoonEnd;
+
+      if (!hasMorning || !hasAfternoon) {
+        throw new Error('Debes enviar horarios de mañana y de tarde para tipo full.');
+      }
     }
 
-    if (
-      props.availabilityType === AvailabilityType.half &&
-      (!props.morningStart ||
-        !props.morningEnd ||
-        !props.afternoonStart ||
-        !props.afternoonEnd)
-    ) {
-      throw new Error(
-        'La hora de inicio y fin de la mañana o la hora de inicio y fin de la tarde son obligatorias si el tipo de disponibilidad es half.',
-      );
+    if (props.availabilityType === AvailabilityType.half) {
+      const hasMorning = props.morningStart && props.morningEnd;
+      const hasAfternoon = props.afternoonStart && props.afternoonEnd;
+
+      if (!hasMorning && !hasAfternoon) {
+        throw new Error('Debes enviar horarios de mañana o de tarde para tipo half.');
+      }
+      if (hasMorning && hasAfternoon) {
+        throw new Error('Para tipo half solo se permite mañana o tarde, no ambos.');
+      }
     }
 
-    if (
-      props.morningStart &&
-      props.morningEnd &&
-      props.morningStart >= props.morningEnd
-    ) {
-      throw new Error(
-        'La hora de inicio de la mañana no puede ser mayor o igual a la hora de fin de la mañana.',
-      );
-    }
-
-    if (
-      props.afternoonStart &&
-      props.afternoonEnd &&
-      props.afternoonStart >= props.afternoonEnd
-    ) {
-      throw new Error(
-        'La hora de inicio de la tarde no puede ser mayor o igual a la hora de fin de la tarde.',
-      );
+    if (props.availabilityType === AvailabilityType.off) {
+      props.morningStart = null;
+      props.morningEnd = null;
+      props.afternoonStart = null;
+      props.afternoonEnd = null;
     }
 
     return new CommerceWorkingPattern(

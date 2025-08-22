@@ -9,6 +9,7 @@ import { CommerceConfig as CommerceConfigDomain } from '@/domain/entities/commer
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/application/constants/activity-log.constants';
 import { UpdateCommerceConfigDto } from '@/interfaces/controllers/commerceConfig/dto/update-commerceConfig.dto';
+import { validateOpenCloseTime } from '@/domain/value-objects/configs/validate-hours';
 
 @Injectable()
 export class UpdateCommerceConfig {
@@ -44,27 +45,11 @@ export class UpdateCommerceConfig {
     }
 
     if (data.openTime) {
-      const [openH, openM] = data.openTime.split(':').map(Number);
-      const [closeH, closeM] = commerceConfig.closeTime.split(':').map(Number);
-
-      if (openH > closeH || (openH === closeH && openM >= closeM)) {
-        throw new HttpException(
-          'La hora de apertura debe ser menor a la de cierre',
-          HttpStatus.BAD_REQUEST
-        );
-      }
+      validateOpenCloseTime(data.openTime, commerceConfig.closeTime)
     }
 
     if (data.closeTime) {
-      const [openH, openM] = commerceConfig.openTime.split(':').map(Number);
-      const [closeH, closeM] = data.closeTime.split(':').map(Number);
-
-      if (openH > closeH || (openH === closeH && openM >= closeM)) {
-        throw new HttpException(
-          'La hora de apertura debe ser menor a la de cierre',
-          HttpStatus.BAD_REQUEST
-        );
-      }
+      validateOpenCloseTime(commerceConfig.openTime, data.closeTime)
     }
 
     const updatedConfigData = CommerceConfigDomain.create({
