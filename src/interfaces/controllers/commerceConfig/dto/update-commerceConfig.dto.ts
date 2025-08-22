@@ -11,22 +11,6 @@ import {
 export class UpdateCommerceConfigDto {
   @ApiProperty({
     example: true,
-    description: 'Permitir cancelaciones',
-  })
-  @Type(() => Boolean)
-  @IsBoolean({ message: 'El allowCancel debe ser un booleano' })
-  allowCancel?: boolean;
-
-  @ApiProperty({
-    example: true,
-    description: 'Permitir reprogramaciones',
-  })
-  @Type(() => Boolean)
-  @IsBoolean({ message: 'El allowReschedule debe ser un booleano' })
-  allowReschedule?: boolean;
-
-  @ApiProperty({
-    example: true,
     description: 'Permitir notificaciones',
   })
   @Type(() => Boolean)

@@ -186,8 +186,6 @@ model CommerceConfig {
   id                      Int      @id @default(autoincrement())
   commerceId              Int      @unique
   standardDurationMinutes Int
-  allowCancel             Boolean
-  allowReschedule         Boolean
   allowNotifications      Boolean
   openTime                DateTime
   closeTime               DateTime

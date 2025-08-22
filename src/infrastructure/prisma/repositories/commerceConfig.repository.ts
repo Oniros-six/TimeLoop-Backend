@@ -13,8 +13,6 @@ export class PrismaCommerceConfigRepository
     id: number;
     commerceId: number;
     standardDurationMinutes: number;
-    allowCancel: boolean;
-    allowReschedule: boolean;
     allowNotifications: boolean;
     openTime: Date;
     closeTime: Date;
@@ -24,8 +22,6 @@ export class PrismaCommerceConfigRepository
       commerce.id,
       commerce.commerceId,
       commerce.standardDurationMinutes,
-      commerce.allowCancel,
-      commerce.allowReschedule,
       commerce.allowNotifications,
       commerce.openTime,
       commerce.closeTime,

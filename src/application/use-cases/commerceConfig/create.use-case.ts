@@ -34,8 +34,6 @@ export class CreateCommerceConfig {
     const commerceConfig = CommerceConfigDomain.create({
       commerceId: commerceId,
       standardDurationMinutes: data.standardDurationMinutes,
-      allowCancel: data.allowCancel,
-      allowReschedule: data.allowReschedule,
       allowNotifications: data.allowNotifications,
       openTime: data.openTime,
       closeTime: data.closeTime,

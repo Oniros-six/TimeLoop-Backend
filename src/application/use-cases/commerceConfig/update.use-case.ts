@@ -20,7 +20,7 @@ export class UpdateCommerceConfig {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
+  ) { }
 
   async execute(commerceId: number, data: UpdateCommerceConfigDto) {
     const commerce = await this.commerceRepository.findCommerce({
@@ -47,8 +47,6 @@ export class UpdateCommerceConfig {
       commerceId: commerceId,
       standardDurationMinutes:
         data.standardDurationMinutes ?? commerceConfig.standardDurationMinutes,
-      allowCancel: data.allowCancel ?? commerceConfig.allowCancel,
-      allowReschedule: data.allowReschedule ?? commerceConfig.allowReschedule,
       allowNotifications:
         data.allowNotifications ?? commerceConfig.allowNotifications,
       openTime: data.openTime ?? commerceConfig.openTime,

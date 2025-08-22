@@ -20,24 +20,6 @@ export class CreateCommerceConfigDto {
 
   @ApiProperty({
     example: true,
-    description: 'Permitir cancelaciones',
-  })
-  @Type(() => Boolean)
-  @IsBoolean({ message: 'El allowCancel debe ser un booleano' })
-  @IsNotEmpty({ message: 'El allowCancel es requerido' })
-  allowCancel: boolean;
-
-  @ApiProperty({
-    example: true,
-    description: 'Permitir reprogramaciones',
-  })
-  @Type(() => Boolean)
-  @IsBoolean({ message: 'El allowReschedule debe ser un booleano' })
-  @IsNotEmpty({ message: 'El allowReschedule es requerido' })
-  allowReschedule: boolean;
-
-  @ApiProperty({
-    example: true,
     description: 'Permitir notificaciones',
   })
   @Type(() => Boolean)

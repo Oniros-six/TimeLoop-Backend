@@ -3,8 +3,6 @@ export class CommerceConfig {
     public readonly id: number,
     public readonly commerceId: number,
     public standardDurationMinutes: number,
-    public allowCancel: boolean,
-    public allowReschedule: boolean,
     public allowNotifications: boolean,
     public openTime: Date,
     public closeTime: Date,
@@ -15,8 +13,6 @@ export class CommerceConfig {
   static create(props: {
     commerceId: number;
     standardDurationMinutes: number;
-    allowCancel: boolean;
-    allowReschedule: boolean;
     allowNotifications: boolean;
     openTime: Date;
     closeTime: Date;
@@ -24,14 +20,6 @@ export class CommerceConfig {
   }): CommerceConfig {
     if (!props.commerceId || props.commerceId <= 0) {
       throw new Error('El ID de comercio no es válido.');
-    }
-
-    if (typeof props.allowCancel !== 'boolean') {
-      throw new Error('El valor de allowCancel debe ser un booleano.');
-    }
-
-    if (typeof props.allowReschedule !== 'boolean') {
-      throw new Error('El valor de allowReschedule debe ser un booleano.');
     }
 
     if (typeof props.allowNotifications !== 'boolean') {
@@ -58,8 +46,6 @@ export class CommerceConfig {
       0,
       props.commerceId,
       props.standardDurationMinutes,
-      props.allowCancel,
-      props.allowReschedule,
       props.allowNotifications,
       props.openTime,
       props.closeTime,
