@@ -68,13 +68,16 @@ export class ServicesController {
   })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get(':id')
-  async find(@Param('id', ParseIntPipe) id: number, @Query('commerceId', ParseIntPipe) commerceId: number) {
+  async find(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('commerceId', ParseIntPipe) commerceId: number,
+  ) {
     const res = await this.findServiceUseCase.execute(id, commerceId);
-  
+
     if (!res.data) {
       return { message: 'Servicio no encontrado', statusCode: 404, data: null };
     }
-  
+
     return {
       message: res.message,
       statusCode: res.statusCode,

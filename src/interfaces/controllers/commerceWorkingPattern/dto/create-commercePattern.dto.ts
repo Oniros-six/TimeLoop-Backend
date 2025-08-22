@@ -1,4 +1,5 @@
 import { AvailabilityType } from '@/domain/common/AvailabilityType';
+import { WeekDays } from '@/domain/common/weekdays';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
@@ -8,6 +9,7 @@ import {
   IsString,
   IsOptional,
   IsMilitaryTime,
+  IsEnum,
 } from 'class-validator';
 
 export class CreateCommercePatternDto {
@@ -21,16 +23,12 @@ export class CreateCommercePatternDto {
   commerceId: number;
 
   @ApiProperty({
-    example: 1,
+    example: 'MONDAY',
     description: 'Día de la semana',
   })
-  @Type(() => Number)
-  @IsNumber({}, { message: 'El día de la semana debe ser un número' })
-  @IsIn([0, 1, 2, 3, 4, 5, 6], {
-    message: 'El día de la semana debe ser un número entre 0 y 6',
-  })
+  @IsEnum(WeekDays, { message: 'El día de la semana debe estar en ingles' })
   @IsNotEmpty({ message: 'El día de la semana es requerido' })
-  weekday: number;
+  weekday: WeekDays;
 
   @ApiProperty({
     example: 'full',

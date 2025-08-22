@@ -1,10 +1,11 @@
 import { AvailabilityType } from '@/domain/common/AvailabilityType';
+import { WeekDays } from '../common/weekdays';
 
 export class UserWorkingPattern {
   constructor(
     public readonly id: number,
     public readonly userId: number,
-    public readonly weekday: number,
+    public readonly weekday: WeekDays,
     public readonly availabilityType: AvailabilityType,
     public readonly morningStart: Date | null,
     public readonly morningEnd: Date | null,
@@ -15,7 +16,7 @@ export class UserWorkingPattern {
   // Factory method
   static create(props: {
     userId: number;
-    weekday: number;
+    weekday: WeekDays;
     availabilityType: AvailabilityType;
     morningStart: Date | null;
     morningEnd: Date | null;
@@ -26,8 +27,10 @@ export class UserWorkingPattern {
       throw new Error('El ID de usuario no es válido.');
     }
 
-    if (!props.weekday || props.weekday <= 0 || props.weekday > 6) {
-      throw new Error('Weekday debe ser un numero positivo, no mayor a 6');
+    if (!props.weekday || !Object.values(WeekDays).includes(props.weekday)) {
+      throw new Error(
+        'Weekday debe ser un día válido de la semana en inglés (ej: MONDAY, TUESDAY...)',
+      );
     }
 
     if (

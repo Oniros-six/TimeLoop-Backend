@@ -1,3 +1,4 @@
+import { WeekDays } from '../common/weekdays';
 import { UserWorkingPattern } from '../entities/userWorkingPattern.entity';
 
 export interface IUserWorkingPatternRepository {
@@ -15,7 +16,7 @@ export interface IUserWorkingPatternRepository {
 
   verifyUserWorkingPattern(data: {
     userId: number;
-    weekday: number;
+    weekday: WeekDays;
   }): Promise<boolean>;
 
   updateUserWorkingPattern(data: {

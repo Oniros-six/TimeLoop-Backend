@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { IUserWorkingPatternRepository } from '@/domain/repositories/userWorkingPattern.repository';
 import { UserWorkingPattern as DomainClient } from '@/domain/entities/userWorkingPattern.entity';
 import { AvailabilityType } from '@/domain/common/AvailabilityType';
+import { WeekDays } from '@/domain/common/weekdays';
 
 @Injectable()
 export class PrismaUserWorkingPatternRepository
@@ -13,7 +14,7 @@ export class PrismaUserWorkingPatternRepository
   private toDomain(pattern: {
     id: number;
     userId: number;
-    weekday: number;
+    weekday: WeekDays;
     availabilityType: AvailabilityType;
     morningStart: Date | null;
     morningEnd: Date | null;
@@ -65,7 +66,7 @@ export class PrismaUserWorkingPatternRepository
 
   async verifyUserWorkingPattern(data: {
     userId: number;
-    weekday: number;
+    weekday: WeekDays;
   }): Promise<boolean> {
     const result = await this.prisma.userWorkingPattern.findFirst({
       where: { userId: data.userId, weekday: data.weekday },

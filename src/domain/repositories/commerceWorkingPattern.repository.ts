@@ -1,3 +1,4 @@
+import { WeekDays } from '../common/weekdays';
 import { CommerceWorkingPattern } from '../entities/commerceWorkingPattern.entity';
 
 export interface ICommerceWorkingPatternRepository {
@@ -15,7 +16,7 @@ export interface ICommerceWorkingPatternRepository {
 
   verifyCommerceWorkingPattern(data: {
     commerceId: number;
-    weekday: number;
+    weekday: WeekDays;
   }): Promise<boolean>;
 
   updateCommerceWorkingPattern(data: {

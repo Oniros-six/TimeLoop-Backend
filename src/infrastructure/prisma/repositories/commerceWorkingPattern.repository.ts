@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ICommerceWorkingPatternRepository } from '@/domain/repositories/commerceWorkingPattern.repository';
 import { CommerceWorkingPattern as DomainClient } from '@/domain/entities/commerceWorkingPattern.entity';
 import { AvailabilityType } from '@/domain/common/AvailabilityType';
+import { WeekDays } from '@/domain/common/weekdays';
 
 @Injectable()
 export class PrismaCommerceWorkingPatternRepository
@@ -13,7 +14,7 @@ export class PrismaCommerceWorkingPatternRepository
   private toDomain(pattern: {
     id: number;
     commerceId: number;
-    weekday: number;
+    weekday: WeekDays;
     availabilityType: AvailabilityType;
     morningStart: Date | null;
     morningEnd: Date | null;
@@ -65,7 +66,7 @@ export class PrismaCommerceWorkingPatternRepository
 
   async verifyCommerceWorkingPattern(data: {
     commerceId: number;
-    weekday: number;
+    weekday: WeekDays;
   }): Promise<boolean> {
     const result = await this.prisma.commerceWorkingPattern.findFirst({
       where: { commerceId: data.commerceId, weekday: data.weekday },

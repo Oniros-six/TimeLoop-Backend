@@ -68,6 +68,16 @@ enum ChangeType {
   REINSTATED
 }
 
+enum WeekDays {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
 // =========================================
 // Core Models
 // =========================================
@@ -208,7 +218,7 @@ model UserConfig {
 model UserWorkingPattern {
   id               Int              @id @default(autoincrement())
   userId           Int
-  weekday          Int
+  weekday          WeekDays
   availabilityType AvailabilityType
   morningStart     DateTime?
   morningEnd       DateTime?
@@ -246,7 +256,7 @@ model UserWorkingOverride {
 model CommerceWorkingPattern {
   id               Int              @id @default(autoincrement())
   commerceId       Int
-  weekday          Int
+  weekday          WeekDays
   availabilityType AvailabilityType
   morningStart     DateTime?
   morningEnd       DateTime?
