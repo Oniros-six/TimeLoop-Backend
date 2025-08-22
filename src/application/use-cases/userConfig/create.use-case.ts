@@ -33,9 +33,6 @@ export class CreateUserConfig {
 
     const userConfig = UserConfigDomain.create({
       userId: userId,
-      darkMode: data.darkMode,
-      reminder: data.reminder,
-      reminderFrequency: data.reminderFrequency,
     });
 
     try {

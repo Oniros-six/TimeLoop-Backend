@@ -44,9 +44,6 @@ export class UpdateUserConfig {
 
     const updatedConfigData = UserConfigDomain.create({
       userId: userId,
-      darkMode: data.darkMode ?? userConfig.darkMode,
-      reminder: data.reminder ?? userConfig.reminder,
-      reminderFrequency: data.reminderFrequency ?? userConfig.reminderFrequency,
     });
 
     try {
