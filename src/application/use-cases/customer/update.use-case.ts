@@ -12,13 +12,30 @@ export class UpdateCustomer {
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: ICustomerRepository,
     private readonly activityLogService: ActivityLogService,
-  ) {}
+  ) { }
 
   async execute(id: number, data: UpdateCustomerDto) {
+
+    // Validate customer existence
     const customer = await this.customerRepository.findCustomer({ id: id });
 
     if (!customer) {
       throw new HttpException('Cliente no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    // Validate customer email not in use
+    if (data.email && data.email !== customer.email) {
+      const exists = await this.customerRepository.findCustomerByEmailAndCommerce({
+        email: data.email,
+        commerceId: data.commerceId,
+      });
+    
+      if (exists) {
+        throw new HttpException(
+          'Ya existe un cliente con este email.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
 
     try {

@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsNumber,
   IsOptional,
   IsString,
   Matches,
@@ -8,6 +10,14 @@ import {
 } from 'class-validator';
 
 export class UpdateCustomerDto {
+  @ApiProperty({
+    example: 1,
+    description: 'ID del comercio donde se registro el cliente',
+  })
+  @Type(() => Number)
+  @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
+  commerceId: number;
+  
   @ApiProperty({ example: 'Leandro', description: 'Nombre del cliente' })
   @IsOptional()
   @IsString({ message: 'El nombre tiene que contener solo letras' })

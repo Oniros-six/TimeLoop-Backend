@@ -85,8 +85,8 @@ enum WeekDays {
 model Commerce {
   id               Int              @id @default(autoincrement())
   name             String
-  email            String
-  phone            String
+  email            String           @unique
+  phone            String           @unique
   address          String
   businessCategory BusinessCategory
   active           Boolean
@@ -107,7 +107,7 @@ model Commerce {
 model Customer {
   id           Int    @id @default(autoincrement())
   name         String
-  email        String
+  email        String @unique
   phone        String
   internalNote String
   commerceId   Int

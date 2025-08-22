@@ -13,9 +13,10 @@ export class UpdateCommerce {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
+  ) { }
 
   async execute(id: number, data: UpdateCommerceDto) {
+
     // Validacion de existencia
     const found = await this.commerceRepository.findCommerce({
       commerceId: id,
@@ -23,6 +24,30 @@ export class UpdateCommerce {
 
     if (!found) {
       throw new HttpException('Comercio no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    // Validacion de email existente
+    if (data.email && data.email !== found.email) {
+      const exists = await this.commerceRepository.findCommerceByEmail({ email: data.email })
+
+      if (exists) {
+        throw new HttpException(
+          'Ya existe un comercio con este email.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    // Validacion de phone existente
+    if (data.phone && data.phone !== found.phone) {
+      const exists = await this.commerceRepository.findCommerceByPhone({ phone: data.phone })
+
+      if (exists) {
+        throw new HttpException(
+          'Ya existe un comercio con este número de telefono.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
 
     try {
