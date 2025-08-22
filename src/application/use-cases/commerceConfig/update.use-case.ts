@@ -43,6 +43,30 @@ export class UpdateCommerceConfig {
       );
     }
 
+    if (data.openTime) {
+      const [openH, openM] = data.openTime.split(':').map(Number);
+      const [closeH, closeM] = commerceConfig.closeTime.split(':').map(Number);
+
+      if (openH > closeH || (openH === closeH && openM >= closeM)) {
+        throw new HttpException(
+          'La hora de apertura debe ser menor a la de cierre',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
+
+    if (data.closeTime) {
+      const [openH, openM] = commerceConfig.openTime.split(':').map(Number);
+      const [closeH, closeM] = data.closeTime.split(':').map(Number);
+
+      if (openH > closeH || (openH === closeH && openM >= closeM)) {
+        throw new HttpException(
+          'La hora de apertura debe ser menor a la de cierre',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
+
     const updatedConfigData = CommerceConfigDomain.create({
       commerceId: commerceId,
       standardDurationMinutes:

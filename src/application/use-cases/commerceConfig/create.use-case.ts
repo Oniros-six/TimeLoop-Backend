@@ -20,7 +20,7 @@ export class CreateCommerceConfig {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
+  ) { }
 
   async execute(commerceId: number, data: CreateCommerceConfigDto) {
     const commerce = await this.commerceRepository.findCommerce({
@@ -29,6 +29,16 @@ export class CreateCommerceConfig {
 
     if (!commerce) {
       throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
+    }
+
+    const [openH, openM] = data.openTime.split(':').map(Number);
+    const [closeH, closeM] = data.closeTime.split(':').map(Number);
+
+    if (openH > closeH || (openH === closeH && openM >= closeM)) {
+      throw new HttpException(
+        'La hora de apertura debe ser menor a la de cierre',
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     const commerceConfig = CommerceConfigDomain.create({

@@ -2,10 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
-  IsDate,
-  IsNotEmpty,
   IsNumber,
   IsString,
+  Matches,
 } from 'class-validator';
 
 export class UpdateCommerceConfigDto {
@@ -33,18 +32,23 @@ export class UpdateCommerceConfigDto {
   welcomeMessage?: string;
 
   @ApiProperty({
-    example: '0000-00-00T09:00:00.000Z',
+    example: '09:00:00',
     description: 'La hora de apertura del comercio',
   })
-  @Type(() => Date)
-  @IsDate({ message: 'La fecha debe ser una fecha válida' })
-  openTime: Date;
+  @IsString()
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
+    message: 'El formato debe ser HH:mm:ss',
+  })
+  openTime?: string;
 
   @ApiProperty({
-    example: '0000-00-00T21:00:00.000Z',
+    example: '21:00:00',
     description: 'La hora de cierre del comercio',
   })
-  @Type(() => Date)
-  @IsDate({ message: 'La fecha debe ser una fecha válida' })
-  closeTime: Date;
+  @IsString()
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
+    message: 'El formato debe ser HH:mm:ss',
+  })
+  closeTime?: string;
 }
+

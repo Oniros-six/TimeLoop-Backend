@@ -2,6 +2,9 @@
 CREATE TYPE "public"."BusinessCategory" AS ENUM ('Peluqueria', 'Barberia', 'Estetica', 'EntrenamientoPersonal', 'Spa', 'Fotografia', 'Tatuajes', 'Otros');
 
 -- CreateEnum
+CREATE TYPE "public"."Roles" AS ENUM ('ADMIN', 'EMPLOYEE');
+
+-- CreateEnum
 CREATE TYPE "public"."AvailabilityType" AS ENUM ('full', 'half', 'off');
 
 -- CreateEnum
@@ -15,6 +18,9 @@ CREATE TYPE "public"."EntityType" AS ENUM ('BOOKING', 'CUSTOMER', 'USER', 'COMME
 
 -- CreateEnum
 CREATE TYPE "public"."ChangeType" AS ENUM ('CREATED', 'UPDATED', 'CANCELLED', 'SUSPENDED', 'REINSTATED');
+
+-- CreateEnum
+CREATE TYPE "public"."WeekDays" AS ENUM ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY');
 
 -- CreateTable
 CREATE TABLE "public"."commerces" (
@@ -63,7 +69,7 @@ CREATE TABLE "public"."users" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "roleId" INTEGER NOT NULL,
+    "role" "public"."Roles" NOT NULL,
     "commerceId" INTEGER NOT NULL,
     "active" BOOLEAN NOT NULL,
 
@@ -89,11 +95,9 @@ CREATE TABLE "public"."commerce_configs" (
     "id" SERIAL NOT NULL,
     "commerceId" INTEGER NOT NULL,
     "standardDurationMinutes" INTEGER NOT NULL,
-    "allowCancel" BOOLEAN NOT NULL,
-    "allowReschedule" BOOLEAN NOT NULL,
     "allowNotifications" BOOLEAN NOT NULL,
-    "openTime" TIMESTAMP(3) NOT NULL,
-    "closeTime" TIMESTAMP(3) NOT NULL,
+    "openTime" TEXT NOT NULL,
+    "closeTime" TEXT NOT NULL,
     "welcomeMessage" TEXT NOT NULL,
 
     CONSTRAINT "commerce_configs_pkey" PRIMARY KEY ("id")
@@ -103,9 +107,6 @@ CREATE TABLE "public"."commerce_configs" (
 CREATE TABLE "public"."user_configs" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "darkMode" BOOLEAN NOT NULL,
-    "reminder" BOOLEAN NOT NULL,
-    "reminderFrequency" INTEGER NOT NULL,
 
     CONSTRAINT "user_configs_pkey" PRIMARY KEY ("id")
 );
@@ -114,7 +115,7 @@ CREATE TABLE "public"."user_configs" (
 CREATE TABLE "public"."user_working_patterns" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "weekday" INTEGER NOT NULL,
+    "weekday" "public"."WeekDays" NOT NULL,
     "availabilityType" "public"."AvailabilityType" NOT NULL,
     "morningStart" TIMESTAMP(3),
     "morningEnd" TIMESTAMP(3),
@@ -143,7 +144,7 @@ CREATE TABLE "public"."user_working_overrides" (
 CREATE TABLE "public"."commerce_working_patterns" (
     "id" SERIAL NOT NULL,
     "commerceId" INTEGER NOT NULL,
-    "weekday" INTEGER NOT NULL,
+    "weekday" "public"."WeekDays" NOT NULL,
     "availabilityType" "public"."AvailabilityType" NOT NULL,
     "morningStart" TIMESTAMP(3),
     "morningEnd" TIMESTAMP(3),
@@ -184,32 +185,6 @@ CREATE TABLE "public"."activity_logs" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."roles" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-
-    CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."role_permissions" (
-    "roleId" INTEGER NOT NULL,
-    "permissionId" INTEGER NOT NULL,
-
-    CONSTRAINT "role_permissions_pkey" PRIMARY KEY ("roleId","permissionId")
-);
-
--- CreateTable
-CREATE TABLE "public"."permissions" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-
-    CONSTRAINT "permissions_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "public"."services" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
@@ -238,6 +213,15 @@ CREATE TABLE "public"."booking_services" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "commerces_email_key" ON "public"."commerces"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "commerces_phone_key" ON "public"."commerces"("phone");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "customers_email_key" ON "public"."customers"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "public"."users"("email");
 
 -- CreateIndex
@@ -257,9 +241,6 @@ ALTER TABLE "public"."bookings" ADD CONSTRAINT "bookings_customerId_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "public"."bookings" ADD CONSTRAINT "bookings_statusId_fkey" FOREIGN KEY ("statusId") REFERENCES "public"."statuses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."users" ADD CONSTRAINT "users_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "public"."roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."users" ADD CONSTRAINT "users_commerceId_fkey" FOREIGN KEY ("commerceId") REFERENCES "public"."commerces"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -296,12 +277,6 @@ ALTER TABLE "public"."activity_logs" ADD CONSTRAINT "activity_logs_commerceId_fk
 
 -- AddForeignKey
 ALTER TABLE "public"."activity_logs" ADD CONSTRAINT "activity_logs_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "public"."customers"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."role_permissions" ADD CONSTRAINT "role_permissions_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "public"."roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."role_permissions" ADD CONSTRAINT "role_permissions_permissionId_fkey" FOREIGN KEY ("permissionId") REFERENCES "public"."permissions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."services" ADD CONSTRAINT "services_commerceId_fkey" FOREIGN KEY ("commerceId") REFERENCES "public"."commerces"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

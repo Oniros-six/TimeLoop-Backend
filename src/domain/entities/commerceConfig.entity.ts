@@ -4,8 +4,8 @@ export class CommerceConfig {
     public readonly commerceId: number,
     public standardDurationMinutes: number,
     public allowNotifications: boolean,
-    public openTime: Date,
-    public closeTime: Date,
+    public openTime: string,
+    public closeTime: string,
     public welcomeMessage: string,
   ) {}
 
@@ -14,8 +14,8 @@ export class CommerceConfig {
     commerceId: number;
     standardDurationMinutes: number;
     allowNotifications: boolean;
-    openTime: Date;
-    closeTime: Date;
+    openTime: string;
+    closeTime: string;
     welcomeMessage: string;
   }): CommerceConfig {
     if (!props.commerceId || props.commerceId <= 0) {

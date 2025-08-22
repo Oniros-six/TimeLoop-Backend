@@ -187,8 +187,8 @@ model CommerceConfig {
   commerceId              Int      @unique
   standardDurationMinutes Int
   allowNotifications      Boolean
-  openTime                DateTime
-  closeTime               DateTime
+  openTime                String
+  closeTime               String
   welcomeMessage          String
 
   commerce Commerce @relation(fields: [commerceId], references: [id], name: "CommerceConfig")

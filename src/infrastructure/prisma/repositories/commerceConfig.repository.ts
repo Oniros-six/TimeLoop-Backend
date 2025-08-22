@@ -14,8 +14,8 @@ export class PrismaCommerceConfigRepository
     commerceId: number;
     standardDurationMinutes: number;
     allowNotifications: boolean;
-    openTime: Date;
-    closeTime: Date;
+    openTime: string;
+    closeTime: string;
     welcomeMessage: string;
   }): DomainClient {
     return new DomainClient(
