@@ -10,7 +10,6 @@ import { Request } from 'express';
 export class AuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-
     if (!request.isAuthenticated()) {
       throw new UnauthorizedException(
         'Debe iniciar sesión para acceder a este recurso',

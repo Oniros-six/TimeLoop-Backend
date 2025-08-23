@@ -8,10 +8,11 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
 import { AuthenticatedRequest, LoginRequest } from '@/domain/common/auth.types';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -19,24 +20,53 @@ export class AuthController {
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
+  @ApiBody({
+    type: LoginUserDto,
+    description: 'Credenciales del usuario necesarias para iniciar sesión',
+    examples: {
+      ejemplo1: {
+        summary: 'Ejemplo de credenciales válidas',
+        value: {
+          email: 'usuario@dominio.com',
+          password: 'securePass123',
+        },
+      },
+    },
+  })
   @UseGuards(PassportAuthGuard('local'))
   @Post('login')
-  login(@Req() req: LoginRequest) {
-    if (!req.user) {
+  async login(@Req() req: AuthenticatedRequest) {
+    const user = req.user;
+    if (!user) {
       throw new InternalServerErrorException('Usuario no encontrado');
     }
 
-    return {
-      message: 'Login exitoso',
-      user: {
-        id: req.user.id,
-        name: req.user.name,
-        email: req.user.email,
-        role: req.user.role,
-        commerceId: req.user.commerceId,
-        active: req.user.active,
-      },
-    };
+    return new Promise((resolve, reject) => {
+      // Passport login
+      req.login(user, { session: true }, (err) => {
+        if (err) return reject(err);
+
+        // Forzar guardar sesión antes de responder
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error('Error guardando sesión:', saveErr);
+            return reject(new InternalServerErrorException('Error guardando sesión'));
+          }
+
+          resolve({
+            message: 'Login exitoso',
+            user: {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
+              commerceId: user.commerceId,
+              active: user.active,
+            },
+          });
+        });
+      });
+    });
   }
 
   @ApiOperation({ summary: 'Verificar estado de autenticación' })
