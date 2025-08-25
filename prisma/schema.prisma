@@ -78,6 +78,15 @@ enum WeekDays {
   SUNDAY
 }
 
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  NO_SHOW
+  COMPLETED
+  RESCHEDULED
+}
+
 // =========================================
 // Core Models
 // =========================================
@@ -123,10 +132,9 @@ model Customer {
 model Booking {
   id         Int      @id @default(autoincrement())
   date       DateTime
-  timeStart  DateTime
   timeEnd    DateTime
   duration   Int
-  statusId   Int
+  status     BookingStatus
   customerId Int
   serviceId  Int
   commerceId Int
@@ -134,7 +142,6 @@ model Booking {
 
   commerce        Commerce         @relation("CommerceBookings", fields: [commerceId], references: [id])
   customer        Customer         @relation("CustomerBookings", fields: [customerId], references: [id])
-  status          Status           @relation("BookingStatus", fields: [statusId], references: [id])
   bookingServices BookingService[] @relation("BookingServices")
 
   @@map("bookings")
@@ -164,7 +171,7 @@ model User {
 
 model Reminder {
   id          Int             @id @default(autoincrement())
-  bookingId   Int
+  bookingId   Int             @unique
   customerId  Int
   commerceId  Int
   channel     ReminderChannel
@@ -183,8 +190,8 @@ model Reminder {
 // =========================================
 
 model CommerceConfig {
-  id                      Int      @id @default(autoincrement())
-  commerceId              Int      @unique
+  id                      Int     @id @default(autoincrement())
+  commerceId              Int     @unique
   standardDurationMinutes Int
   allowNotifications      Boolean
   openTime                String
@@ -197,8 +204,8 @@ model CommerceConfig {
 }
 
 model UserConfig {
-  id                Int     @id @default(autoincrement())
-  userId            Int     @unique
+  id     Int @id @default(autoincrement())
+  userId Int @unique
 
   user User @relation(fields: [userId], references: [id], name: "UserConfig")
 
@@ -317,16 +324,6 @@ model Service {
   bookingServices BookingService[] @relation("BookingServices")
 
   @@map("services")
-}
-
-model Status {
-  id          Int    @id @default(autoincrement())
-  name        String
-  description String
-
-  bookings Booking[] @relation("BookingStatus")
-
-  @@map("statuses")
 }
 
 model BookingService {

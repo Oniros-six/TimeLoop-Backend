@@ -2,24 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { Booking as DomainClient } from '@/domain/entities/booking.entity';
-import { BookingStatus } from '@/domain/value-objects/booking/booking-status.vo';
-import { BookingDate } from '@/domain/value-objects/booking/booking-date.vo';
-import { BookingTime } from '@/domain/value-objects/booking/booking-time.vo';
+import { BookingStatus } from '@/domain/common/BookingStatus';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 
 @Injectable()
 export class PrismaBookingRepository implements IBookingRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private toDomain(booking: {
     id: number;
     customerId: number;
     commerceId: number;
     duration: number;
-    statusId: number;
+    status: BookingStatus;
     serviceId: number;
     date: Date;
-    timeStart: Date;
+    timeEnd: Date;
     notes: string;
   }): DomainClient {
     return new DomainClient(
@@ -27,45 +25,26 @@ export class PrismaBookingRepository implements IBookingRepository {
       booking.customerId,
       booking.commerceId,
       booking.duration,
-      BookingStatus.fromDatabaseId(booking.statusId),
+      booking.status,
       booking.serviceId,
-      new BookingDate(booking.date),
-      new BookingTime(booking.timeStart),
+      booking.date,
+      booking.timeEnd,
       booking.notes,
     );
   }
 
-  async createSchedule(data: {
-    customerId: number;
-    serviceId: number;
-    commerceId: number;
-    date: Date;
-    timeStart: Date;
-    duration: number;
-    notes: string | undefined;
-  }): Promise<DomainClient | null> {
-    const booking = DomainClient.createPending(
-      data.customerId,
-      data.serviceId,
-      data.commerceId,
-      data.date,
-      data.timeStart,
-      data.duration,
-      data.notes,
-    );
-
+  async createSchedule(data: DomainClient): Promise<DomainClient | null> {
     const result = await this.prisma.$transaction(async (prisma) => {
       return await prisma.booking.create({
         data: {
-          date: booking.date.value,
-          timeStart: booking.timeStart.value,
-          timeEnd: booking.timeEnd.value,
-          duration: booking.duration,
-          statusId: booking.status.getDatabaseId(),
-          customerId: booking.customerId,
-          serviceId: booking.serviceId,
-          commerceId: booking.commerceId,
-          notes: booking.notes,
+          date: data.date,
+          timeEnd: data.timeEnd,
+          duration: data.duration,
+          status: data.status,
+          customerId: data.customerId,
+          serviceId: data.serviceId,
+          commerceId: data.commerceId,
+          notes: data.notes,
         },
       });
     });
@@ -75,37 +54,32 @@ export class PrismaBookingRepository implements IBookingRepository {
   }
 
   async findOverlapping(data: {
-    startTime: Date;
+    id?: number;
     endTime: Date;
     date: Date;
     commerceId: number;
-  }): Promise<DomainClient[] | null> {
-    const result = await this.prisma.booking.findMany({
+  }): Promise<DomainClient | null> {
+    const result = await this.prisma.booking.findFirst({
       where: {
+        id: { not: data.id },
         commerceId: data.commerceId,
-        date: data.date,
-        timeStart: { lt: data.endTime },
-        timeEnd: { gt: data.startTime },
+        date: { lt: data.endTime },   // startDB < endNew
+        timeEnd: { gt: data.date }    // endDB > startNew
       },
     });
-
-    if (!result || result.length === 0) return null;
-
-    return result.map((booking) => this.toDomain(booking));
+    if (!result) return null;
+    return this.toDomain(result);
   }
 
   async findBusy(data: {
     date: Date;
-    timeStart: Date;
     commerceId: number;
   }): Promise<DomainClient | null> {
-    const statusConfirmed = BookingStatus.getConfirmed().getDatabaseId();
     const result = await this.prisma.booking.findFirst({
       where: {
         date: data.date,
-        timeStart: data.timeStart,
         commerceId: data.commerceId,
-        statusId: statusConfirmed,
+        status: BookingStatus.CONFIRMED,
       },
     });
     if (!result) return null;
@@ -129,11 +103,14 @@ export class PrismaBookingRepository implements IBookingRepository {
 
   async findAllByDateAndCommerce(data: {
     commerceId: number;
-    date: string;
+    date: Date;
   }): Promise<DomainClient[] | null> {
-    const rawDate = data.date;
-    const start = new Date(`${rawDate}T00:00:00.000Z`);
-    const end = new Date(`${rawDate}T23:59:59.999Z`);
+    const date = data.date; 
+
+    const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
+    
+    const end = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999));
+    
     const result = await this.prisma.booking.findMany({
       where: {
         date: {
@@ -151,14 +128,14 @@ export class PrismaBookingRepository implements IBookingRepository {
 
   async findBusySlots(data: {
     commerceId: number;
-    date: string;
+    date: Date;
   }): Promise<DomainClient[] | null> {
-    const rawDate = data.date;
-    const start = new Date(`${rawDate}T00:00:00.000Z`);
-    const end = new Date(`${rawDate}T23:59:59.999Z`);
-    const statusConfirmed = BookingStatus.getConfirmed().getDatabaseId();
-    const statusPending = BookingStatus.getPending().getDatabaseId();
-    const statusRescheduled = BookingStatus.getRescheduled().getDatabaseId();
+    const date = data.date; 
+
+    const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
+    
+    const end = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999));
+    
     const result = await this.prisma.booking.findMany({
       where: {
         date: {
@@ -166,8 +143,8 @@ export class PrismaBookingRepository implements IBookingRepository {
           lte: end,
         },
         commerceId: data.commerceId,
-        statusId: {
-          in: [statusConfirmed, statusPending, statusRescheduled],
+        status: {
+          in: [BookingStatus.CONFIRMED, BookingStatus.PENDING, BookingStatus.RESCHEDULED],
         },
       },
     });
@@ -183,18 +160,15 @@ export class PrismaBookingRepository implements IBookingRepository {
     });
 
     if (!result) return null;
-
     return this.toDomain(result);
   }
 
   async cancelSchedule(data: { id: number }): Promise<DomainClient | null> {
-    const cancelStatus = BookingStatus.getCancelled().getDatabaseId();
-
     const result = await this.prisma.$transaction(async (tx) => {
       return await tx.booking.update({
         where: { id: data.id },
         data: {
-          statusId: cancelStatus,
+          status: BookingStatus.CANCELED,
         },
       });
     });
@@ -208,8 +182,7 @@ export class PrismaBookingRepository implements IBookingRepository {
     id: number;
     dataToUpdate: BookingUpdateData;
   }): Promise<DomainClient | null> {
-    const updateStatus = BookingStatus.getConfirmed().getDatabaseId();
-    data.dataToUpdate.statusId = updateStatus;
+    data.dataToUpdate.status = BookingStatus.CONFIRMED;
 
     const result = await this.prisma.$transaction(async (tx) => {
       return await tx.booking.update({

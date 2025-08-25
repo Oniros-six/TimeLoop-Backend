@@ -1,13 +1,7 @@
 import { EntityType } from '@/application/constants/activity-log.constants';
-import {
-  BOOKING_REPOSITORY,
-  SERVICE_REPOSITORY,
-} from '@/application/constants/providers';
+import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/constants/providers';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
-import {
-  ReminderChannel,
-  ReminderStatus,
-} from '@/domain/common/ReminderConstants';
+import { ReminderChannel, ReminderStatus } from '@/domain/common/ReminderConstants';
 import { Booking } from '@/domain/entities/booking.entity';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
@@ -15,11 +9,10 @@ import { IServiceRepository } from '@/domain/repositories/services.repository';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
 import { RemindersService } from '@/domain/services/reminders/reminders.service';
-import { BookingDate } from '@/domain/value-objects/booking/booking-date.vo';
-import { BookingTime } from '@/domain/value-objects/booking/booking-time.vo';
 import { CreateBookingDto } from '@/interfaces/controllers/booking/dto/create-booking.dto';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { addMinutesToTime, ensureNotPast } from '@/domain/value-objects/booking/validations';
 
 @Injectable()
 export class CreateBooking {
@@ -34,119 +27,98 @@ export class CreateBooking {
 
     private readonly remindersService: RemindersService,
 
-    private eventEmitter: EventEmitter2,
-  ) {}
+    private readonly eventEmitter: EventEmitter2,
+  ) { }
 
   async execute(data: CreateBookingDto) {
-    try {
-      // Validar datos usando Value Objects (incluye todas las validaciones)
-      const bookingDate = new BookingDate(data.date);
+    //* 1) Validación de fecha y hora
+    const scheduledAt = ensureNotPast(data.date);
 
-      // Service existence validation
-      const service = await this.serviceRepository.findService({
-        serviceId: data.serviceId,
-        commerceId: data.commerceId,
-      });
+    //* 2) Validar existencia del servicio
+    const service = await this.serviceRepository.findService({
+      serviceId: data.serviceId,
+      commerceId: data.commerceId,
+    });
 
-      if (!service) {
-        throw new HttpException(
-          'El servicio no existe o no pertenece al comercio especificado',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      // Schedule available validation
-      const startTime = new BookingTime(data.timeStart);
-      const endTime = new BookingTime(
-        new Date(data.timeStart.getTime() + data.duration * 60 * 1000),
-      );
-      const overlappingBookings = await this.bookingRepository.findOverlapping({
-        startTime: startTime.value,
-        endTime: endTime.value,
-        date: bookingDate.value,
-        commerceId: data.commerceId,
-      });
-
-      if (overlappingBookings != null && overlappingBookings) {
-        return {
-          message: 'El horario está ocupado',
-          statusCode: HttpStatus.CONFLICT,
-        };
-      }
-
-      // Booking creation using domain entity
-      const booking = Booking.createPending(
-        data.customerId,
-        data.serviceId,
-        data.commerceId,
-        bookingDate.value,
-        startTime.value,
-        data.duration,
-        data.notes,
-      );
-
-      const result = await this.bookingRepository.createSchedule({
-        customerId: booking.customerId,
-        serviceId: booking.serviceId,
-        commerceId: booking.commerceId,
-        date: booking.date.value,
-        timeStart: booking.timeStart.value,
-        duration: booking.duration,
-        notes: booking.notes,
-      });
-
-      if (result === null) {
-        throw new HttpException(
-          'Error al registrar el turno, intente de nuevo en unos minutos.',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      // Activity register
-      await this.activityLogService.created({
-        entityType: EntityType.BOOKING,
-        entityId: result.id,
-        userId: null,
-        commerceId: result.commerceId,
-        customerId: result.customerId,
-        detail: `Se crea una nueva reserva`,
-      });
-
-      // Reminder creation
-      const scheduledAt = new Date(
-        bookingDate.value.getTime() + startTime.value.getTime(),
-      );
-
-      //TODO en un futuro agregar un parametro extra, para definir en este momento como pretende recibir el recordatorio el cliente
-      const reminder = Reminder.create({
-        bookingId: result.id,
-        customerId: result.customerId,
-        commerceId: result.commerceId,
-        scheduledAt: scheduledAt,
-        sentAt: null,
-        channel: ReminderChannel.email,
-        status: ReminderStatus.pending,
-      });
-      await this.remindersService.create(reminder);
-
-      // Creation event emitter
-      this.eventEmitter.emit(
-        BOOKING_EVENTS.CREATED,
-        new BookingCreatedEvent(result),
-      );
-
-      return {
-        message: 'Su reserva ha sido agendada con éxito.',
-        statusCode: HttpStatus.OK,
-        data: result,
-      };
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error desconocido';
-      console.error(message);
+    if (!service) {
       throw new HttpException(
-        'Algo salió mal al guardar el horario, inténtelo de nuevo más tarde.',
+        'El servicio no existe o no pertenece al comercio especificado',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    //* 3) Calcular endTime según duración del servicio
+    const timeEnd = addMinutesToTime(data.date, service.durationMinutes);
+
+
+    //* 4) Validar solapamiento
+    const overlappingBookings = await this.bookingRepository.findOverlapping({
+      commerceId: data.commerceId,
+      date: data.date,
+      endTime: timeEnd,
+    });
+
+    if (overlappingBookings) {
+      throw new HttpException('El horario está ocupado', HttpStatus.CONFLICT);
+    }
+
+    //* 5) Crear booking como entidad de dominio
+    const booking = Booking.createPending(
+      data.customerId,
+      data.serviceId,
+      data.commerceId,
+      data.date,
+      timeEnd,
+      service.durationMinutes,
+      data.notes,
+    );
+
+    const result = await this.bookingRepository.createSchedule(booking);
+    if (!result) {
+      throw new HttpException(
+        'Error al registrar la reserva, intente de nuevo en unos minutos.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    //* 6) Registrar actividad
+    await this.activityLogService.created({
+      entityType: EntityType.BOOKING,
+      entityId: result.id,
+      userId: null,
+      commerceId: result.commerceId,
+      customerId: result.customerId,
+      detail: `Se crea una nueva reserva`,
+    });
+
+    //* 7) Crear recordatorio
+    const reminder = Reminder.create({
+      bookingId: result.id,
+      customerId: result.customerId,
+      commerceId: result.commerceId,
+      scheduledAt,
+      sentAt: null,
+      channel: ReminderChannel.email,
+      status: ReminderStatus.pending,
+    });
+
+    await this.remindersService.create(reminder);
+
+
+    //* 8) Emitir evento de creación
+    this.eventEmitter.emit(BOOKING_EVENTS.CREATED, new BookingCreatedEvent(result));
+
+    return {
+      message: 'Su reserva ha sido agendada con éxito.',
+      statusCode: HttpStatus.OK,
+      data: result,
+    };
+  } catch(err: unknown) {
+    const message = err instanceof Error ? err.message : 'Error desconocido';
+    console.error(message);
+    throw new HttpException(
+      message,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
 }

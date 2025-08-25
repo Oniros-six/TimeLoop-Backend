@@ -24,9 +24,11 @@ export class CancelBooking {
 
   async execute(id: number, data: CancelBookingDto) {
     const { commerceId, customerId } = data;
+    //* Confirmamos la existencia del booking
     try {
       const booking = await this.bookingRepository.findOne({ id: id });
 
+    //* Validamos que se pueda cancelar
       if (
         !booking ||
         booking.commerceId !== commerceId ||
@@ -46,6 +48,7 @@ export class CancelBooking {
         );
       }
 
+      //* Generamos el cambio
       const result = await this.bookingRepository.cancelSchedule({ id: id });
 
       if (result === null) {
@@ -55,7 +58,7 @@ export class CancelBooking {
         );
       }
 
-      // Activity register
+      //* Guardamos la actividad
       await this.activityLogService.cancelled({
         entityType: EntityType.BOOKING,
         entityId: result.id,
@@ -65,8 +68,10 @@ export class CancelBooking {
         detail: `Se cancela la reserva`,
       });
 
+      //* Cancelamos el reminder
       await this.remindersService.cancelReminder(result.id);
-      // Emitir evento de cancelación
+      
+      //* Emitir evento de cancelación
       this.eventEmitter.emit(
         BOOKING_EVENTS.CANCELLED,
         new BookingCancelledEvent(result),

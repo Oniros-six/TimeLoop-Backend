@@ -1,7 +1,9 @@
+import { BookingStatus } from '@/domain/common/BookingStatus';
+
 export interface BookingUpdateData {
   date?: Date;
-  timeStart?: Date;
+  timeEnd?: Date;
   serviceId?: number;
   notes?: string;
-  statusId?: number;
+  status?: BookingStatus;
 }

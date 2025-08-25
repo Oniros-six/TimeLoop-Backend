@@ -1,6 +1,4 @@
-import { BookingDate } from '../value-objects/booking/booking-date.vo';
-import { BookingTime } from '../value-objects/booking/booking-time.vo';
-import { BookingStatus } from '../value-objects/booking/booking-status.vo';
+import { BookingStatus } from "@/domain/common/BookingStatus"
 
 export class Booking {
   constructor(
@@ -10,37 +8,27 @@ export class Booking {
     public readonly duration: number,
     public status: BookingStatus,
     public serviceId: number,
-    public date: BookingDate,
-    public timeStart: BookingTime,
+    public date: Date,
+    public timeEnd: Date,
     public notes: string,
-  ) {
-    this.timeEnd = this.timeStart.addMinutes(this.duration);
-  }
-
-  public timeEnd: BookingTime;
+  ) {}
 
   // Solo métodos de dominio esenciales
   canBeCancelled(): boolean {
-    return this.status.value === 'confirmed' || this.status.value === 'pending';
+    return this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
   }
 
   canBeRescheduled(): boolean {
-    return this.status.value === 'confirmed' || this.status.value === 'pending';
+    return this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
   }
 
-  cancel(): void {
-    if (!this.canBeCancelled()) {
-      throw new Error('No se puede cancelar esta reserva');
-    }
-    this.status = new BookingStatus('cancelled');
-  }
 
   static createPending(
     customerId: number,
     serviceId: number,
     commerceId: number,
     date: Date,
-    timeStart: Date,
+    timeEnd: Date,
     duration: number,
     notes: string = '',
   ): Booking {
@@ -49,11 +37,12 @@ export class Booking {
       customerId,
       commerceId,
       duration,
-      new BookingStatus('pending'),
+      BookingStatus.PENDING,
       serviceId,
-      new BookingDate(date),
-      new BookingTime(timeStart),
+      date,
+      timeEnd,
       notes,
     );
   }
+
 }

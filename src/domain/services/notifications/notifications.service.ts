@@ -97,7 +97,7 @@ export class NotificationService {
     });
     if (!commerce) throw new Error('Commerce not found');
 
-    const message = `Se ha creado una reserva para el día ${booking.date.value.toISOString()} a las ${booking.timeStart.value.toISOString()}.`;
+    const message = `Se ha creado una reserva para el día ${booking.date.toISOString()}`;
     await this.provider.sendEmail(commerce.email, 'Nueva reserva', message);
   }
 
@@ -108,7 +108,7 @@ export class NotificationService {
     });
     if (!commerce) throw new Error('Commerce not found');
 
-    const message = `Se ha cancelado una reserva para el día ${booking.date.value.toISOString()} a las ${booking.timeStart.value.toISOString()}.`;
+    const message = `Se ha cancelado una reserva para el día ${booking.date.toISOString()}`;
     await this.provider.sendEmail(commerce.email, 'Reserva cancelada', message);
   }
 
@@ -124,7 +124,7 @@ export class NotificationService {
     });
     if (!commerce) throw new Error('Commerce not found');
 
-    const message = `Se ha reprogramado una reserva para el día ${newDate.toISOString()} a las ${booking.timeStart.value.toISOString()}.`;
+    const message = `Se ha reprogramado una reserva para el día ${newDate.toISOString()}`;
     await this.provider.sendEmail(
       commerce.email,
       'Reserva reprogramada',

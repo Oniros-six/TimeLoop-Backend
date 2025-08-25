@@ -5,7 +5,6 @@ import {
   IsNotEmpty,
   MinLength,
   MaxLength,
-  Min,
   IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -31,36 +30,13 @@ export class CreateBookingDto {
   serviceId: number;
 
   @ApiProperty({
-    example: '2025-07-08T17:30:00.000Z',
-    description: 'Dia y hora de inicio de la reserva',
-  })
-  @Type(() => Date)
-  @IsDate({ message: 'La hora de inicio debe ser una fecha válida' })
-  @IsNotEmpty({ message: 'La hora de inicio es requerida' })
-  timeStart: Date;
-
-  @ApiProperty({
-    example: '2025-07-08T00:00:00.000Z',
-    description: 'En que fecha ser realizo la reserva',
+    example: '2025-07-08T15:00:00-03:00',
+    description: 'Fecha y hora de la reserva (ISO 8601 con zona horaria)',
   })
   @Type(() => Date)
   @IsDate({ message: 'La fecha debe ser una fecha válida' })
   @IsNotEmpty({ message: 'La fecha es requerida' })
   date: Date;
-
-  @ApiProperty({ example: 1, description: 'Estado actual de la reserva' })
-  @IsNumber({}, { message: 'El ID de estado debe ser un número' })
-  @IsNotEmpty({ message: 'El estado es requerido' })
-  statusid: number;
-
-  @ApiProperty({
-    example: 90,
-    description: 'Duración de la reserva en minutos',
-  })
-  @IsNumber({}, { message: 'La duración debe ser un número' })
-  @IsNotEmpty({ message: 'La duración es requerida' })
-  @Min(1, { message: 'La duración debe ser mayor a 0 minutos' })
-  duration: number;
 
   @ApiProperty({
     example: 'Soy alergico a ... y preciso ...',

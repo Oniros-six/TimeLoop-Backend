@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   Query,
   Patch,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -98,7 +99,7 @@ export class BookingController {
   @ApiBody({ type: CancelBookingDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Patch(':id')
-  cancelBooking(@Param('/id') id: number, @Body() dto: CancelBookingDto) {
+  cancelBooking(@Param('id', ParseIntPipe) id: number, @Body() dto: CancelBookingDto) {
     return this.cancelBookingUseCase.execute(id, dto);
   }
 
@@ -106,7 +107,7 @@ export class BookingController {
   @ApiBody({ type: UpdateBookingDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Put(':id')
-  update(@Param('/id') id: number, @Body() dto: UpdateBookingDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBookingDto) {
     return this.updateBookingUseCase.execute(id, dto);
   }
 }
