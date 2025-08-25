@@ -11,7 +11,7 @@ import { FindAllUserWorkingOverride } from '@/application/use-cases/userWorkingO
 import {
   USER_REPOSITORY,
   USER_WORKING_OVERRIDE_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 // Repositories
 import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';

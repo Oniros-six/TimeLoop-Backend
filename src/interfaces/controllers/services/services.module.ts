@@ -13,7 +13,7 @@ import { DeleteService } from '@/application/use-cases/services/delete.use-case'
 import {
   COMMERCE_REPOSITORY,
   SERVICE_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 // Repositories
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';

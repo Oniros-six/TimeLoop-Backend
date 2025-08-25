@@ -4,7 +4,7 @@ import { IUserWorkingPatternRepository } from '@/domain/repositories/userWorking
 import {
   USER_REPOSITORY,
   USER_WORKING_PATTERN_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 import { UserWorkingPattern as UserWorkingPatternDomain } from '@/domain/entities/userWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';

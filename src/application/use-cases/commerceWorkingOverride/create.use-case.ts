@@ -4,7 +4,7 @@ import { ICommerceWorkingOverrideRepository } from '@/domain/repositories/commer
 import {
   COMMERCE_REPOSITORY,
   COMMERCE_WORKING_OVERRIDE_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 import { CommerceWorkingOverride as CommerceWorkingOverrideDomain } from '@/domain/entities/commerceWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';

@@ -1,7 +1,7 @@
 //src\infrastructure\notifications\notification-provider.service.ts
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
-import { RESEND_PROVIDER } from '@/application/constants/providers';
+import { RESEND_PROVIDER } from '@/application/providers';
 import { INotificationProvider } from '@/domain/services/notifications/notification-provider.interface';
 
 @Injectable()

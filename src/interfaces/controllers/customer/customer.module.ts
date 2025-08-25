@@ -12,7 +12,7 @@ import { UpdateCustomer } from '@/application/use-cases/customer/update.use-case
 import {
   COMMERCE_REPOSITORY,
   CUSTOMER_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 // Repositories
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';

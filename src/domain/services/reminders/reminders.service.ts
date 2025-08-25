@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
-import { REMINDER_REPOSITORY } from '@/application/constants/providers';
+import { REMINDER_REPOSITORY } from '@/application/providers';
 import { Reminder } from '@/domain/entities/reminder.entity';
 
 @Injectable()

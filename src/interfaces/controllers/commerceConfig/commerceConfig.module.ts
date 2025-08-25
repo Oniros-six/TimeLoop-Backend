@@ -11,7 +11,7 @@ import { FindCommerceConfig } from '@/application/use-cases/commerceConfig/find.
 import {
   COMMERCE_REPOSITORY,
   COMMERCE_CONFIG_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 // Repositories
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';

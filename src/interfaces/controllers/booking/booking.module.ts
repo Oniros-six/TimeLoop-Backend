@@ -15,7 +15,7 @@ import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
 import {
   BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 // Repositories
 import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/booking.repository';

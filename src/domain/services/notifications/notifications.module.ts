@@ -4,7 +4,7 @@ import { NotificationService } from './notifications.service';
 import { ResendProvider } from '@/infrastructure/notifications/resend.provider';
 import { ResendNotificationProvider } from '@/infrastructure/notifications/ResendNotificationProvider';
 import { PrismaModule } from '@/infrastructure/prisma/prisma.module';
-import { REMINDER_REPOSITORY } from '@/application/constants/providers';
+import { REMINDER_REPOSITORY } from '@/application/providers';
 import { PrismaReminderRepository } from '@/infrastructure/prisma/repositories/reminder.repository';
 
 @Module({

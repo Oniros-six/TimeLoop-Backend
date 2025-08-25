@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICustomerRepository } from '@/domain/repositories/customer.repository';
 import { UpdateCustomerDto } from '@/interfaces/controllers/customer/dto/update-customer.dto';
 import { CustomerUpdateData } from '@/domain/common/CustomerUpdateData';
-import { CUSTOMER_REPOSITORY } from '@/application/constants/providers';
+import { CUSTOMER_REPOSITORY } from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 

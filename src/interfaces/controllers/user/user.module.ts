@@ -14,7 +14,7 @@ import { ReinstateUser } from '@/application/use-cases/user/reinstate.use-case';
 import {
   COMMERCE_REPOSITORY,
   USER_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 // Repositories
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';

@@ -11,7 +11,7 @@ import { FindAllCommerceWorkingOverride } from '@/application/use-cases/commerce
 import {
   COMMERCE_REPOSITORY,
   COMMERCE_WORKING_OVERRIDE_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 // Repositories
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';

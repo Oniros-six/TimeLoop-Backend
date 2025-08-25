@@ -2,7 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { ActivityLogService } from './activity-log.service';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { PrismaActivityLogRepository } from '@/infrastructure/prisma/repositories/activityLog.repository';
-import { ACTIVITY_LOG_REPOSITORY } from '@/application/constants/providers';
+import { ACTIVITY_LOG_REPOSITORY } from '@/application/providers';
 
 @Global()
 @Module({

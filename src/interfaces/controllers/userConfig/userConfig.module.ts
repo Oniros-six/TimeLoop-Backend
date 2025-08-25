@@ -11,7 +11,7 @@ import { FindUserConfig } from '@/application/use-cases/userConfig/find.use-case
 import {
   USER_REPOSITORY,
   USER_CONFIG_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 // Repositories
 import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';

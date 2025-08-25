@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { UpdateBookingDto } from '@/interfaces/controllers/booking/dto/update-booking.dto';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
-import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/constants/providers';
+import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { EventEmitter2 } from '@nestjs/event-emitter';

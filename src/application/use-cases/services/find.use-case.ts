@@ -3,7 +3,7 @@ import { IServiceRepository } from '@/domain/repositories/services.repository';
 import {
   COMMERCE_REPOSITORY,
   SERVICE_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 
 @Injectable()

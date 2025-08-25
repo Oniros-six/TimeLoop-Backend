@@ -10,7 +10,7 @@ import { SuspendCommerce } from '@/application/use-cases/commerce/suspend.use-ca
 import { ReinstateCommerce } from '@/application/use-cases/commerce/reinstate.use-case';
 
 // Tokens
-import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
+import { COMMERCE_REPOSITORY } from '@/application/providers';
 
 // Repositories
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';

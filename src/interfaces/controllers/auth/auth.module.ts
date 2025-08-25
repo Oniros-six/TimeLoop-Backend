@@ -8,7 +8,7 @@
   import { FindUser } from '@/application/use-cases/user/find.use-case';
 
   // Tokens
-  import { USER_REPOSITORY } from '@/application/constants/providers';
+  import { USER_REPOSITORY } from '@/application/providers';
 
   // Repositories
   import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';

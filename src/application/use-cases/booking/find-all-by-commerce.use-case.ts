@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { FindByCommerceDto } from '@/interfaces/controllers/booking/dto/find-by-commerce.dto';
-import { BOOKING_REPOSITORY } from '@/application/constants/providers';
+import { BOOKING_REPOSITORY } from '@/application/providers';
 
 @Injectable()
 export class FindAllByCommerce {

@@ -11,7 +11,7 @@ import { FindAllUserWorkingPattern } from '@/application/use-cases/userWorkingPa
 import {
   USER_REPOSITORY,
   USER_WORKING_PATTERN_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 // Repositories
 import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';

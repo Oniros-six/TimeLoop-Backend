@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICommerceWorkingPatternRepository } from '@/domain/repositories/commerceWorkingPattern.repository';
-import { COMMERCE_WORKING_PATTERN_REPOSITORY } from '@/application/constants/providers';
+import { COMMERCE_WORKING_PATTERN_REPOSITORY } from '@/application/providers';
 
 import { CommerceWorkingPattern as CommerceWorkingPatternDomain } from '@/domain/entities/commerceWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';

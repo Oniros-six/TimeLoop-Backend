@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
-import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
+import { COMMERCE_REPOSITORY } from '@/application/providers';
 import { CreateCommerceDto } from '@/interfaces/controllers/commerces/dto/create-commerce.dto';
 import { Commerce as CommerceDomain } from '@/domain/entities/commerce.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';

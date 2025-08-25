@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICommerceWorkingOverrideRepository } from '@/domain/repositories/commerceWorkingOverride.repository';
-import { COMMERCE_WORKING_OVERRIDE_REPOSITORY } from '@/application/constants/providers';
+import { COMMERCE_WORKING_OVERRIDE_REPOSITORY } from '@/application/providers';
 
 import { CommerceWorkingOverride as CommerceWorkingOverrideDomain } from '@/domain/entities/commerceWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';

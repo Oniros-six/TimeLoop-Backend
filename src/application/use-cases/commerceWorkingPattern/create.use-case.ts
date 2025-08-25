@@ -4,7 +4,7 @@ import { ICommerceWorkingPatternRepository } from '@/domain/repositories/commerc
 import {
   COMMERCE_REPOSITORY,
   COMMERCE_WORKING_PATTERN_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 import { CommerceWorkingPattern as CommerceWorkingPatternDomain } from '@/domain/entities/commerceWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';

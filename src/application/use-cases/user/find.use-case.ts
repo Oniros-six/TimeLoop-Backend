@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from '@/domain/repositories/user.repository';
-import { USER_REPOSITORY } from '@/application/constants/providers';
+import { USER_REPOSITORY } from '@/application/providers';
 
 @Injectable()
 export class FindUser {

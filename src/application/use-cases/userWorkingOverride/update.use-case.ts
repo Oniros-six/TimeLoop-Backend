@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IUserWorkingOverrideRepository } from '@/domain/repositories/userWorkingOverride.repository';
-import { USER_WORKING_OVERRIDE_REPOSITORY } from '@/application/constants/providers';
+import { USER_WORKING_OVERRIDE_REPOSITORY } from '@/application/providers';
 
 import { UserWorkingOverride as UserWorkingOverrideDomain } from '@/domain/entities/userWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';

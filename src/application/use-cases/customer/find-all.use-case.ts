@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICustomerRepository } from '@/domain/repositories/customer.repository';
 import {
   CUSTOMER_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 @Injectable()
 export class FindAllCustomers {

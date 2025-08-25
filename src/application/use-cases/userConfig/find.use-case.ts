@@ -3,7 +3,7 @@ import { IUserRepository } from '@/domain/repositories/user.repository';
 import {
   USER_REPOSITORY,
   USER_CONFIG_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 import { IUserConfigRepository } from '@/domain/repositories/userConfig.repository';
 
 @Injectable()

@@ -4,7 +4,7 @@ import { NotificationService } from '../../../src/domain/services/notifications/
 import { INotificationProvider } from '../../../src/domain/services/notifications/notification-provider.interface';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
-import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
+import { COMMERCE_REPOSITORY } from '@/application/providers';
 
 describe('NotificationModule', () => {
   let module: TestingModule;

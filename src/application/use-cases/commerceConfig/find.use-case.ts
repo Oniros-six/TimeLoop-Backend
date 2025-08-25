@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   COMMERCE_REPOSITORY,
   COMMERCE_CONFIG_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.repository';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 

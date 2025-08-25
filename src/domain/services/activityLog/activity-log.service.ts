@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ActivityLog } from '@/domain/entities/activityLog.entity';
 import { IActivityLogRepository } from '@/domain/repositories/activityLog.repository';
-import { ACTIVITY_LOG_REPOSITORY } from '@/application/constants/providers';
+import { ACTIVITY_LOG_REPOSITORY } from '@/application/providers';
 
 @Injectable()
 export class ActivityLogService {

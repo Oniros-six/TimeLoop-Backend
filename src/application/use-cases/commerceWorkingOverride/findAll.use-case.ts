@@ -4,7 +4,7 @@ import { ICommerceWorkingOverrideRepository } from '@/domain/repositories/commer
 import {
   COMMERCE_REPOSITORY,
   COMMERCE_WORKING_OVERRIDE_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 @Injectable()
 export class FindAllCommerceWorkingOverride {

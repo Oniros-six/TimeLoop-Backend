@@ -3,7 +3,7 @@ import { RemindersService } from '../reminders.service';
 import { NotificationService } from '@/domain/services/notifications/notifications.service';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 import { ReminderDTO } from '../reminder.dto';
-import { REMINDER_REPOSITORY } from '@/application/constants/providers';
+import { REMINDER_REPOSITORY } from '@/application/providers';
 
 describe('RemindersService', () => {
   let service: RemindersService;

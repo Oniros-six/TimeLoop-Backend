@@ -4,7 +4,7 @@ import { UpdateServiceDto } from '@/interfaces/controllers/services/dto/update-s
 import {
   COMMERCE_REPOSITORY,
   SERVICE_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';

@@ -11,7 +11,7 @@ import { INotificationProvider } from '@/domain/services/notifications/notificat
 import {
   COMMERCE_REPOSITORY,
   REMINDER_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';

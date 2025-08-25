@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IUserWorkingPatternRepository } from '@/domain/repositories/userWorkingPattern.repository';
-import { USER_WORKING_PATTERN_REPOSITORY } from '@/application/constants/providers';
+import { USER_WORKING_PATTERN_REPOSITORY } from '@/application/providers';
 
 import { UserWorkingPattern as UserWorkingPatternDomain } from '@/domain/entities/userWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';

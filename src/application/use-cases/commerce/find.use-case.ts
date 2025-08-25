@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
-import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
+import { COMMERCE_REPOSITORY } from '@/application/providers';
 
 @Injectable()
 export class FindCommerce {

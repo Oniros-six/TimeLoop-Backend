@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { IUserRepository } from '@/domain/repositories/user.repository';
-import { USER_REPOSITORY } from '@/application/constants/providers';
+import { USER_REPOSITORY } from '@/application/providers';
 import { Inject } from '@nestjs/common';
 import { LoginUserDto } from '@/interfaces/controllers/auth/dto/login-user.dto';
 

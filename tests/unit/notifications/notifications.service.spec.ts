@@ -16,7 +16,7 @@ import { Commerce } from '@/domain/entities/commerce.entity';
 import {
   COMMERCE_REPOSITORY,
   REMINDER_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 

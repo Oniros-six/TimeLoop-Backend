@@ -4,7 +4,7 @@ import { IUserWorkingOverrideRepository } from '@/domain/repositories/userWorkin
 import {
   USER_REPOSITORY,
   USER_WORKING_OVERRIDE_REPOSITORY,
-} from '@/application/constants/providers';
+} from '@/application/providers';
 
 import { UserWorkingOverride as UserWorkingOverrideDomain } from '@/domain/entities/userWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';

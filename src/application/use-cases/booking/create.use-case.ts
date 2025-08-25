@@ -1,5 +1,5 @@
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
-import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/constants/providers';
+import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/providers';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
 import { ReminderChannel, ReminderStatus } from '@/domain/dbEnums/ReminderConstants';
 import { Booking } from '@/domain/entities/booking.entity';
