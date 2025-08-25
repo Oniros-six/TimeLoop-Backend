@@ -3,6 +3,8 @@ import { User } from '../entities/user.entity';
 export interface IUserRepository {
   findUser(data: { userId: number }): Promise<User | null>;
 
+  findUserByCommerce(data: { userId: number, commerceId: number }): Promise<User | null>;
+
   findUserByName(data: {
     commerceId: number;
     name: string;
