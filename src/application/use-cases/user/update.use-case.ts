@@ -4,7 +4,6 @@ import { USER_REPOSITORY } from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { UpdateUserDto } from '@/interfaces/controllers/user/dto/update-user.dto';
-import { UserUpdateData } from '@/domain/common/UserUpdateData';
 import { Roles } from '@/domain/dbEnums/user-roles.constants';
 import { AuthService } from '@/domain/services/auth/auth.service';
 
@@ -17,7 +16,7 @@ export class UpdateUser {
     private readonly activityLogService: ActivityLogService,
 
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   async execute(id: number, data: UpdateUserDto) {
     const user = await this.userRepository.findUser({
@@ -44,23 +43,13 @@ export class UpdateUser {
       throw new HttpException('Rol inexistente.', HttpStatus.BAD_REQUEST);
     }
 
-    const newUserData: UserUpdateData = {};
-
-    if (data.name) {
-      newUserData.name = data.name;
-    }
-    if (data.email) {
-      newUserData.email = data.email;
-    }
-
     if (data.password) {
-      newUserData.password = await this.authService.hashPassword(data.password);
-    }
-    if (data.role) {
-      newUserData.role = data.role;
+      data.password = await this.authService.hashPassword(data.password);
     }
 
-    if (Object.keys(newUserData).length === 0) {
+    const hasChanges = user.update(data);
+
+    if (!hasChanges) {
       return {
         message: 'No se realizaron cambios en la información.',
         statusCode: HttpStatus.OK,
@@ -71,7 +60,7 @@ export class UpdateUser {
     try {
       const result = await this.userRepository.updateUser({
         userId: id,
-        newUserData: newUserData,
+        newUserData: user,
       });
 
       if (result === null) {
@@ -80,7 +69,6 @@ export class UpdateUser {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-      const updatedFields = Object.keys(newUserData).join(', ');
 
       await this.activityLogService.updated({
         entityType: EntityType.USER,
@@ -88,7 +76,7 @@ export class UpdateUser {
         userId: result.id,
         commerceId: user.commerceId,
         customerId: null,
-        detail: `Se actualizaron los campos: ${updatedFields}.`,
+        detail: `Se actualizaron los campos del user: ${user.id}.`,
       });
 
       return {

@@ -1,4 +1,3 @@
-import { UserUpdateData } from '../common/UserUpdateData';
 import { User } from '../entities/user.entity';
 
 export interface IUserRepository {
@@ -21,6 +20,6 @@ export interface IUserRepository {
 
   updateUser(data: {
     userId: number;
-    newUserData: UserUpdateData;
+    newUserData: User;
   }): Promise<User | null>;
 }

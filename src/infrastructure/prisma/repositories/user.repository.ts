@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IUserRepository } from '@/domain/repositories/user.repository';
-import { User as DomainClient } from '@/domain/entities/user.entity';
-import { UserUpdateData } from '@/domain/common/UserUpdateData';
+import { User as DomainClient, User } from '@/domain/entities/user.entity';
 import { Roles } from '@/domain/dbEnums/user-roles.constants';
 
 @Injectable()
@@ -91,7 +90,7 @@ export class PrismaUserRepository implements IUserRepository {
 
   async updateUser(data: {
     userId: number;
-    newUserData: UserUpdateData;
+    newUserData: User;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.user.update({
       where: { id: data.userId },
