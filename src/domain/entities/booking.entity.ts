@@ -6,9 +6,10 @@ export class Booking {
     public readonly customerId: number,
     public readonly commerceId: number,
     public readonly duration: number,
+    public userId: number,
     public status: BookingStatus,
     public serviceId: number,
-    public date: Date,
+    public timeStart: Date,
     public timeEnd: Date,
     public notes: string,
   ) { }
@@ -18,7 +19,7 @@ export class Booking {
     const validStatus = this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
 
     // Diferencia entre la reserva y ahora en milisegundos
-    const diffMs = this.date.getTime() - Date.now();
+    const diffMs = this.timeStart.getTime() - Date.now();
 
     // Convertir a horas
     const diffHours = diffMs / 1000 / 60 / 60;
@@ -34,14 +35,13 @@ export class Booking {
     const validStatus = this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
 
     // Diferencia entre la reserva y ahora en milisegundos
-    const diffMs = this.date.getTime() - Date.now();
+    const diffMs = this.timeStart.getTime() - Date.now();
 
     // Convertir a horas
     const diffHours = diffMs / 1000 / 60 / 60;
 
     // Se permite reprogramar si queda más de 1 hora para la reserva
     const isOnTime = diffHours > 1;
-
     return validStatus && isOnTime;
   }
 
@@ -50,7 +50,8 @@ export class Booking {
     customerId: number,
     serviceId: number,
     commerceId: number,
-    date: Date,
+    userId: number,
+    timeStart: Date,
     timeEnd: Date,
     duration: number,
     notes: string = '',
@@ -60,9 +61,10 @@ export class Booking {
       customerId,
       commerceId,
       duration,
+      userId,
       BookingStatus.PENDING,
       serviceId,
-      date,
+      timeStart,
       timeEnd,
       notes,
     );

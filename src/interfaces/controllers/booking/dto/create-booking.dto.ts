@@ -24,6 +24,11 @@ export class CreateBookingDto {
   @IsNotEmpty({ message: 'El cliente es requerido' })
   customerId: number;
 
+  @ApiProperty({ example: 1, description: 'ID del empleado que atiende' })
+  @IsNumber({}, { message: 'El ID de empleado debe ser un número' })
+  @IsNotEmpty({ message: 'El empleado es requerido' })
+  userId: number;
+
   @ApiProperty({ example: 1, description: 'ID del servicio reservado' })
   @IsNumber({}, { message: 'El ID de servicio debe ser un número' })
   @IsNotEmpty({ message: 'El servicio es requerido' })
@@ -36,7 +41,7 @@ export class CreateBookingDto {
   @Type(() => Date)
   @IsDate({ message: 'La fecha debe ser una fecha válida' })
   @IsNotEmpty({ message: 'La fecha es requerida' })
-  date: Date;
+  timeStart: Date;
 
   @ApiProperty({
     example: 'Soy alergico a ... y preciso ...',

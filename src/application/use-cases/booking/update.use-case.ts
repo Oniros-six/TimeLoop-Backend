@@ -1,4 +1,4 @@
-import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/providers';
+import { BOOKING_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
@@ -8,8 +8,10 @@ import {
 } from '@/domain/dbEnums/ReminderConstants';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { Service } from '@/domain/entities/service.entity';
+import { User } from '@/domain/entities/user.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
+import { IUserRepository } from '@/domain/repositories/user.repository';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
 import { RemindersService } from '@/domain/services/reminders/reminders.service';
@@ -26,6 +28,9 @@ export class UpdateBooking {
 
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
+
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
 
     private readonly activityLogService: ActivityLogService,
     private readonly eventEmitter: EventEmitter2,
@@ -55,41 +60,62 @@ export class UpdateBooking {
       );
     }
 
-    //* 2) Definir siguiente servicio (En caso de ser diferente al actual)
+    //* 2) Definir siguiente servicio y usuario (En caso de ser diferentes al actual)
     let nextService: Service;
     if (newData.serviceId !== undefined && newData.serviceId !== booking.serviceId) {
-      const svc = await this.serviceRepository.findService({ serviceId: newData.serviceId, commerceId: newData.commerceId });
-      if (!svc) {
+      const res = await this.serviceRepository.findService({ serviceId: newData.serviceId, commerceId: newData.commerceId });
+      if (!res) {
         throw new HttpException(
           'El servicio no existe o no pertenece al comercio especificado',
           HttpStatus.NOT_FOUND,
         );
       }
-      nextService = svc;
+      nextService = res;
     } else {
-      const svc = await this.serviceRepository.findService({ serviceId: booking.serviceId, commerceId: newData.commerceId });
-      if (!svc) {
+      const res = await this.serviceRepository.findService({ serviceId: booking.serviceId, commerceId: booking.commerceId });
+      if (!res) {
         throw new HttpException(
           'El servicio no existe o no pertenece al comercio especificado',
           HttpStatus.NOT_FOUND,
         );
       }
-      nextService = svc;
+      nextService = res;
+    }
+
+    let nextUser: User;
+    if (newData.userId !== undefined && newData.userId !== booking.userId) {
+      const res = await this.userRepository.findUserByCommerce({ userId: newData.userId, commerceId: newData.commerceId });
+      if (!res) {
+        throw new HttpException(
+          'El usuario no existe o no pertenece al comercio especificado',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      nextUser = res;
+    } else {
+      const res = await this.userRepository.findUserByCommerce({ userId: booking.userId, commerceId: booking.commerceId });
+      if (!res) {
+        throw new HttpException(
+          'El usuario no existe o no pertenece al comercio especificado',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      nextUser = res;
     }
 
     //* 3) Determinar fecha y hora a usar
-    const nextDate = newData.date ? ensureNotPast(newData.date) : booking.date;
+    const nextTimeStart = newData.timeStart ? ensureNotPast(newData.timeStart) : booking.timeStart;
 
     //* 4) Calcular timeEnd según duración del servicio final
-    const nextTimeEnd = addMinutesToTime(nextDate, nextService.durationMinutes);
+    const nextTimeEnd = addMinutesToTime(nextTimeStart, nextService.durationMinutes);
 
     //* 5) Chequeo de solapamiento (si cambió fecha, hora o servicio)
-    if (nextDate != booking.date || nextService.id != booking.serviceId) {
+    if (nextTimeStart != booking.timeStart || nextService.id != booking.serviceId) {
       const overlapping = await this.bookingRepository.findOverlapping({
         id, // id de la reserva actual para excluirla si es necesario
         commerceId: newData.commerceId,
-        date: nextDate,
-        endTime: nextTimeEnd,
+        timeStart: nextTimeStart,
+        timeEnd: nextTimeEnd,
       });
 
       if (overlapping) {
@@ -102,7 +128,9 @@ export class UpdateBooking {
 
     dataToUpdate.serviceId = nextService.id;
 
-    dataToUpdate.date = nextDate;
+    dataToUpdate.userId = nextUser.id;
+
+    dataToUpdate.timeStart = nextTimeStart;
 
     dataToUpdate.timeEnd = nextTimeEnd;
 
@@ -134,7 +162,7 @@ export class UpdateBooking {
     await this.activityLogService.updated({
       entityType: EntityType.BOOKING,
       entityId: result.id,
-      userId: null,
+      userId: result.userId,
       commerceId: result.commerceId,
       customerId: result.customerId,
       detail: `Se actualizaron los campos: ${updatedFields}.`,
@@ -145,22 +173,24 @@ export class UpdateBooking {
       bookingId: result.id,
       customerId: result.customerId,
       commerceId: result.commerceId,
-      scheduledAt: nextDate,
+      scheduledAt: nextTimeStart,
       sentAt: null,
       channel: ReminderChannel.email,
       status: ReminderStatus.pending,
     });
     await this.remindersService.updateReminder(reminder);
 
-    //* 10) Emitir evento si hubo cambio de horario (date/time/service -> afecta duración/fin)
+    //* 10) Emitir evento si hubo cambio
     if (
-      dataToUpdate.date !== undefined ||
+      dataToUpdate.timeStart !== undefined ||
       dataToUpdate.serviceId !== undefined ||
+      dataToUpdate.userId !== undefined ||
+      dataToUpdate.notes !== undefined ||
       dataToUpdate.timeEnd !== undefined
     ) {
       this.eventEmitter.emit(
         BOOKING_EVENTS.RESCHEDULED,
-        new BookingRescheduledEvent(result, nextDate),
+        new BookingRescheduledEvent(result, nextTimeStart),
       );
     }
 

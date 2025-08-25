@@ -14,7 +14,7 @@ export class FindBusySlots {
     try {
       const result = await this.bookingRepository.findBusySlots({
         commerceId: data.commerceId,
-        date: data.date,
+        timeStart: data.date,
       });
 
       if (!result || result.length == 0) {

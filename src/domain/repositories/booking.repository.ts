@@ -4,7 +4,7 @@ import { Booking } from '../entities/booking.entity';
 export interface IBookingRepository {
   //* Create repository methods
   findBusy(data: {
-    date: Date;
+    timeStart: Date;
     commerceId: number;
   }): Promise<Booking | null>;
 
@@ -13,8 +13,8 @@ export interface IBookingRepository {
   findOverlapping(data: {
     id?: number;
     commerceId: number;
-    date: Date;
-    endTime: Date;
+    timeStart: Date;
+    timeEnd: Date;
   }): Promise<Booking | null>;
 
   //* FindAllByCommerce repository methods
@@ -23,13 +23,13 @@ export interface IBookingRepository {
   //* findBusySlots repository methods
   findBusySlots(data: {
     commerceId: number;
-    date: Date;
+    timeStart: Date;
   }): Promise<Booking[] | null>;
 
   //* findAllByDateAndCommerce repository methods
   findAllByDateAndCommerce(data: {
     commerceId: number;
-    date: Date;
+    timeStart: Date;
   }): Promise<Booking[] | null>;
 
   //* Cancel a schedule

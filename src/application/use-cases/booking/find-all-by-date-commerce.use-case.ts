@@ -14,7 +14,7 @@ export class FindAllByCommerceAndDate {
     try {
       const result = await this.bookingRepository.findAllByDateAndCommerce({
         commerceId: data.commerceId,
-        date: data.date,
+        timeStart: data.date,
       });
 
       if (!result || result.length == 0) {

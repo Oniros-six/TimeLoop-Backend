@@ -1,5 +1,5 @@
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
-import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/providers';
+import { BOOKING_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
 import { ReminderChannel, ReminderStatus } from '@/domain/dbEnums/ReminderConstants';
 import { Booking } from '@/domain/entities/booking.entity';
@@ -13,6 +13,7 @@ import { CreateBookingDto } from '@/interfaces/controllers/booking/dto/create-bo
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { addMinutesToTime, ensureNotPast } from '@/domain/value-objects/booking/validations';
+import { IUserRepository } from '@/domain/repositories/user.repository';
 
 @Injectable()
 export class CreateBooking {
@@ -23,6 +24,9 @@ export class CreateBooking {
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
 
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
+
     private readonly activityLogService: ActivityLogService,
 
     private readonly remindersService: RemindersService,
@@ -32,9 +36,9 @@ export class CreateBooking {
 
   async execute(data: CreateBookingDto) {
     //* 1) Validación de fecha y hora
-    const scheduledAt = ensureNotPast(data.date);
+    const scheduledAt = ensureNotPast(data.timeStart);
 
-    //* 2) Validar existencia del servicio
+    //* 2) Validar existencia del servicio y del usuario
     const service = await this.serviceRepository.findService({
       serviceId: data.serviceId,
       commerceId: data.commerceId,
@@ -47,15 +51,27 @@ export class CreateBooking {
       );
     }
 
-    //* 3) Calcular endTime según duración del servicio
-    const timeEnd = addMinutesToTime(data.date, service.durationMinutes);
+    const user = await this.userRepository.findUserByCommerce({
+      userId: data.userId,
+      commerceId: data.commerceId,
+    });
+
+    if (!user) {
+      throw new HttpException(
+        'El usuario no existe o no pertenece al comercio especificado',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    //* 3) Calcular timeEnd según duración del servicio
+    const timeEnd = addMinutesToTime(data.timeStart, service.durationMinutes);
 
 
     //* 4) Validar solapamiento
     const overlappingBookings = await this.bookingRepository.findOverlapping({
       commerceId: data.commerceId,
-      date: data.date,
-      endTime: timeEnd,
+      timeStart: data.timeStart,
+      timeEnd: timeEnd,
     });
 
     if (overlappingBookings) {
@@ -67,7 +83,8 @@ export class CreateBooking {
       data.customerId,
       data.serviceId,
       data.commerceId,
-      data.date,
+      data.userId,
+      data.timeStart,
       timeEnd,
       service.durationMinutes,
       data.notes,
@@ -85,7 +102,7 @@ export class CreateBooking {
     await this.activityLogService.created({
       entityType: EntityType.BOOKING,
       entityId: result.id,
-      userId: null,
+      userId: result.userId,
       commerceId: result.commerceId,
       customerId: result.customerId,
       detail: `Se crea una nueva reserva`,

@@ -127,13 +127,14 @@ model Customer {
 
 model Booking {
   id         Int      @id @default(autoincrement())
-  date       DateTime
+  timeStart  DateTime
   timeEnd    DateTime
   duration   Int
   status     BookingStatus
   customerId Int
   serviceId  Int
   commerceId Int
+  userId     Int
   notes      String
 
   commerce        Commerce         @relation("CommerceBookings", fields: [commerceId], references: [id])
@@ -159,6 +160,19 @@ model User {
   logs             ActivityLog[]         @relation("UserLogs")
 
   @@map("users")
+}
+
+model Service {
+  id              Int    @id @default(autoincrement())
+  name            String
+  price           Float
+  durationMinutes Int
+  commerceId      Int
+
+  commerce        Commerce         @relation("CommerceServices", fields: [commerceId], references: [id])
+  bookingServices BookingService[] @relation("BookingServices")
+
+  @@map("services")
 }
 
 // =========================================
@@ -309,18 +323,6 @@ model ActivityLog {
 // Service Models
 // =========================================
 
-model Service {
-  id              Int    @id @default(autoincrement())
-  name            String
-  price           Float
-  durationMinutes Int
-  commerceId      Int
-
-  commerce        Commerce         @relation("CommerceServices", fields: [commerceId], references: [id])
-  bookingServices BookingService[] @relation("BookingServices")
-
-  @@map("services")
-}
 
 model BookingService {
   bookingId Int

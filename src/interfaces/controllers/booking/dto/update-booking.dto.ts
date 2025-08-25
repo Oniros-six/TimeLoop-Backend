@@ -20,6 +20,10 @@ export class UpdateBookingDto {
   @IsOptional()
   @IsNumber()
   serviceId?: number;
+  
+  @ApiProperty({ example: 1, description: 'ID del empleado que atiende' })
+  @IsNumber({}, { message: 'El ID de empleado debe ser un número' })
+  userId: number;
 
   @ApiProperty({
     example: '2025-07-08T15:00:00-03:00',
@@ -28,7 +32,7 @@ export class UpdateBookingDto {
   @IsOptional()
   @Type(() => Date)
   @IsDate({ message: 'La fecha debe ser una fecha válida' })
-  date?: Date;
+  timeStart?: Date;
 
   @ApiProperty({ description: 'Notas adicionales' })
   @IsOptional()
