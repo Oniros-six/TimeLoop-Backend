@@ -20,75 +20,66 @@ export class CancelBooking {
     private readonly eventEmitter: EventEmitter2,
 
     private readonly remindersService: RemindersService,
-  ) {}
+  ) { }
 
   async execute(id: number, data: CancelBookingDto) {
     const { commerceId, customerId } = data;
     //* Confirmamos la existencia del booking
-    try {
-      const booking = await this.bookingRepository.findOne({ id: id });
+    const booking = await this.bookingRepository.findOne({ id: id });
 
     //* Validamos que se pueda cancelar
-      if (
-        !booking ||
-        booking.commerceId !== commerceId ||
-        booking.customerId !== customerId
-      ) {
-        throw new HttpException(
-          'No autorizado o reserva no encontrada',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      // Delegate cancellation validation to domain method
-      if (!booking.canBeCancelled()) {
-        throw new HttpException(
-          'No se puede cancelar esta reserva',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      //* Generamos el cambio
-      const result = await this.bookingRepository.cancelSchedule({ id: id });
-
-      if (result === null) {
-        throw new HttpException(
-          'Error al cancelar el turno, intenta de nuevo en unos minutos.',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      //* Guardamos la actividad
-      await this.activityLogService.cancelled({
-        entityType: EntityType.BOOKING,
-        entityId: result.id,
-        userId: null,
-        commerceId: result.commerceId,
-        customerId: result.customerId,
-        detail: `Se cancela la reserva`,
-      });
-
-      //* Cancelamos el reminder
-      await this.remindersService.cancelReminder(result.id);
-      
-      //* Emitir evento de cancelación
-      this.eventEmitter.emit(
-        BOOKING_EVENTS.CANCELLED,
-        new BookingCancelledEvent(result),
-      );
-
-      return {
-        message: 'La reserva ha sido cancelada exitosamente.',
-        statusCode: HttpStatus.OK,
-        data: result,
-      };
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error desconocido';
-      console.error(message);
+    if (
+      !booking ||
+      booking.commerceId !== commerceId ||
+      booking.customerId !== customerId
+    ) {
       throw new HttpException(
-        'Algo salió mal al cancelar la reserva, inténtelo de nuevo más tarde.',
+        'No autorizado o reserva no encontrada',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    // Delegate cancellation validation to domain method
+    if (!booking.canBeCancelled()) {
+      throw new HttpException(
+        'No se puede cancelar esta reserva',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    //* Generamos el cambio
+    const result = await this.bookingRepository.cancelSchedule({ id: id });
+
+    if (result === null) {
+      throw new HttpException(
+        'Error al cancelar el turno, intenta de nuevo en unos minutos.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    //* Guardamos la actividad
+    await this.activityLogService.cancelled({
+      entityType: EntityType.BOOKING,
+      entityId: result.id,
+      userId: null,
+      commerceId: result.commerceId,
+      customerId: result.customerId,
+      detail: `Se cancela la reserva`,
+    });
+
+    //* Cancelamos el reminder
+    await this.remindersService.cancelReminder(result.id);
+
+    //* Emitir evento de cancelación
+    this.eventEmitter.emit(
+      BOOKING_EVENTS.CANCELLED,
+      new BookingCancelledEvent(result),
+    );
+
+    return {
+      message: 'La reserva ha sido cancelada exitosamente.',
+      statusCode: HttpStatus.OK,
+      data: result,
+    };
   }
 }

@@ -11,15 +11,38 @@ export class Booking {
     public date: Date,
     public timeEnd: Date,
     public notes: string,
-  ) {}
+  ) { }
 
   // Solo métodos de dominio esenciales
   canBeCancelled(): boolean {
-    return this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
+    const validStatus = this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
+
+    // Diferencia entre la reserva y ahora en milisegundos
+    const diffMs = this.date.getTime() - Date.now();
+
+    // Convertir a horas
+    const diffHours = diffMs / 1000 / 60 / 60;
+
+    // Se permite reprogramar si queda más de 1 hora para la reserva
+    const isOnTime = diffHours > 1;
+
+    return validStatus && isOnTime;
   }
 
   canBeRescheduled(): boolean {
-    return this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
+    // Solo reservas activas pueden reprogramarse
+    const validStatus = this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
+
+    // Diferencia entre la reserva y ahora en milisegundos
+    const diffMs = this.date.getTime() - Date.now();
+
+    // Convertir a horas
+    const diffHours = diffMs / 1000 / 60 / 60;
+
+    // Se permite reprogramar si queda más de 1 hora para la reserva
+    const isOnTime = diffHours > 1;
+
+    return validStatus && isOnTime;
   }
 
 

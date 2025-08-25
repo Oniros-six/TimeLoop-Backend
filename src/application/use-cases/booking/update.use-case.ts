@@ -1,22 +1,22 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { IBookingRepository } from '@/domain/repositories/booking.repository';
-import { UpdateBookingDto } from '@/interfaces/controllers/booking/dto/update-booking.dto';
-import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/providers';
-import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
-import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
-import { RemindersService } from '@/domain/services/reminders/reminders.service';
+import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import {
   ReminderChannel,
   ReminderStatus,
 } from '@/domain/dbEnums/ReminderConstants';
 import { Reminder } from '@/domain/entities/reminder.entity';
-import { IServiceRepository } from '@/domain/repositories/services.repository';
-import { addMinutesToTime, ensureNotPast } from '@/domain/value-objects/booking/validations';
 import { Service } from '@/domain/entities/service.entity';
+import { IBookingRepository } from '@/domain/repositories/booking.repository';
+import { IServiceRepository } from '@/domain/repositories/services.repository';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
+import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
+import { RemindersService } from '@/domain/services/reminders/reminders.service';
+import { addMinutesToTime, ensureNotPast } from '@/domain/value-objects/booking/validations';
+import { UpdateBookingDto } from '@/interfaces/controllers/booking/dto/update-booking.dto';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UpdateBooking {
@@ -39,8 +39,7 @@ export class UpdateBooking {
     if (
       !booking || // Se valida que exista
       booking.commerceId !== newData.commerceId || // Se valida que el comercio sea el mismo donde se realizo la reserva
-      booking.customerId !== newData.customerId ||  // Se valida que el usuario que pide, sea el mismo que realizo la reserva
-      !booking.canBeRescheduled() // Se valida que sea reagendable
+      booking.customerId !== newData.customerId  // Se valida que el usuario que pide, sea el mismo que realizo la reserva
     ) {
       throw new HttpException(
         'No autorizado o reserva no encontrada',
@@ -48,6 +47,13 @@ export class UpdateBooking {
       );
     }
 
+     // Se valida que sea reagendable)
+    if(!booking.canBeRescheduled()){
+      throw new HttpException(
+        'Esta reserva no se puede reagendar',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     //* 2) Definir siguiente servicio (En caso de ser diferente al actual)
     let nextService: Service;
