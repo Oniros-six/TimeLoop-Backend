@@ -63,8 +63,13 @@ export class PrismaBookingRepository implements IBookingRepository {
       where: {
         id: { not: data.id },
         commerceId: data.commerceId,
-        date: { lt: data.endTime },   // startDB < endNew
-        timeEnd: { gt: data.date }    // endDB > startNew
+        status: {
+          in: [BookingStatus.CONFIRMED, BookingStatus.PENDING, BookingStatus.RESCHEDULED],
+        },
+        AND: [
+          { date: { lt: data.endTime } },  // startDB < endNew
+          { timeEnd: { gt: data.date } },  // endDB > startNew
+        ],
       },
     });
     if (!result) return null;
