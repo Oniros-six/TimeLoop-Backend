@@ -25,11 +25,8 @@ export class UpdateCustomer {
 
     // Validate customer email not in use
     if (data.email && data.email !== customer.email) {
-      const exists = await this.customerRepository.findCustomerByEmailAndCommerce({
-        email: data.email,
-        commerceId: data.commerceId,
-      });
-    
+      const exists = await this.customerRepository.findCustomerByEmail({ email: data.email });
+
       if (exists) {
         throw new HttpException(
           'Ya existe un cliente con este email.',
@@ -49,9 +46,6 @@ export class UpdateCustomer {
       }
       if (data.phone && data.phone != customer.phone) {
         newCustomerData.phone = data.phone;
-      }
-      if (data.internalNote && data.internalNote != customer.internalNote) {
-        newCustomerData.internalNote = data.internalNote;
       }
 
       if (Object.keys(newCustomerData).length === 0) {
@@ -79,7 +73,7 @@ export class UpdateCustomer {
         entityType: EntityType.CUSTOMER,
         entityId: result.id,
         userId: null,
-        commerceId: result.commerceId,
+        commerceId: null,
         customerId: result.id,
         detail: `Se actualizaron los campos: ${updatedFields}.`,
       });

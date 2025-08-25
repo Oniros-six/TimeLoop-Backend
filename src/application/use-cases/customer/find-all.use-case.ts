@@ -1,38 +1,22 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICustomerRepository } from '@/domain/repositories/customer.repository';
-import { FindByCommerceDto } from '@/interfaces/controllers/customer/dto/find-customers-commerce.dto';
-import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import {
   CUSTOMER_REPOSITORY,
-  COMMERCE_REPOSITORY,
 } from '@/application/constants/providers';
 
 @Injectable()
-export class FindAllCustomersByCommerce {
+export class FindAllCustomers {
   constructor(
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: ICustomerRepository,
-
-    @Inject(COMMERCE_REPOSITORY)
-    private readonly commerceRepository: ICommerceRepository,
   ) {}
 
-  async execute(data: FindByCommerceDto) {
-    const commerce = await this.commerceRepository.findCommerce({
-      commerceId: data.commerceId,
-    });
-
-    if (!commerce) {
-      throw new HttpException('Comercio no encontrado', HttpStatus.NOT_FOUND);
-    }
-
+  async execute() {
     try {
-      const customers = await this.customerRepository.findCustomersByCommerce({
-        commerceId: data.commerceId,
-      });
+      const customers = await this.customerRepository.findCustomers();
       if (!customers || customers.length == 0) {
         return {
-          message: 'No hay clientes asociados a este comercio.',
+          message: 'No hay clientes.',
           statusCode: HttpStatus.OK,
           data: customers,
         };

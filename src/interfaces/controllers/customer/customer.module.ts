@@ -5,7 +5,7 @@ import { PrismaModule } from '@/infrastructure/prisma/prisma.module';
 // Use cases
 import { CreateCustomer } from '@/application/use-cases/customer/create.use-case';
 import { FindCustomer } from '@/application/use-cases/customer/find.use-case';
-import { FindAllCustomersByCommerce } from '@/application/use-cases/customer/find-all-by-commerce.use-case';
+import { FindAllCustomers } from '@/application/use-cases/customer/find-all.use-case';
 import { UpdateCustomer } from '@/application/use-cases/customer/update.use-case';
 
 // Tokens
@@ -33,7 +33,7 @@ import { PrismaCustomerRepository } from '@/infrastructure/prisma/repositories/c
 
     CreateCustomer,
     FindCustomer,
-    FindAllCustomersByCommerce,
+    FindAllCustomers,
     UpdateCustomer,
   ],
 })

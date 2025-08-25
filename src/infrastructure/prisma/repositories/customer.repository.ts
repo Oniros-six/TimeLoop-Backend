@@ -6,23 +6,19 @@ import { CustomerUpdateData } from '@/domain/common/CustomerUpdateData';
 
 @Injectable()
 export class PrismaCustomerRepository implements ICustomerRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private toDomain(customer: {
     id: number;
-    commerceId: number;
     name: string;
     email: string;
     phone: string;
-    internalNote: string;
   }): DomainClient {
     return new DomainClient(
       customer.id,
-      customer.commerceId,
       customer.name,
       customer.email,
       customer.phone,
-      customer.internalNote,
     );
   }
 
@@ -30,17 +26,13 @@ export class PrismaCustomerRepository implements ICustomerRepository {
     name: string;
     email: string;
     phone: string;
-    internalNote: string;
-    commerceId: number;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.$transaction(async (tx) => {
       return await tx.customer.create({
         data: {
-          commerceId: data.commerceId,
           name: data.name,
-          email: data.email || '',
-          phone: data.phone || '',
-          internalNote: data.internalNote || '',
+          email: data.email,
+          phone: data.phone
         },
       });
     });
@@ -49,14 +41,8 @@ export class PrismaCustomerRepository implements ICustomerRepository {
     return this.toDomain(result);
   }
 
-  async findCustomersByCommerce(data: {
-    commerceId: number;
-  }): Promise<DomainClient[] | null> {
-    const result = await this.prisma.customer.findMany({
-      where: {
-        commerceId: data.commerceId,
-      },
-    });
+  async findCustomers(): Promise<DomainClient[] | null> {
+    const result = await this.prisma.customer.findMany();
 
     if (!result || result.length === 0) return null;
 
@@ -88,14 +74,10 @@ export class PrismaCustomerRepository implements ICustomerRepository {
     return this.toDomain(result);
   }
 
-  async findCustomerByEmailAndCommerce(data: {
-    email: string;
-    commerceId: number;
-  }): Promise<DomainClient | null> {
+  async findCustomerByEmail(data: { email: string; }): Promise<DomainClient | null> {
     const result = await this.prisma.customer.findFirst({
       where: {
         email: data.email,
-        commerceId: data.commerceId,
       },
     });
 

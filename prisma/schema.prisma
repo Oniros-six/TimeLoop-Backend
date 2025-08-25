@@ -101,7 +101,6 @@ model Commerce {
   active           Boolean
 
   users            User[]                    @relation("CommerceUsers")
-  customers        Customer[]                @relation("CommerceCustomers")
   bookings         Booking[]                 @relation("CommerceBookings")
   reminders        Reminder[]                @relation("CommerceReminders")
   services         Service[]                 @relation("CommerceServices")
@@ -118,10 +117,7 @@ model Customer {
   name         String
   email        String @unique
   phone        String
-  internalNote String
-  commerceId   Int
 
-  commerce  Commerce      @relation("CommerceCustomers", fields: [commerceId], references: [id])
   bookings  Booking[]     @relation("CustomerBookings")
   reminders Reminder[]    @relation("CustomerReminders")
   logs      ActivityLog[] @relation("CustomerLogs")

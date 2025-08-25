@@ -7,22 +7,20 @@ import {
   Put,
   UsePipes,
   ValidationPipe,
-  Query,
   ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateCustomer } from '@/application/use-cases/customer/create.use-case';
 import { FindCustomer } from '@/application/use-cases/customer/find.use-case';
-import { FindAllCustomersByCommerce } from '@/application/use-cases/customer/find-all-by-commerce.use-case';
+import { FindAllCustomers } from '@/application/use-cases/customer/find-all.use-case';
 import { UpdateCustomer } from '@/application/use-cases/customer/update.use-case';
+
 import { CreateCustomerDto } from './dto/create-customer.dto';
-import { FindByCommerceDto } from './dto/find-customers-commerce.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @ApiTags('Customers')
@@ -31,7 +29,7 @@ export class CustomerController {
   constructor(
     private readonly createCustomerUseCase: CreateCustomer,
     private readonly findCustomerUseCase: FindCustomer,
-    private readonly findAllCustomersByCommerceUseCase: FindAllCustomersByCommerce,
+    private readonly findAllCustomersUseCase: FindAllCustomers,
     private readonly updateCustomerUseCase: UpdateCustomer,
   ) {}
 
@@ -44,21 +42,14 @@ export class CustomerController {
     return this.createCustomerUseCase.execute(dto);
   }
 
-  // Get all clients by commerceId
+  // Get all clients
   @ApiOperation({
     summary:
-      'Obtener todos los clientes de un comercio con base en la ID del comercio',
+      'Obtener todos los clientes',
   })
-  @ApiQuery({
-    name: 'commerceId',
-    required: true,
-    type: Number,
-    description: 'ID del comercio',
-  })
-  @UsePipes(new ValidationPipe({ transform: true }))
   @Get()
-  findAll(@Query() dto: FindByCommerceDto) {
-    return this.findAllCustomersByCommerceUseCase.execute(dto);
+  findAll() {
+    return this.findAllCustomersUseCase.execute();
   }
 
   // Get a client

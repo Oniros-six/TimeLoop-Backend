@@ -9,15 +9,7 @@ import {
   MaxLength,
 } from 'class-validator';
 
-export class UpdateCustomerDto {
-  @ApiProperty({
-    example: 1,
-    description: 'ID del comercio donde se registro el cliente',
-  })
-  @Type(() => Number)
-  @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
-  commerceId: number;
-  
+export class UpdateCustomerDto {  
   @ApiProperty({ example: 'Leandro', description: 'Nombre del cliente' })
   @IsOptional()
   @IsString({ message: 'El nombre tiene que contener solo letras' })
@@ -55,13 +47,4 @@ export class UpdateCustomerDto {
     message: 'El número debe comenzar con 09 y tener 9 dígitos',
   })
   phone?: string;
-
-  @ApiProperty({
-    example: 'El es temperamental, e impuntual...',
-    description: 'Nota acerca del cliente, hecha por el comercio, es privada',
-  })
-  @IsOptional()
-  @IsString({ message: 'Las notas deben ser texto' })
-  @MaxLength(500, { message: 'Las notas no pueden exceder los 500 caracteres' })
-  internalNote?: string;
 }

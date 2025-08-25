@@ -11,14 +11,6 @@ import {
 } from 'class-validator';
 
 export class CreateCustomerDto {
-  @ApiProperty({
-    example: 1,
-    description: 'ID del comercio donde se registro el cliente',
-  })
-  @Type(() => Number)
-  @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
-  commerceId: number;
-
   @ApiProperty({ example: 'Leandro', description: 'Nombre del cliente' })
   @IsString({ message: 'El nombre tiene que contener solo letras' })
   @IsNotEmpty({ message: 'El nombre es requerido' })
@@ -44,6 +36,7 @@ export class CreateCustomerDto {
   @Matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
     message: 'El correo debe tener un formato válido (ej. usuario@dominio.com)',
   })
+  @IsNotEmpty({ message: 'El correo es requerido' })
   email: string;
 
   @ApiProperty({
@@ -53,14 +46,6 @@ export class CreateCustomerDto {
   @Matches(/^09\d{7}$/, {
     message: 'El número debe comenzar con 09 y tener 9 dígitos',
   })
+  @IsNotEmpty({ message: 'El telefono es requerido' })
   phone: string;
-
-  @ApiProperty({
-    example: 'El es temperamental, e impuntual...',
-    description: 'Nota acerca del cliente, hecha por el comercio, es privada',
-  })
-  @IsOptional()
-  @IsString({ message: 'Las notas deben ser texto' })
-  @MaxLength(500, { message: 'Las notas no pueden exceder los 500 caracteres' })
-  internalNote?: string;
 }
