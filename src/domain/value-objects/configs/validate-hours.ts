@@ -1,4 +1,4 @@
-import { AvailabilityType } from '@/domain/common/AvailabilityType';
+import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 export function validateOpenCloseTime(openTime: string, closeTime: string): void {

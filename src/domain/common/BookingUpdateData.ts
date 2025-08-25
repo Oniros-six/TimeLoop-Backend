@@ -1,4 +1,4 @@
-import { BookingStatus } from '@/domain/common/BookingStatus';
+import { BookingStatus } from '@/domain/dbEnums/BookingStatus';
 
 export interface BookingUpdateData {
   date?: Date;

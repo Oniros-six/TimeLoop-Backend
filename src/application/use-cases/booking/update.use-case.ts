@@ -4,7 +4,7 @@ import { UpdateBookingDto } from '@/interfaces/controllers/booking/dto/update-bo
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { BOOKING_REPOSITORY, SERVICE_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
@@ -12,7 +12,7 @@ import { RemindersService } from '@/domain/services/reminders/reminders.service'
 import {
   ReminderChannel,
   ReminderStatus,
-} from '@/domain/common/ReminderConstants';
+} from '@/domain/dbEnums/ReminderConstants';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
 import { addMinutesToTime, ensureNotPast } from '@/domain/value-objects/booking/validations';

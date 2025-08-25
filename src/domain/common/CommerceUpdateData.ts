@@ -1,4 +1,4 @@
-import { BusinessCategory } from './BusinessCategory';
+import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory';
 
 export interface CommerceUpdateData {
   name?: string;

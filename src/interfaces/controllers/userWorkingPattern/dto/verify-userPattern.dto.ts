@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
-import { WeekDays } from '@/domain/common/weekdays';
+import { WeekDays } from '@/domain/dbEnums/weekdays';
 
 export class VerifyUserPatternDto {
   @ApiProperty({

@@ -1,4 +1,4 @@
-import { BusinessCategory } from '../common/BusinessCategory';
+import { BusinessCategory } from '../dbEnums/BusinessCategory';
 
 export class Commerce {
   constructor(

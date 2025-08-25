@@ -1,4 +1,4 @@
-import { BookingStatus } from "@/domain/common/BookingStatus"
+import { BookingStatus } from "@/domain/dbEnums/BookingStatus"
 
 export class Booking {
   constructor(

@@ -4,7 +4,7 @@ import { COMMERCE_WORKING_PATTERN_REPOSITORY } from '@/application/constants/pro
 
 import { CommerceWorkingPattern as CommerceWorkingPatternDomain } from '@/domain/entities/commerceWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { UpdateCommercePatternDto } from '@/interfaces/controllers/commerceWorkingPattern/dto/update-commercePattern.dto';
 import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 

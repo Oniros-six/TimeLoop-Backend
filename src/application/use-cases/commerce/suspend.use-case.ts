@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 
 @Injectable()
 export class SuspendCommerce {

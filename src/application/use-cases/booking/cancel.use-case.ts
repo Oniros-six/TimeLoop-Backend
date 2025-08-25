@@ -3,7 +3,7 @@ import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { CancelBookingDto } from '@/interfaces/controllers/booking/dto/cancel-booking.dto';
 import { BOOKING_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BookingCancelledEvent } from '@/domain/common/booking.events';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';

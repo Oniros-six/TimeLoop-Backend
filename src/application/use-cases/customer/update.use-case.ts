@@ -4,7 +4,7 @@ import { UpdateCustomerDto } from '@/interfaces/controllers/customer/dto/update-
 import { CustomerUpdateData } from '@/domain/common/CustomerUpdateData';
 import { CUSTOMER_REPOSITORY } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 
 @Injectable()
 export class UpdateCustomer {

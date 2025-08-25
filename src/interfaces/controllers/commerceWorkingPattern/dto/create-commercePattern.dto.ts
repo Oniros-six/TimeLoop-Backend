@@ -1,5 +1,5 @@
-import { AvailabilityType } from '@/domain/common/AvailabilityType';
-import { WeekDays } from '@/domain/common/weekdays';
+import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType';
+import { WeekDays } from '@/domain/dbEnums/weekdays';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {

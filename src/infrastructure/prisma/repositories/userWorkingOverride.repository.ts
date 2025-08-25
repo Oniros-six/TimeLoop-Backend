@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IUserWorkingOverrideRepository } from '@/domain/repositories/userWorkingOverride.repository';
 import { UserWorkingOverride as DomainClient } from '@/domain/entities/userWorkingOverride.entity';
-import { AvailabilityType } from '@/domain/common/AvailabilityType';
+import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType';
 
 @Injectable()
 export class PrismaUserWorkingOverrideRepository

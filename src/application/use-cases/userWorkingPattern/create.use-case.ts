@@ -8,7 +8,7 @@ import {
 
 import { UserWorkingPattern as UserWorkingPatternDomain } from '@/domain/entities/userWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { CreateUserPatternDto } from '@/interfaces/controllers/userWorkingPattern/dto/create-userPattern.dto';
 import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 

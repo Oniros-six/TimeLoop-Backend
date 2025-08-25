@@ -8,7 +8,7 @@ import { IUserConfigRepository } from '@/domain/repositories/userConfig.reposito
 import { CreateUserConfigDto } from '@/interfaces/controllers/userConfig/dto/create-userConfig.dto';
 import { UserConfig as UserConfigDomain } from '@/domain/entities/userConfig.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 
 @Injectable()
 export class CreateUserConfig {

@@ -1,4 +1,4 @@
-import { WeekDays } from '../common/weekdays';
+import { WeekDays } from '../dbEnums/weekdays';
 import { UserWorkingPattern } from '../entities/userWorkingPattern.entity';
 
 export interface IUserWorkingPatternRepository {

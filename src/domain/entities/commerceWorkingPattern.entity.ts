@@ -1,5 +1,5 @@
-import { AvailabilityType } from '@/domain/common/AvailabilityType';
-import { WeekDays } from '@/domain/common/weekdays';
+import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType';
+import { WeekDays } from '@/domain/dbEnums/weekdays';
 
 export class CommerceWorkingPattern {
   constructor(

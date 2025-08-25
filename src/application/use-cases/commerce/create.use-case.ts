@@ -4,7 +4,7 @@ import { COMMERCE_REPOSITORY } from '@/application/constants/providers';
 import { CreateCommerceDto } from '@/interfaces/controllers/commerces/dto/create-commerce.dto';
 import { Commerce as CommerceDomain } from '@/domain/entities/commerce.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 
 @Injectable()
 export class CreateCommerce {

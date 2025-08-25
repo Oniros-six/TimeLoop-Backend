@@ -5,7 +5,7 @@ import {
   SERVICE_REPOSITORY,
 } from '@/application/constants/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 
 @Injectable()

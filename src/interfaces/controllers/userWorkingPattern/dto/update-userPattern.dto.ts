@@ -1,4 +1,4 @@
-import { AvailabilityType } from '@/domain/common/AvailabilityType';
+import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsIn, IsString, IsOptional, Matches } from 'class-validator';

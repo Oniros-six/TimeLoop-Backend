@@ -8,7 +8,7 @@ import {
 
 import { CommerceWorkingOverride as CommerceWorkingOverrideDomain } from '@/domain/entities/commerceWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { CreateCommerceOverrideDto } from '@/interfaces/controllers/commerceWorkingOverride/dto/create-commerceOverride.dto';
 import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 

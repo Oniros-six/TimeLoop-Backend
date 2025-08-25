@@ -4,7 +4,7 @@ import { USER_WORKING_OVERRIDE_REPOSITORY } from '@/application/constants/provid
 
 import { UserWorkingOverride as UserWorkingOverrideDomain } from '@/domain/entities/userWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/application/constants/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { UpdateUserOverrideDto } from '@/interfaces/controllers/userWorkingOverride/dto/update-userOverride.dto';
 import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 
