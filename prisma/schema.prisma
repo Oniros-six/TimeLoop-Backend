@@ -62,11 +62,12 @@ model Booking {
   duration        Int
   customerId      Int
   commerceId      Int
+  userId          Int
+  totalPrice      Float
   notes           String
   status          BookingStatus
   timeEnd         DateTime
   timeStart       DateTime
-  userId          Int
   bookingServices BookingService[]
   commerce        Commerce         @relation("CommerceBookings", fields: [commerceId], references: [id])
   customer        Customer         @relation("CustomerBookings", fields: [customerId], references: [id])

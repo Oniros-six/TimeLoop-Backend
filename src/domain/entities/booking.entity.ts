@@ -14,6 +14,7 @@ export class Booking {
     public timeStart: Date,
     public timeEnd: Date,
     public notes: string,
+    public totalPrice: number,
     public bookingServices: BookingService[],
   ) { }
 
@@ -27,6 +28,14 @@ export class Booking {
 
   calcServicesDuration(services: Service[]): number {
     return services.reduce((total, service) => total + service.durationMinutes, 0);
+  }
+
+  static calcTotalPrice(services: Service[]): number {
+    return services.reduce((total, service) => total + service.price, 0);
+  }
+
+  calcTotalPrice(services: Service[]): number {
+    return services.reduce((total, service) => total + service.price, 0);
   }
 
   private isActiveAndOnTime(): boolean {
@@ -55,7 +64,8 @@ export class Booking {
     const newServices = services.map(service => new BookingService(0, service.id));
     const totalDuration = this.calcServicesDuration(services)
     const timeEnd = addMinutesToTime(timeStart, totalDuration);
-
+    const totalprice = this.calcTotalPrice(services)
+    
     const booking = new Booking(
       0, // ID será asignado por la DB
       customerId,
@@ -66,6 +76,7 @@ export class Booking {
       timeStart,
       timeEnd,
       notes,
+      totalprice,
       newServices,
     );
 

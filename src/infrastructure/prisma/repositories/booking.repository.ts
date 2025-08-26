@@ -20,6 +20,7 @@ export class PrismaBookingRepository implements IBookingRepository {
     bookingServices: BookingService[];
     timeStart: Date;
     timeEnd: Date;
+    totalPrice: number;
     notes: string;
   }): DomainClient {
     return new DomainClient(
@@ -32,6 +33,7 @@ export class PrismaBookingRepository implements IBookingRepository {
       booking.timeStart,
       booking.timeEnd,
       booking.notes,
+      booking.totalPrice,
       booking.bookingServices,
     );
   }
@@ -48,6 +50,7 @@ export class PrismaBookingRepository implements IBookingRepository {
           commerceId: data.commerceId,
           userId: data.userId,
           notes: data.notes,
+          totalPrice: data.totalPrice,
           bookingServices: {
             create: data.bookingServices.map(bs => ({
               serviceId: bs.serviceId,
@@ -241,6 +244,7 @@ export class PrismaBookingRepository implements IBookingRepository {
           status: BookingStatus.CONFIRMED,
           userId: data.dataToUpdate.userId,
           notes: data.dataToUpdate.notes,
+          totalPrice: data.dataToUpdate.totalPrice,
           bookingServices: {
             create: data.dataToUpdate.serviceIds.map(bs => ({
               serviceId: bs.serviceId,

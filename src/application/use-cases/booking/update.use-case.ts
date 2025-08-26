@@ -103,6 +103,7 @@ export class UpdateBooking {
     const nextTimeStart = newData.timeStart ? ensureNotPast(newData.timeStart) : booking.timeStart;
 
     const totalDuration = booking.calcServicesDuration(nextServices)
+    const totalPrice = booking.calcTotalPrice(nextServices)
     const nextTimeEnd = addMinutesToTime(nextTimeStart, totalDuration);
 
     //* 6) Construir diff (solo campos que realmente cambian)
@@ -110,6 +111,7 @@ export class UpdateBooking {
       serviceIds: nextServices.map(service =>
         new BookingService(booking.id, service.id)
       ),
+      totalPrice:totalPrice,
       duration: totalDuration,
       userId: nextUser.id,
       timeStart: nextTimeStart,
