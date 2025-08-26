@@ -241,7 +241,7 @@ export class PrismaBookingRepository implements IBookingRepository {
           timeStart: data.dataToUpdate.timeStart,
           timeEnd: data.dataToUpdate.timeEnd,
           duration: data.dataToUpdate.duration,
-          status: BookingStatus.CONFIRMED,
+          status: BookingStatus.RESCHEDULED,
           userId: data.dataToUpdate.userId,
           notes: data.dataToUpdate.notes,
           totalPrice: data.dataToUpdate.totalPrice,
