@@ -6,7 +6,7 @@ import { ServiceUpdateData } from '@/domain/common/ServiceUpdateData';
 
 @Injectable()
 export class PrismaServicesRepository implements IServiceRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private toDomain(service: {
     id: number;
@@ -24,18 +24,35 @@ export class PrismaServicesRepository implements IServiceRepository {
     );
   }
 
-  async findService(data: {
+  async findServices(data: {
+    serviceIds: number[];
+    commerceId: number;
+  }): Promise<DomainClient[]> {
+    const { serviceIds, commerceId } = data;
+    const result = await this.prisma.service.findMany({
+      where: {
+        id: { in: serviceIds },
+        commerceId: commerceId,
+      },
+    });
+    if (!result || result.length == 0) return [];
+    return result.map((service) => this.toDomain(service));
+  }
+
+  async findOne(data: {
     serviceId: number;
     commerceId: number;
   }): Promise<DomainClient | null> {
     const { serviceId, commerceId } = data;
-    const result = await this.prisma.service.findUnique({
+    const result = await this.prisma.service.findFirst({
       where: {
         id: serviceId,
         commerceId: commerceId,
       },
     });
+
     if (!result) return null;
+
     return this.toDomain(result);
   }
 

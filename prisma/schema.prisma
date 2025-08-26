@@ -7,9 +7,206 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// =========================================
-// Enums
-// =========================================
+model Commerce {
+  id               Int                       @id @default(autoincrement())
+  name             String
+  email            String                    @unique
+  phone            String                    @unique
+  address          String
+  businessCategory BusinessCategory
+  active           Boolean
+  logs             ActivityLog[]             @relation("CommerceLogs")
+  bookings         Booking[]                 @relation("CommerceBookings")
+  config           CommerceConfig?           @relation("CommerceConfig")
+  overridePatterns CommerceWorkingOverride[] @relation("CommerceOverridePatterns")
+  workingPatterns  CommerceWorkingPattern[]  @relation("CommerceWorkingPatterns")
+  reminders        Reminder[]                @relation("CommerceReminders")
+  services         Service[]                 @relation("CommerceServices")
+  users            User[]                    @relation("CommerceUsers")
+
+  @@map("commerces")
+}
+
+model Customer {
+  id        Int           @id @default(autoincrement())
+  name      String
+  email     String        @unique
+  phone     String
+  logs      ActivityLog[] @relation("CustomerLogs")
+  bookings  Booking[]     @relation("CustomerBookings")
+  reminders Reminder[]    @relation("CustomerReminders")
+
+  @@map("customers")
+}
+
+model User {
+  id               Int                   @id @default(autoincrement())
+  name             String
+  email            String                @unique
+  password         String
+  role             Roles
+  commerceId       Int
+  active           Boolean
+  logs             ActivityLog[]         @relation("UserLogs")
+  bookings         Booking[]             @relation("UserBookings")
+  config           UserConfig?           @relation("UserConfig")
+  overridePatterns UserWorkingOverride[] @relation("UserOverridePatterns")
+  workingPatterns  UserWorkingPattern[]  @relation("UserWorkingPatterns")
+  commerce         Commerce              @relation("CommerceUsers", fields: [commerceId], references: [id])
+
+  @@map("users")
+}
+
+model Booking {
+  id              Int              @id @default(autoincrement())
+  duration        Int
+  customerId      Int
+  commerceId      Int
+  notes           String
+  status          BookingStatus
+  timeEnd         DateTime
+  timeStart       DateTime
+  userId          Int
+  bookingServices BookingService[]
+  commerce        Commerce         @relation("CommerceBookings", fields: [commerceId], references: [id])
+  customer        Customer         @relation("CustomerBookings", fields: [customerId], references: [id])
+  user            User             @relation("UserBookings", fields: [userId], references: [id])
+
+  @@map("bookings")
+}
+
+model Service {
+  id              Int              @id @default(autoincrement())
+  name            String
+  price           Float
+  durationMinutes Int
+  commerceId      Int
+  bookingServices BookingService[]
+  commerce        Commerce         @relation("CommerceServices", fields: [commerceId], references: [id])
+
+  @@map("services")
+}
+
+model BookingService {
+  bookingId Int
+  serviceId Int
+  id        Int     @id @default(autoincrement())
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  service   Service @relation(fields: [serviceId], references: [id])
+
+  @@map("booking_services")
+}
+
+model CommerceConfig {
+  id                      Int      @id @default(autoincrement())
+  commerceId              Int      @unique
+  standardDurationMinutes Int
+  allowNotifications      Boolean
+  openTime                String
+  closeTime               String
+  welcomeMessage          String
+  commerce                Commerce @relation("CommerceConfig", fields: [commerceId], references: [id])
+
+  @@map("commerce_configs")
+}
+
+model UserConfig {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation("UserConfig", fields: [userId], references: [id])
+
+  @@map("user_configs")
+}
+
+model UserWorkingPattern {
+  id               Int              @id @default(autoincrement())
+  userId           Int
+  weekday          WeekDays
+  availabilityType AvailabilityType
+  morningStart     String?
+  morningEnd       String?
+  afternoonStart   String?
+  afternoonEnd     String?
+  user             User             @relation("UserWorkingPatterns", fields: [userId], references: [id])
+
+  @@map("user_working_patterns")
+}
+
+model UserWorkingOverride {
+  id             Int              @id @default(autoincrement())
+  userId         Int
+  date           DateTime
+  overrideType   AvailabilityType
+  morningStart   String?
+  morningEnd     String?
+  afternoonStart String?
+  afternoonEnd   String?
+  notes          String
+  user           User             @relation("UserOverridePatterns", fields: [userId], references: [id])
+
+  @@map("user_working_overrides")
+}
+
+model CommerceWorkingPattern {
+  id               Int              @id @default(autoincrement())
+  commerceId       Int
+  weekday          WeekDays
+  availabilityType AvailabilityType
+  morningStart     String?
+  morningEnd       String?
+  afternoonStart   String?
+  afternoonEnd     String?
+  commerce         Commerce         @relation("CommerceWorkingPatterns", fields: [commerceId], references: [id])
+
+  @@map("commerce_working_patterns")
+}
+
+model CommerceWorkingOverride {
+  id             Int              @id @default(autoincrement())
+  commerceId     Int
+  date           DateTime
+  overrideType   AvailabilityType
+  morningStart   String?
+  morningEnd     String?
+  afternoonStart String?
+  afternoonEnd   String?
+  notes          String
+  commerce       Commerce         @relation("CommerceOverridePatterns", fields: [commerceId], references: [id])
+
+  @@map("commerce_working_overrides")
+}
+
+model ActivityLog {
+  id         Int        @id @default(autoincrement())
+  entityId   Int
+  userId     Int?
+  commerceId Int?
+  customerId Int?
+  entityType EntityType
+  changeType ChangeType
+  detail     String
+  timestamp  DateTime   @default(now())
+  commerce   Commerce?  @relation("CommerceLogs", fields: [commerceId], references: [id])
+  customer   Customer?  @relation("CustomerLogs", fields: [customerId], references: [id])
+  user       User?      @relation("UserLogs", fields: [userId], references: [id])
+
+  @@map("activity_logs")
+}
+
+model Reminder {
+  id          Int             @id @default(autoincrement())
+  bookingId   Int             @unique
+  customerId  Int
+  commerceId  Int
+  channel     ReminderChannel
+  status      ReminderStatus
+  scheduledAt DateTime
+  sentAt      DateTime?
+  commerce    Commerce        @relation("CommerceReminders", fields: [commerceId], references: [id])
+  customer    Customer        @relation("CustomerReminders", fields: [customerId], references: [id])
+
+  @@map("reminders")
+}
 
 enum BusinessCategory {
   Peluqueria
@@ -85,252 +282,4 @@ enum BookingStatus {
   NO_SHOW
   COMPLETED
   RESCHEDULED
-}
-
-// =========================================
-// Core Models
-// =========================================
-
-model Commerce {
-  id               Int              @id @default(autoincrement())
-  name             String
-  email            String           @unique
-  phone            String           @unique
-  address          String
-  businessCategory BusinessCategory
-  active           Boolean
-
-  users            User[]                    @relation("CommerceUsers")
-  bookings         Booking[]                 @relation("CommerceBookings")
-  reminders        Reminder[]                @relation("CommerceReminders")
-  services         Service[]                 @relation("CommerceServices")
-  workingPatterns  CommerceWorkingPattern[]  @relation("CommerceWorkingPatterns")
-  overridePatterns CommerceWorkingOverride[] @relation("CommerceOverridePatterns")
-  config           CommerceConfig?           @relation("CommerceConfig")
-  logs             ActivityLog[]             @relation("CommerceLogs")
-
-  @@map("commerces")
-}
-
-model Customer {
-  id           Int    @id @default(autoincrement())
-  name         String
-  email        String @unique
-  phone        String
-
-  bookings  Booking[]     @relation("CustomerBookings")
-  reminders Reminder[]    @relation("CustomerReminders")
-  logs      ActivityLog[] @relation("CustomerLogs")
-
-  @@map("customers")
-}
-
-model Booking {
-  id         Int      @id @default(autoincrement())
-  timeStart  DateTime
-  timeEnd    DateTime
-  duration   Int
-  status     BookingStatus
-  customerId Int
-  serviceId  Int
-  commerceId Int
-  userId     Int
-  notes      String
-
-  commerce        Commerce         @relation("CommerceBookings", fields: [commerceId], references: [id])
-  customer        Customer         @relation("CustomerBookings", fields: [customerId], references: [id])
-  bookingServices BookingService[] @relation("BookingServices")
-
-  @@map("bookings")
-}
-
-model User {
-  id         Int     @id @default(autoincrement())
-  name       String
-  email      String  @unique
-  password   String
-  role       Roles
-  commerceId Int
-  active     Boolean
-
-  commerce         Commerce              @relation("CommerceUsers", fields: [commerceId], references: [id])
-  workingPatterns  UserWorkingPattern[]  @relation("UserWorkingPatterns")
-  overridePatterns UserWorkingOverride[] @relation("UserOverridePatterns")
-  config           UserConfig?           @relation("UserConfig")
-  logs             ActivityLog[]         @relation("UserLogs")
-
-  @@map("users")
-}
-
-model Service {
-  id              Int    @id @default(autoincrement())
-  name            String
-  price           Float
-  durationMinutes Int
-  commerceId      Int
-
-  commerce        Commerce         @relation("CommerceServices", fields: [commerceId], references: [id])
-  bookingServices BookingService[] @relation("BookingServices")
-
-  @@map("services")
-}
-
-// =========================================
-// Notifications Models
-// =========================================
-
-model Reminder {
-  id          Int             @id @default(autoincrement())
-  bookingId   Int             @unique
-  customerId  Int
-  commerceId  Int
-  channel     ReminderChannel
-  status      ReminderStatus
-  scheduledAt DateTime
-  sentAt      DateTime?
-
-  customer Customer @relation(name: "CustomerReminders", fields: [customerId], references: [id])
-  commerce Commerce @relation(name: "CommerceReminders", fields: [commerceId], references: [id])
-
-  @@map("reminders")
-}
-
-// =========================================
-// Configuration Models
-// =========================================
-
-model CommerceConfig {
-  id                      Int     @id @default(autoincrement())
-  commerceId              Int     @unique
-  standardDurationMinutes Int
-  allowNotifications      Boolean
-  openTime                String
-  closeTime               String
-  welcomeMessage          String
-
-  commerce Commerce @relation(fields: [commerceId], references: [id], name: "CommerceConfig")
-
-  @@map("commerce_configs")
-}
-
-model UserConfig {
-  id     Int @id @default(autoincrement())
-  userId Int @unique
-
-  user User @relation(fields: [userId], references: [id], name: "UserConfig")
-
-  @@map("user_configs")
-}
-
-// =========================================
-// User Working Pattern Models
-// =========================================
-
-//* Se tiene un working pattern por cada dia de la semana
-model UserWorkingPattern {
-  id               Int              @id @default(autoincrement())
-  userId           Int
-  weekday          WeekDays
-  availabilityType AvailabilityType
-  morningStart     String?
-  morningEnd       String?
-  afternoonStart   String?
-  afternoonEnd     String?
-
-  user User @relation(fields: [userId], references: [id], name: "UserWorkingPatterns")
-
-  @@map("user_working_patterns")
-}
-
-//* Esto define un horario especifico para un dia particular
-model UserWorkingOverride {
-  id             Int              @id @default(autoincrement())
-  userId         Int
-  date           DateTime
-  overrideType   AvailabilityType
-  morningStart   String?
-  morningEnd     String?
-  afternoonStart String?
-  afternoonEnd   String?
-  notes          String
-
-  user User @relation(fields: [userId], references: [id], name: "UserOverridePatterns")
-
-  @@map("user_working_overrides")
-}
-
-// =========================================
-// Commerce Working Pattern Models
-// =========================================
-
-//* Lo que hace es definir un horario de apertura y cierre por dia
-//* Se tiene un working pattern por cada dia de la semana
-model CommerceWorkingPattern {
-  id               Int              @id @default(autoincrement())
-  commerceId       Int
-  weekday          WeekDays
-  availabilityType AvailabilityType
-  morningStart     String?
-  morningEnd       String?
-  afternoonStart   String?
-  afternoonEnd     String?
-
-  commerce Commerce @relation(fields: [commerceId], references: [id], name: "CommerceWorkingPatterns")
-
-  @@map("commerce_working_patterns")
-}
-
-//* Esto define un horario especifico para un dia particular
-model CommerceWorkingOverride {
-  id             Int              @id @default(autoincrement())
-  commerceId     Int
-  date           DateTime
-  overrideType   AvailabilityType
-  morningStart   String?
-  morningEnd     String?
-  afternoonStart String?
-  afternoonEnd   String?
-  notes          String
-
-  commerce Commerce @relation(fields: [commerceId], references: [id], name: "CommerceOverridePatterns")
-
-  @@map("commerce_working_overrides")
-}
-
-// =========================================
-// Logging and Tracking Models
-// =========================================
-
-model ActivityLog {
-  id         Int        @id @default(autoincrement())
-  entityId   Int
-  userId     Int?
-  commerceId Int?
-  customerId Int?
-  entityType EntityType
-  changeType ChangeType
-  detail     String
-  timestamp  DateTime   @default(now())
-
-  user     User?     @relation(fields: [userId], references: [id], name: "UserLogs")
-  commerce Commerce? @relation(fields: [commerceId], references: [id], name: "CommerceLogs")
-  customer Customer? @relation(fields: [customerId], references: [id], name: "CustomerLogs")
-
-  @@map("activity_logs")
-}
-
-// =========================================
-// Service Models
-// =========================================
-
-
-model BookingService {
-  bookingId Int
-  serviceId Int
-
-  booking Booking @relation("BookingServices", fields: [bookingId], references: [id])
-  service Service @relation("BookingServices", fields: [serviceId], references: [id])
-
-  @@id([bookingId, serviceId])
-  @@map("booking_services")
 }

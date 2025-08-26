@@ -4,6 +4,7 @@ import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { Booking as DomainClient } from '@/domain/entities/booking.entity';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
+import { BookingService } from '@/domain/entities/bookingService.entity';
 
 @Injectable()
 export class PrismaBookingRepository implements IBookingRepository {
@@ -16,7 +17,7 @@ export class PrismaBookingRepository implements IBookingRepository {
     duration: number;
     userId: number;
     status: BookingStatus;
-    serviceId: number;
+    bookingServices: BookingService[];
     timeStart: Date;
     timeEnd: Date;
     notes: string;
@@ -28,10 +29,10 @@ export class PrismaBookingRepository implements IBookingRepository {
       booking.duration,
       booking.userId,
       booking.status,
-      booking.serviceId,
       booking.timeStart,
       booking.timeEnd,
       booking.notes,
+      booking.bookingServices,
     );
   }
 
@@ -44,16 +45,28 @@ export class PrismaBookingRepository implements IBookingRepository {
           duration: data.duration,
           status: data.status,
           customerId: data.customerId,
-          serviceId: data.serviceId,
           commerceId: data.commerceId,
           userId: data.userId,
           notes: data.notes,
+          bookingServices: {
+            create: data.bookingServices.map(bs => ({
+              serviceId: bs.serviceId,
+            })),
+          },
+        },
+        include: {
+          bookingServices: {
+            include: {
+              service: true,
+            },
+          },
         },
       });
     });
+
     if (!result) return null;
 
-    return this.toDomain(result);
+    return this.toDomain(result); // tu función para mapear a entidad de dominio
   }
 
   async findOverlapping(data: {
@@ -73,6 +86,8 @@ export class PrismaBookingRepository implements IBookingRepository {
           { timeStart: { lt: data.timeEnd } },  // startDB < endNew
           { timeEnd: { gt: data.timeStart } },  // endDB > startNew
         ],
+      }, include: {
+        bookingServices: true,
       },
     });
     if (!result) return null;
@@ -89,6 +104,9 @@ export class PrismaBookingRepository implements IBookingRepository {
         commerceId: data.commerceId,
         status: BookingStatus.CONFIRMED,
       },
+      include: {
+        bookingServices: true,
+      },
     });
     if (!result) return null;
 
@@ -101,6 +119,9 @@ export class PrismaBookingRepository implements IBookingRepository {
     const result = await this.prisma.booking.findMany({
       where: {
         commerceId: data.commerceId,
+      },
+      include: {
+        bookingServices: true,
       },
     });
 
@@ -126,6 +147,9 @@ export class PrismaBookingRepository implements IBookingRepository {
           lte: end,
         },
         commerceId: data.commerceId,
+      },
+      include: {
+        bookingServices: true,
       },
     });
 
@@ -155,6 +179,9 @@ export class PrismaBookingRepository implements IBookingRepository {
           in: [BookingStatus.CONFIRMED, BookingStatus.PENDING, BookingStatus.RESCHEDULED],
         },
       },
+      include: {
+        bookingServices: true,
+      },
     });
 
     if (!result || result.length === 0) return null;
@@ -165,6 +192,9 @@ export class PrismaBookingRepository implements IBookingRepository {
   async findOne(data: { id: number }): Promise<DomainClient | null> {
     const result = await this.prisma.booking.findUnique({
       where: { id: data.id },
+      include: {
+        bookingServices: true,
+      },
     });
 
     if (!result) return null;
@@ -178,6 +208,9 @@ export class PrismaBookingRepository implements IBookingRepository {
         data: {
           status: BookingStatus.CANCELED,
         },
+        include: {
+          bookingServices: true,
+        },
       });
     });
 
@@ -190,16 +223,41 @@ export class PrismaBookingRepository implements IBookingRepository {
     id: number;
     dataToUpdate: BookingUpdateData;
   }): Promise<DomainClient | null> {
-    data.dataToUpdate.status = BookingStatus.CONFIRMED;
+
     const result = await this.prisma.$transaction(async (tx) => {
+
+      // Borrar los servicios antiguos
+      await tx.bookingService.deleteMany({
+        where: { bookingId: data.id }
+      });
+
+      // Actualizar la reserva y crear los nuevos bookingServices
       return await tx.booking.update({
         where: { id: data.id },
-        data: data.dataToUpdate,
+        data: {
+          timeStart: data.dataToUpdate.timeStart,
+          timeEnd: data.dataToUpdate.timeEnd,
+          duration: data.dataToUpdate.duration,
+          status: BookingStatus.CONFIRMED,
+          userId: data.dataToUpdate.userId,
+          notes: data.dataToUpdate.notes,
+          bookingServices: {
+            create: data.dataToUpdate.serviceIds.map(bs => ({
+              serviceId: bs.serviceId,
+            })),
+          },
+        },
+        include: {
+          bookingServices: {
+            include: { service: true },
+          },
+        },
       });
+
     });
 
     if (!result) return null;
-
     return this.toDomain(result);
   }
+
 }

@@ -16,10 +16,10 @@ export class UpdateBookingDto {
   @IsNumber({}, { message: 'El ID del cliente debe ser un número' })
   customerId: number;
 
-  @ApiProperty({ description: 'Nuevo ID de servicio', example: 3 })
+  @ApiProperty({ description: 'IDs de servicios', example: [1, 3], required: false })
   @IsOptional()
-  @IsNumber()
-  serviceId?: number;
+  @IsNumber({}, { each: true })
+  serviceIds?: number[];
   
   @ApiProperty({ example: 1, description: 'ID del empleado que atiende' })
   @IsNumber({}, { message: 'El ID de empleado debe ser un número' })

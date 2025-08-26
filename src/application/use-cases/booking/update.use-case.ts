@@ -6,6 +6,7 @@ import {
   ReminderChannel,
   ReminderStatus,
 } from '@/domain/dbEnums/ReminderConstants';
+import { BookingService } from '@/domain/entities/bookingService.entity';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { Service } from '@/domain/entities/service.entity';
 import { User } from '@/domain/entities/user.entity';
@@ -52,87 +53,69 @@ export class UpdateBooking {
       );
     }
 
-     // Se valida que sea reagendable)
-    if(!booking.canBeRescheduled()){
+    // Se valida que sea reagendable
+    if (!booking.canBeRescheduled()) {
       throw new HttpException(
         'Esta reserva no se puede reagendar',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    //* 2) Definir siguiente servicio y usuario (En caso de ser diferentes al actual)
-    let nextService: Service;
-    if (newData.serviceId !== undefined && newData.serviceId !== booking.serviceId) {
-      const res = await this.serviceRepository.findService({ serviceId: newData.serviceId, commerceId: newData.commerceId });
-      if (!res) {
-        throw new HttpException(
-          'El servicio no existe o no pertenece al comercio especificado',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      nextService = res;
-    } else {
-      const res = await this.serviceRepository.findService({ serviceId: booking.serviceId, commerceId: booking.commerceId });
-      if (!res) {
-        throw new HttpException(
-          'El servicio no existe o no pertenece al comercio especificado',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      nextService = res;
-    }
+    let nextServices: Service[];
 
-    let nextUser: User;
-    if (newData.userId !== undefined && newData.userId !== booking.userId) {
-      const res = await this.userRepository.findUserByCommerce({ userId: newData.userId, commerceId: newData.commerceId });
-      if (!res) {
-        throw new HttpException(
-          'El usuario no existe o no pertenece al comercio especificado',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      nextUser = res;
-    } else {
-      const res = await this.userRepository.findUserByCommerce({ userId: booking.userId, commerceId: booking.commerceId });
-      if (!res) {
-        throw new HttpException(
-          'El usuario no existe o no pertenece al comercio especificado',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      nextUser = res;
-    }
-
-    //* 3) Determinar fecha y hora a usar
-    const nextTimeStart = newData.timeStart ? ensureNotPast(newData.timeStart) : booking.timeStart;
-
-    //* 4) Calcular timeEnd según duración del servicio final
-    const nextTimeEnd = addMinutesToTime(nextTimeStart, nextService.durationMinutes);
-
-    //* 5) Chequeo de solapamiento (si cambió fecha, hora o servicio)
-    if (nextTimeStart != booking.timeStart || nextService.id != booking.serviceId) {
-      const overlapping = await this.bookingRepository.findOverlapping({
-        id, // id de la reserva actual para excluirla si es necesario
+    if (newData.serviceIds !== undefined) {
+      // Buscamos solo los nuevos IDs
+      const services = await this.serviceRepository.findServices({
+        serviceIds: newData.serviceIds,
         commerceId: newData.commerceId,
-        timeStart: nextTimeStart,
-        timeEnd: nextTimeEnd,
       });
 
-      if (overlapping) {
-        throw new HttpException('El horario está ocupado', HttpStatus.CONFLICT);
+      if (services.length !== newData.serviceIds.length) {
+        throw new HttpException(
+          'Al menos uno de los servicios no pertenece al comercio especificado',
+          HttpStatus.NOT_FOUND,
+        );
       }
+
+      nextServices = services;
+    } else {
+      // Mantenemos los servicios actuales del booking
+      const currentServiceIds = booking.bookingServices.map(bs => bs.serviceId);
+      const services = await this.serviceRepository.findServices({
+        serviceIds: currentServiceIds,
+        commerceId: booking.commerceId,
+      });
+
+      nextServices = services;
     }
 
+
+    //* 3) Definir el nuevo usuario (o dejar el que ya estaba)
+    const userIdToCheck = newData.userId ?? booking.userId;
+    const nextUser = await this.userRepository.findUserByCommerce({
+      userId: userIdToCheck,
+      commerceId: newData.commerceId,
+    });
+    if (!nextUser) throw new HttpException('El usuario no existe o no pertenece al comercio', HttpStatus.NOT_FOUND);
+
+
+    //* 4) Determinar fecha y hora de inicio y fin
+    const nextTimeStart = newData.timeStart ? ensureNotPast(newData.timeStart) : booking.timeStart;
+
+    const totalDuration = booking.calcServicesDuration(nextServices)
+    const nextTimeEnd = addMinutesToTime(nextTimeStart, totalDuration);
+
     //* 6) Construir diff (solo campos que realmente cambian)
-    const dataToUpdate: BookingUpdateData = {};
+    const dataToUpdate: BookingUpdateData = {
+      serviceIds: nextServices.map(service =>
+        new BookingService(booking.id, service.id)
+      ),
+      duration: totalDuration,
+      userId: nextUser.id,
+      timeStart: nextTimeStart,
+      timeEnd: nextTimeEnd,
+    };
 
-    dataToUpdate.serviceId = nextService.id;
-
-    dataToUpdate.userId = nextUser.id;
-
-    dataToUpdate.timeStart = nextTimeStart;
-
-    dataToUpdate.timeEnd = nextTimeEnd;
 
     if (newData.notes !== undefined && newData.notes !== booking.notes) {
       dataToUpdate.notes = newData.notes;
@@ -147,8 +130,22 @@ export class UpdateBooking {
       };
     }
 
+    //* 5) Chequeo de solapamiento (si cambió fecha, hora o servicio)
+    if (nextTimeStart.getTime() !== booking.timeStart.getTime() ||
+      nextTimeEnd.getTime() !== booking.timeEnd.getTime()) {
+      const overlapping = await this.bookingRepository.findOverlapping({
+        id, // id de la reserva actual para excluirla si es necesario
+        commerceId: newData.commerceId,
+        timeStart: nextTimeStart,
+        timeEnd: nextTimeEnd,
+      });
+
+      if (overlapping) {
+        throw new HttpException('El horario está ocupado', HttpStatus.CONFLICT);
+      }
+    }
+
     //* 8) Persistencia + efectos laterales
-    // TODO: idealmente envolver update + log + reminder en una transacción si comparten DB.
     const result = await this.bookingRepository.updateSchedule({ id, dataToUpdate });
     if (result === null) {
       throw new HttpException(
@@ -181,13 +178,7 @@ export class UpdateBooking {
     await this.remindersService.updateReminder(reminder);
 
     //* 10) Emitir evento si hubo cambio
-    if (
-      dataToUpdate.timeStart !== undefined ||
-      dataToUpdate.serviceId !== undefined ||
-      dataToUpdate.userId !== undefined ||
-      dataToUpdate.notes !== undefined ||
-      dataToUpdate.timeEnd !== undefined
-    ) {
+    if (Object.keys(dataToUpdate).length > 0) {
       this.eventEmitter.emit(
         BOOKING_EVENTS.RESCHEDULED,
         new BookingRescheduledEvent(result, nextTimeStart),

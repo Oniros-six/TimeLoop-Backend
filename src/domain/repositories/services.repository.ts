@@ -2,7 +2,12 @@ import { ServiceUpdateData } from '../common/ServiceUpdateData';
 import { Service } from '../entities/service.entity';
 
 export interface IServiceRepository {
-  findService(data: {
+  findServices(data: {
+    serviceIds: number[];
+    commerceId: number;
+  }): Promise<Service[]>;
+
+  findOne (data: {
     serviceId: number;
     commerceId: number;
   }): Promise<Service | null>;

@@ -14,7 +14,7 @@ export class FindService {
 
     @Inject(COMMERCE_REPOSITORY)
     private readonly commerceRepository: ICommerceRepository,
-  ) {}
+  ) { }
 
   async execute(id: number, commerceId: number) {
     const commerce = await this.commerceRepository.findCommerce({
@@ -25,7 +25,7 @@ export class FindService {
       throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
     }
 
-    const service = await this.serviceRepository.findService({
+    const service = await this.serviceRepository.findOne({
       serviceId: id,
       commerceId: commerceId,
     });

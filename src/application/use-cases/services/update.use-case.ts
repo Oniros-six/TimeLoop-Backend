@@ -31,7 +31,7 @@ export class UpdateService {
       throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
     }
 
-    const service = await this.serviceRepository.findService({
+    const service = await this.serviceRepository.findOne({
       serviceId: id,
       commerceId: data.commerceId,
     });

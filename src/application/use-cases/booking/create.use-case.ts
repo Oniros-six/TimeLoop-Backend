@@ -38,19 +38,20 @@ export class CreateBooking {
     //* 1) Validación de fecha y hora
     const scheduledAt = ensureNotPast(data.timeStart);
 
-    //* 2) Validar existencia del servicio y del usuario
-    const service = await this.serviceRepository.findService({
-      serviceId: data.serviceId,
+    //* 2) Validar existencia de los servicios, y que pertenezcan al comercio
+    const services = await this.serviceRepository.findServices({
+      serviceIds: data.serviceIds,
       commerceId: data.commerceId,
     });
 
-    if (!service) {
+    if (!services || services.length !== data.serviceIds.length) {
       throw new HttpException(
-        'El servicio no existe o no pertenece al comercio especificado',
+        'Al menos uno de los servicios no pertenece al comercio especificado',
         HttpStatus.NOT_FOUND,
       );
     }
 
+    //* 3) Validar existencia del usuario y que pertenezca al comercio
     const user = await this.userRepository.findUserByCommerce({
       userId: data.userId,
       commerceId: data.commerceId,
@@ -63,32 +64,26 @@ export class CreateBooking {
       );
     }
 
-    //* 3) Calcular timeEnd según duración del servicio
-    const timeEnd = addMinutesToTime(data.timeStart, service.durationMinutes);
+    //* 4) Crear booking como entidad de dominio
+    const booking = Booking.createPending(
+      data.customerId,
+      data.commerceId,
+      data.userId,
+      data.timeStart,
+      data.notes,
+      services,
+    );
 
-
-    //* 4) Validar solapamiento
+    //* 5) Validar solapamiento
     const overlappingBookings = await this.bookingRepository.findOverlapping({
       commerceId: data.commerceId,
       timeStart: data.timeStart,
-      timeEnd: timeEnd,
+      timeEnd: booking.timeEnd,
     });
 
     if (overlappingBookings) {
       throw new HttpException('El horario está ocupado', HttpStatus.CONFLICT);
     }
-
-    //* 5) Crear booking como entidad de dominio
-    const booking = Booking.createPending(
-      data.customerId,
-      data.serviceId,
-      data.commerceId,
-      data.userId,
-      data.timeStart,
-      timeEnd,
-      service.durationMinutes,
-      data.notes,
-    );
 
     const result = await this.bookingRepository.createSchedule(booking);
     if (!result) {
@@ -130,12 +125,5 @@ export class CreateBooking {
       statusCode: HttpStatus.OK,
       data: result,
     };
-  } catch(err: unknown) {
-    const message = err instanceof Error ? err.message : 'Error desconocido';
-    console.error(message);
-    throw new HttpException(
-      message,
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
   }
 }

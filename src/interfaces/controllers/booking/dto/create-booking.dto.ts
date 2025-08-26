@@ -29,10 +29,9 @@ export class CreateBookingDto {
   @IsNotEmpty({ message: 'El empleado es requerido' })
   userId: number;
 
-  @ApiProperty({ example: 1, description: 'ID del servicio reservado' })
-  @IsNumber({}, { message: 'El ID de servicio debe ser un número' })
-  @IsNotEmpty({ message: 'El servicio es requerido' })
-  serviceId: number;
+  @ApiProperty({ description: 'IDs de servicios', example: [1, 3], required: true })
+  @IsNumber({}, { each: true })
+  serviceIds: number[];
 
   @ApiProperty({
     example: '2025-07-08T15:00:00-03:00',

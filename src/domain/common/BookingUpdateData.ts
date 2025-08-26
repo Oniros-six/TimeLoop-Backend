@@ -1,10 +1,10 @@
-import { BookingStatus } from '@/domain/dbEnums/BookingStatus';
+import { BookingService } from '../entities/bookingService.entity';
 
 export interface BookingUpdateData {
   timeStart?: Date;
   timeEnd?: Date;
-  serviceId?: number;
+  serviceIds: BookingService[];
+  duration?: number;
   userId?: number;
   notes?: string;
-  status?: BookingStatus;
 }

@@ -1,73 +1,75 @@
 import { BookingStatus } from "@/domain/dbEnums/BookingStatus"
+import { BookingService } from "./bookingService.entity";
+import { Service } from "./service.entity";
+import { addMinutesToTime } from "../value-objects/booking/validations";
 
 export class Booking {
   constructor(
     public readonly id: number,
     public readonly customerId: number,
     public readonly commerceId: number,
-    public readonly duration: number,
+    public duration: number,
     public userId: number,
     public status: BookingStatus,
-    public serviceId: number,
     public timeStart: Date,
     public timeEnd: Date,
     public notes: string,
+    public bookingServices: BookingService[],
   ) { }
 
-  // Solo métodos de dominio esenciales
-  canBeCancelled(): boolean {
+  updateServices(serviceIds: number[]) {
+    this.bookingServices = serviceIds.map(id => new BookingService(this.id, id));
+  }
+
+  static calcServicesDuration(services: Service[]): number {
+    return services.reduce((total, service) => total + service.durationMinutes, 0);
+  }
+
+  calcServicesDuration(services: Service[]): number {
+    return services.reduce((total, service) => total + service.durationMinutes, 0);
+  }
+
+  private isActiveAndOnTime(): boolean {
     const validStatus = this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
+    const diffHours = (this.timeStart.getTime() - Date.now()) / 1000 / 60 / 60;
+    return validStatus && diffHours > 1;
+  }
 
-    // Diferencia entre la reserva y ahora en milisegundos
-    const diffMs = this.timeStart.getTime() - Date.now();
-
-    // Convertir a horas
-    const diffHours = diffMs / 1000 / 60 / 60;
-
-    // Se permite reprogramar si queda más de 1 hora para la reserva
-    const isOnTime = diffHours > 1;
-
-    return validStatus && isOnTime;
+  canBeCancelled(): boolean {
+    return this.isActiveAndOnTime();
   }
 
   canBeRescheduled(): boolean {
-    // Solo reservas activas pueden reprogramarse
-    const validStatus = this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
-
-    // Diferencia entre la reserva y ahora en milisegundos
-    const diffMs = this.timeStart.getTime() - Date.now();
-
-    // Convertir a horas
-    const diffHours = diffMs / 1000 / 60 / 60;
-
-    // Se permite reprogramar si queda más de 1 hora para la reserva
-    const isOnTime = diffHours > 1;
-    return validStatus && isOnTime;
+    return this.isActiveAndOnTime();
   }
-
 
   static createPending(
     customerId: number,
-    serviceId: number,
     commerceId: number,
     userId: number,
     timeStart: Date,
-    timeEnd: Date,
-    duration: number,
     notes: string = '',
+    services: Service[],
   ): Booking {
-    return new Booking(
-      0, // ID será asignado por la base de datos
+    // Creamos la relación con los servicios
+    const newServices = services.map(service => new BookingService(0, service.id));
+    const totalDuration = this.calcServicesDuration(services)
+    const timeEnd = addMinutesToTime(timeStart, totalDuration);
+
+    const booking = new Booking(
+      0, // ID será asignado por la DB
       customerId,
       commerceId,
-      duration,
+      totalDuration,
       userId,
       BookingStatus.PENDING,
-      serviceId,
       timeStart,
       timeEnd,
       notes,
+      newServices,
     );
+
+    return booking;
   }
 
 }
