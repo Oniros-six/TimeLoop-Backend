@@ -14,4 +14,5 @@ export const USER_WORKING_OVERRIDE_REPOSITORY =
 export const COMMERCE_WORKING_OVERRIDE_REPOSITORY =
   'ICommerceWorkingOverrideRepository';
 export const REMINDER_REPOSITORY = 'IReminderRepository';
+export const BOOKING_HISTORY_REPOSITORY = 'IBookingHistoryRepository';
 export const RESEND_PROVIDER = 'RESEND_PROVIDER';

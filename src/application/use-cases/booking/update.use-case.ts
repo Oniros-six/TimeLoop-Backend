@@ -1,5 +1,6 @@
-import { BOOKING_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
+import { BOOKING_HISTORY_REPOSITORY, BOOKING_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
+import { BookingHistoryUpdateData } from '@/domain/common/BookingHistoryUpdateData';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import {
@@ -11,6 +12,7 @@ import { Reminder } from '@/domain/entities/reminder.entity';
 import { Service } from '@/domain/entities/service.entity';
 import { User } from '@/domain/entities/user.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
+import { IBookingHistoryRepository } from '@/domain/repositories/bookingHistory.repository';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
 import { IUserRepository } from '@/domain/repositories/user.repository';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
@@ -32,6 +34,9 @@ export class UpdateBooking {
 
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+
+    @Inject(BOOKING_HISTORY_REPOSITORY)
+    private readonly bookingHistoryRepository: IBookingHistoryRepository,
 
     private readonly activityLogService: ActivityLogService,
     private readonly eventEmitter: EventEmitter2,
@@ -61,6 +66,7 @@ export class UpdateBooking {
       );
     }
 
+    //* 2) Determinar que servicios se utilizaran
     let nextServices: Service[];
 
     if (newData.serviceIds !== undefined) {
@@ -106,12 +112,12 @@ export class UpdateBooking {
     const totalPrice = booking.calcTotalPrice(nextServices)
     const nextTimeEnd = addMinutesToTime(nextTimeStart, totalDuration);
 
-    //* 6) Construir diff (solo campos que realmente cambian)
+    //* 5) Construir diff (solo campos que realmente cambian)
     const dataToUpdate: BookingUpdateData = {
       serviceIds: nextServices.map(service =>
         new BookingService(booking.id, service.id)
       ),
-      totalPrice:totalPrice,
+      totalPrice: totalPrice,
       duration: totalDuration,
       userId: nextUser.id,
       timeStart: nextTimeStart,
@@ -123,7 +129,7 @@ export class UpdateBooking {
       dataToUpdate.notes = newData.notes;
     }
 
-    //* 7) Si no hay cambios reales, devolver sin tocar
+    //* 6) Si no hay cambios reales, devolver sin tocar
     if (Object.keys(dataToUpdate).length === 0) {
       return {
         message: 'Sin cambios',
@@ -132,7 +138,7 @@ export class UpdateBooking {
       };
     }
 
-    //* 5) Chequeo de solapamiento (si cambió fecha, hora o servicio)
+    //* 7) Chequeo de solapamiento (si cambió fecha, hora o servicio)
     if (nextTimeStart.getTime() !== booking.timeStart.getTime() ||
       nextTimeEnd.getTime() !== booking.timeEnd.getTime()) {
       const overlapping = await this.bookingRepository.findOverlapping({
@@ -156,7 +162,20 @@ export class UpdateBooking {
       );
     }
 
-    //* 9 Crear el activity log
+    //* 9) Generar historial
+    const history: BookingHistoryUpdateData = {
+      timeStart: result.timeStart,
+      timeEnd: result.timeEnd,
+      priceAtBooking: result.totalPrice,
+      durationAtBooking: result.duration,
+      userId: result.userId,
+      notes: result.notes,
+    }
+
+    await this.bookingHistoryRepository.update({ id: result.id, history: history })
+
+
+    //* 10) Crear el activity log
     const updatedFields = Object.keys(dataToUpdate).join(', ');
     await this.activityLogService.updated({
       entityType: EntityType.BOOKING,
@@ -167,7 +186,7 @@ export class UpdateBooking {
       detail: `Se actualizaron los campos: ${updatedFields}.`,
     });
 
-    //* 10 Crear el reminder
+    //* 11) Crear el reminder
     const reminder = Reminder.update({
       bookingId: result.id,
       customerId: result.customerId,
@@ -179,7 +198,7 @@ export class UpdateBooking {
     });
     await this.remindersService.updateReminder(reminder);
 
-    //* 10) Emitir evento si hubo cambio
+    //* 12) Emitir evento si hubo cambio
     if (Object.keys(dataToUpdate).length > 0) {
       this.eventEmitter.emit(
         BOOKING_EVENTS.RESCHEDULED,

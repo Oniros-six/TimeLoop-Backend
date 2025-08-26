@@ -17,6 +17,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './domain/services/notifications/notifications.module';
 import { RemindersModule } from './domain/services/reminders/reminders.module';
 import { AuthModule } from './interfaces/controllers/auth/auth.module';
+import { BookingHistoryModule } from './interfaces/controllers/bookingHistory/bookingHistory.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AuthModule } from './interfaces/controllers/auth/auth.module';
     NotificationModule,
     RemindersModule,
     AuthModule,
+    BookingHistoryModule
   ],
 })
 export class AppModule {}

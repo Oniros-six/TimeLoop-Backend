@@ -13,6 +13,7 @@ import { PrismaCommerceWorkingPatternRepository } from './repositories/commerceW
 import { PrismaUserWorkingOverrideRepository } from './repositories/userWorkingOverride.repository';
 import { PrismaCommerceWorkingOverrideRepository } from './repositories/commerceWorkingOverride.repository';
 import { PrismaReminderRepository } from './repositories/reminder.repository';
+import { PrismaBookingHistoryRepository } from './repositories/bookingHistory.repository';
 
 @Global()
 @Module({
@@ -70,6 +71,10 @@ import { PrismaReminderRepository } from './repositories/reminder.repository';
       provide: 'IReminderRepository',
       useClass: PrismaReminderRepository,
     },
+    {
+      provide: 'IBookingHistoryRepository',
+      useClass: PrismaBookingHistoryRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -86,6 +91,7 @@ import { PrismaReminderRepository } from './repositories/reminder.repository';
     'IUserWorkingOverrideRepository',
     'ICommerceWorkingOverrideRepository',
     'IReminderRepository',
+    'IBookingHistoryRepository'
   ],
 })
-export class PrismaModule {}
+export class PrismaModule { }

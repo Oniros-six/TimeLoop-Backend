@@ -7,6 +7,89 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// =========================================
+// Enums
+// =========================================
+
+enum BusinessCategory {
+  Peluqueria
+  Barberia
+  Estetica
+  EntrenamientoPersonal
+  Spa
+  Fotografia
+  Tatuajes
+  Otros
+}
+
+enum Roles {
+  ADMIN
+  EMPLOYEE
+}
+
+enum AvailabilityType {
+  full
+  half
+  off
+}
+
+enum ReminderChannel {
+  email
+  whatsapp
+  sms
+}
+
+enum ReminderStatus {
+  pending
+  sent
+  failed
+  canceled
+}
+
+enum EntityType {
+  BOOKING
+  CUSTOMER
+  USER
+  COMMERCE
+  SERVICE
+  USER_CONFIG
+  COMMERCE_CONFIG
+  USER_WORKING_OVERRIDE
+  COMMERCE_WORKING_OVERRIDE
+  USER_WORKING_PATTERN
+  COMMERCE_WORKING_PATTERN
+}
+
+enum ChangeType {
+  CREATED
+  UPDATED
+  CANCELLED
+  SUSPENDED
+  REINSTATED
+}
+
+enum WeekDays {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  NO_SHOW
+  COMPLETED
+  RESCHEDULED
+}
+
+// =========================================
+// Core
+// =========================================
 model Commerce {
   id               Int                       @id @default(autoincrement())
   name             String
@@ -98,6 +181,10 @@ model BookingService {
   @@map("booking_services")
 }
 
+// =========================================
+// Configs
+// =========================================
+
 model CommerceConfig {
   id                      Int      @id @default(autoincrement())
   commerceId              Int      @unique
@@ -119,6 +206,10 @@ model UserConfig {
   @@map("user_configs")
 }
 
+// =========================================
+// Working Patterns
+// =========================================
+
 model UserWorkingPattern {
   id               Int              @id @default(autoincrement())
   userId           Int
@@ -133,6 +224,24 @@ model UserWorkingPattern {
   @@map("user_working_patterns")
 }
 
+model CommerceWorkingPattern {
+  id               Int              @id @default(autoincrement())
+  commerceId       Int
+  weekday          WeekDays
+  availabilityType AvailabilityType
+  morningStart     String?
+  morningEnd       String?
+  afternoonStart   String?
+  afternoonEnd     String?
+  commerce         Commerce         @relation("CommerceWorkingPatterns", fields: [commerceId], references: [id])
+
+  @@map("commerce_working_patterns")
+}
+
+// =========================================
+// Working override
+// =========================================
+
 model UserWorkingOverride {
   id             Int              @id @default(autoincrement())
   userId         Int
@@ -146,20 +255,6 @@ model UserWorkingOverride {
   user           User             @relation("UserOverridePatterns", fields: [userId], references: [id])
 
   @@map("user_working_overrides")
-}
-
-model CommerceWorkingPattern {
-  id               Int              @id @default(autoincrement())
-  commerceId       Int
-  weekday          WeekDays
-  availabilityType AvailabilityType
-  morningStart     String?
-  morningEnd       String?
-  afternoonStart   String?
-  afternoonEnd     String?
-  commerce         Commerce         @relation("CommerceWorkingPatterns", fields: [commerceId], references: [id])
-
-  @@map("commerce_working_patterns")
 }
 
 model CommerceWorkingOverride {
@@ -177,6 +272,9 @@ model CommerceWorkingOverride {
   @@map("commerce_working_overrides")
 }
 
+// =========================================
+// logging, History and Reminders
+// =========================================
 model ActivityLog {
   id         Int        @id @default(autoincrement())
   entityId   Int
@@ -209,78 +307,16 @@ model Reminder {
   @@map("reminders")
 }
 
-enum BusinessCategory {
-  Peluqueria
-  Barberia
-  Estetica
-  EntrenamientoPersonal
-  Spa
-  Fotografia
-  Tatuajes
-  Otros
-}
-
-enum Roles {
-  ADMIN
-  EMPLOYEE
-}
-
-enum AvailabilityType {
-  full
-  half
-  off
-}
-
-enum ReminderChannel {
-  email
-  whatsapp
-  sms
-}
-
-enum ReminderStatus {
-  pending
-  sent
-  failed
-  canceled
-}
-
-enum EntityType {
-  BOOKING
-  CUSTOMER
-  USER
-  COMMERCE
-  SERVICE
-  USER_CONFIG
-  COMMERCE_CONFIG
-  USER_WORKING_OVERRIDE
-  COMMERCE_WORKING_OVERRIDE
-  USER_WORKING_PATTERN
-  COMMERCE_WORKING_PATTERN
-}
-
-enum ChangeType {
-  CREATED
-  UPDATED
-  CANCELLED
-  SUSPENDED
-  REINSTATED
-}
-
-enum WeekDays {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
-}
-
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELED
-  NO_SHOW
-  COMPLETED
-  RESCHEDULED
+model BookingHistory {
+  id                Int           @id @default(autoincrement())
+  bookingId         Int           @unique
+  commerceId        Int
+  userId            Int
+  customerId        Int
+  priceAtBooking    Float
+  durationAtBooking Int
+  timeStart         DateTime
+  timeEnd           DateTime
+  status            BookingStatus
+  notes             String
 }

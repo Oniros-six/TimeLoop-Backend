@@ -14,13 +14,17 @@ import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
 
 // Tokens
 import {
+  BOOKING_HISTORY_REPOSITORY,
   BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
+  USER_REPOSITORY
 } from '@/application/providers';
 
 // Repositories
 import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/booking.repository';
 import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/services.repository';
+import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';
+import { PrismaBookingHistoryRepository } from '@/infrastructure/prisma/repositories/bookingHistory.repository';
 
 @Module({
   imports: [PrismaModule, NotificationModule],
@@ -33,6 +37,14 @@ import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/s
     {
       provide: SERVICE_REPOSITORY,
       useClass: PrismaServicesRepository,
+    },
+    {
+      provide: USER_REPOSITORY,
+      useClass: PrismaUserRepository,
+    },
+    {
+      provide: BOOKING_HISTORY_REPOSITORY,
+      useClass: PrismaBookingHistoryRepository,
     },
 
     // usesCases

@@ -1,5 +1,5 @@
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
-import { BOOKING_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
+import { BOOKING_HISTORY_REPOSITORY, BOOKING_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
 import { ReminderChannel, ReminderStatus } from '@/domain/dbEnums/ReminderConstants';
 import { Booking } from '@/domain/entities/booking.entity';
@@ -12,8 +12,10 @@ import { RemindersService } from '@/domain/services/reminders/reminders.service'
 import { CreateBookingDto } from '@/interfaces/controllers/booking/dto/create-booking.dto';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { addMinutesToTime, ensureNotPast } from '@/domain/value-objects/booking/validations';
+import { ensureNotPast } from '@/domain/value-objects/booking/validations';
 import { IUserRepository } from '@/domain/repositories/user.repository';
+import { IBookingHistoryRepository } from '@/domain/repositories/bookingHistory.repository';
+import { BookingHistory } from '@/domain/entities/bookingHistory.entity';
 
 @Injectable()
 export class CreateBooking {
@@ -26,6 +28,9 @@ export class CreateBooking {
 
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+
+    @Inject(BOOKING_HISTORY_REPOSITORY)
+    private readonly bookingHistoryRepository: IBookingHistoryRepository,
 
     private readonly activityLogService: ActivityLogService,
 
@@ -103,7 +108,23 @@ export class CreateBooking {
       detail: `Se crea una nueva reserva`,
     });
 
-    //* 7) Crear recordatorio
+    //* 7) Generar historial
+    const history = BookingHistory.create({
+      bookingId: result.id,
+      commerceId: result.commerceId,
+      customerId: result.customerId,
+      userId: result.userId,
+      priceAtBooking: result.totalPrice,
+      durationAtBooking: result.duration,
+      timeStart: result.timeStart,
+      timeEnd: result.timeEnd,
+      status: result.status,
+      notes: result.notes
+    })
+
+    await this.bookingHistoryRepository.create(history)
+
+    //* 8) Crear recordatorio
     const reminder = Reminder.create({
       bookingId: result.id,
       customerId: result.customerId,
@@ -117,7 +138,7 @@ export class CreateBooking {
     await this.remindersService.create(reminder);
 
 
-    //* 8) Emitir evento de creación
+    //* 9) Emitir evento de creación
     this.eventEmitter.emit(BOOKING_EVENTS.CREATED, new BookingCreatedEvent(result));
 
     return {
