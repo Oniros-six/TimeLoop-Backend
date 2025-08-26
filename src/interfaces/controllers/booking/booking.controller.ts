@@ -29,6 +29,8 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { FindByCommerceDto } from './dto/find-by-commerce.dto';
 import { FindByDateAndCommerceDto } from './dto/find-by-date-commerce.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
+import { FindByUserDto } from './dto/find-by-user.dto';
+import { FindAllByUser } from '@/application/use-cases/booking/find-all-by-user.use-case';
 
 @ApiTags('Bookings')
 @Controller('booking')
@@ -39,6 +41,7 @@ export class BookingController {
     private readonly findAllByCommerceAndDateUseCase: FindAllByCommerceAndDate,
     private readonly findBusySlotsUseCase: FindBusySlots,
     private readonly findAllByCommerceUseCase: FindAllByCommerce,
+    private readonly findAllByUserUseCase: FindAllByUser,
     private readonly cancelBookingUseCase: CancelBooking,
   ) {}
 
@@ -60,6 +63,17 @@ export class BookingController {
   @Get('commerce')
   findAll(@Query() dto: FindByCommerceDto) {
     return this.findAllByCommerceUseCase.execute(dto);
+  }
+
+  // Get all bookings by userId
+  @ApiOperation({
+    summary: 'Obtener todas las reservas de un usuario, con base en su ID',
+  })
+  @ApiQuery({ name: 'userId', required: true, type: Number })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Get('user')
+  findByUser(@Query() dto: FindByUserDto) {
+    return this.findAllByUserUseCase.execute(dto);
   }
 
   // Get all bookings by date and commerceId on any state

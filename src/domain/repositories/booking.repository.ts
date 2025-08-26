@@ -20,6 +20,8 @@ export interface IBookingRepository {
   //* FindAllByCommerce repository methods
   findAllByCommerce(data: { commerceId: number }): Promise<Booking[] | null>;
 
+  findAllByUser(data: { userId: number }): Promise<Booking[] | null>;
+
   //* findBusySlots repository methods
   findBusySlots(data: {
     commerceId: number;

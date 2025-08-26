@@ -9,6 +9,7 @@ import { UpdateBooking } from '@/application/use-cases/booking/update.use-case';
 import { FindAllByCommerceAndDate } from '@/application/use-cases/booking/find-all-by-date-commerce.use-case';
 import { FindBusySlots } from '@/application/use-cases/booking/find-busy-slots.use-case';
 import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-commerce.use-case';
+import { FindAllByUser } from '@/application/use-cases/booking/find-all-by-user.use-case';
 import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
 
 // Tokens
@@ -40,6 +41,7 @@ import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/s
     FindAllByCommerceAndDate,
     FindBusySlots,
     FindAllByCommerce,
+    FindAllByUser,
     CancelBooking,
   ],
 })

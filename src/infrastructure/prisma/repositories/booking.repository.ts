@@ -116,6 +116,23 @@ export class PrismaBookingRepository implements IBookingRepository {
     return this.toDomain(result);
   }
 
+  async findAllByUser(data: {
+    userId: number;
+  }): Promise<DomainClient[] | null> {
+    const result = await this.prisma.booking.findMany({
+      where: {
+        userId: data.userId,
+      },
+      include: {
+        bookingServices: true,
+      },
+    });
+
+    if (!result || result.length === 0) return null;
+
+    return result.map((booking) => this.toDomain(booking));
+  }
+
   async findAllByCommerce(data: {
     commerceId: number;
   }): Promise<DomainClient[] | null> {
