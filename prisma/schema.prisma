@@ -198,7 +198,6 @@ model CommerceConfig {
   id                      Int      @id @default(autoincrement())
   commerceId              Int      @unique
   cancellationDeadlineMinutes Int
-  allowNotifications      Boolean
   openTime                String
   closeTime               String
   welcomeMessage          String

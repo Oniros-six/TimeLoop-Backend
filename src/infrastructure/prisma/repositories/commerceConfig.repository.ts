@@ -13,7 +13,6 @@ export class PrismaCommerceConfigRepository
     id: number;
     commerceId: number;
     cancellationDeadlineMinutes: number;
-    allowNotifications: boolean;
     openTime: string;
     closeTime: string;
     welcomeMessage: string;
@@ -22,7 +21,6 @@ export class PrismaCommerceConfigRepository
       commerce.id,
       commerce.commerceId,
       commerce.cancellationDeadlineMinutes,
-      commerce.allowNotifications,
       commerce.openTime,
       commerce.closeTime,
       commerce.welcomeMessage,

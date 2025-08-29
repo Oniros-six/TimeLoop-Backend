@@ -56,8 +56,6 @@ export class UpdateCommerceConfig {
       commerceId: commerceId,
       cancellationDeadlineMinutes:
         data.cancellationDeadlineMinutes ?? commerceConfig.cancellationDeadlineMinutes,
-      allowNotifications:
-        data.allowNotifications ?? commerceConfig.allowNotifications,
       openTime: data.openTime ?? commerceConfig.openTime,
       closeTime: data.closeTime ?? commerceConfig.closeTime,
       welcomeMessage: data.welcomeMessage ?? commerceConfig.welcomeMessage,

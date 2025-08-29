@@ -19,15 +19,6 @@ export class CreateCommerceConfigDto {
   commerceId: number;
 
   @ApiProperty({
-    example: true,
-    description: 'Permitir notificaciones',
-  })
-  @Type(() => Boolean)
-  @IsBoolean({ message: 'El allowNotifications debe ser un booleano' })
-  @IsNotEmpty({ message: 'El allowNotifications es requerido' })
-  allowNotifications: boolean;
-
-  @ApiProperty({
     example: 45,
     description: 'Tiempo límite (en minutos) antes de la reserva en el que aún se permite cancelar o reprogramar',
   })

@@ -95,7 +95,6 @@ CREATE TABLE "public"."commerce_configs" (
     "id" SERIAL NOT NULL,
     "commerceId" INTEGER NOT NULL,
     "cancellationDeadlineMinutes" INTEGER NOT NULL,
-    "allowNotifications" BOOLEAN NOT NULL,
     "openTime" TEXT NOT NULL,
     "closeTime" TEXT NOT NULL,
     "welcomeMessage" TEXT NOT NULL,

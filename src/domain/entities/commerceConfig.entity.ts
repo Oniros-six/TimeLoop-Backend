@@ -3,7 +3,6 @@ export class CommerceConfig {
     public readonly id: number,
     public readonly commerceId: number,
     public cancellationDeadlineMinutes: number,
-    public allowNotifications: boolean,
     public openTime: string,
     public closeTime: string,
     public welcomeMessage: string,
@@ -13,17 +12,12 @@ export class CommerceConfig {
   static create(props: {
     commerceId: number;
     cancellationDeadlineMinutes: number;
-    allowNotifications: boolean;
     openTime: string;
     closeTime: string;
     welcomeMessage: string;
   }): CommerceConfig {
     if (!props.commerceId || props.commerceId <= 0) {
       throw new Error('El ID de comercio no es válido.');
-    }
-
-    if (typeof props.allowNotifications !== 'boolean') {
-      throw new Error('El valor de allowNotifications debe ser un booleano.');
     }
 
     if (typeof props.welcomeMessage !== 'string') {
@@ -46,7 +40,6 @@ export class CommerceConfig {
       0,
       props.commerceId,
       props.cancellationDeadlineMinutes,
-      props.allowNotifications,
       props.openTime,
       props.closeTime,
       props.welcomeMessage,
