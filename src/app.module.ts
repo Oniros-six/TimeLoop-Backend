@@ -19,6 +19,7 @@ import { RemindersModule } from './domain/services/reminders/reminders.module';
 import { AuthModule } from './interfaces/controllers/auth/auth.module';
 import { BookingHistoryModule } from './interfaces/controllers/bookingHistory/bookingHistory.module';
 import { InvoiceModule } from './interfaces/controllers/invoices/invoice.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { InvoiceModule } from './interfaces/controllers/invoices/invoice.module'
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
     PrismaModule,
     UserModule,

@@ -3,7 +3,6 @@ import {
   IsNumber,
   IsDate,
   IsNotEmpty,
-  MinLength,
   MaxLength,
   IsOptional,
 } from 'class-validator';
@@ -48,7 +47,6 @@ export class CreateBookingDto {
   })
   @IsOptional()
   @IsString({ message: 'Las notas deben ser texto' })
-  @MinLength(10, { message: 'Las notas deben tener al menos 10 caracteres' })
   @MaxLength(500, { message: 'Las notas no pueden exceder los 500 caracteres' })
   notes?: string;
 }

@@ -60,8 +60,8 @@ export class CreateUserDto {
   password: string;
 
   @ApiProperty({
-    example: 1,
-    description: 'Rol del usuario (1: Admin, 2: Empleado)',
+    example: "ADMIN",
+    description: 'Rol del usuario (ADMIN - EMPLEADO)',
   })
   @IsEnum(Roles, { message: 'El rol debe ser Admin o Empleado' })
   @IsNotEmpty({ message: 'El rol es requerido' })

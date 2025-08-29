@@ -16,6 +16,8 @@ export interface ICommerceRepository {
 
   createCommerce(data: Commerce): Promise<Commerce | null>;
 
+  findAllActive(): Promise<Commerce[] | null>;
+  
   updateCommerce(data: {
     id: number;
     newCommerceData: CommerceUpdateData;

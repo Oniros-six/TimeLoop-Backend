@@ -40,6 +40,17 @@ export class PrismaCommerceRepository implements ICommerceRepository {
     return this.toDomain(result);
   }
 
+  async findAllActive(): Promise<DomainClient[] | null> {
+    const result = await this.prisma.commerce.findMany({
+      where: {
+        active: true
+      },
+    });
+
+    if (!result) return null;
+    return result.map((commerce) => this.toDomain(commerce));
+  }
+
   async findCommerceByName(data: {
     name: string;
   }): Promise<DomainClient | null> {
@@ -55,7 +66,7 @@ export class PrismaCommerceRepository implements ICommerceRepository {
     const result = await this.prisma.commerce.findUnique({
       where: { email: data.email },
     });
-  
+
     return !!result;
   }
 
@@ -63,7 +74,7 @@ export class PrismaCommerceRepository implements ICommerceRepository {
     const result = await this.prisma.commerce.findUnique({
       where: { phone: data.phone },
     });
-  
+
     return !!result;
   }
 
