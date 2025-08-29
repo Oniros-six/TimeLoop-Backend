@@ -29,12 +29,12 @@ export class CreateCommerceConfigDto {
 
   @ApiProperty({
     example: 45,
-    description: 'Duración estándar de las reservas en minutos',
+    description: 'Tiempo límite (en minutos) antes de la reserva en el que aún se permite cancelar o reprogramar',
   })
   @Type(() => Number)
-  @IsNumber({}, { message: 'La duración debe ser un número' })
+  @IsNumber({}, { message: 'El tiempo debe ser un número' })
   @IsNotEmpty({ message: 'La duración es requerida' })
-  standardDurationMinutes: number;
+  cancellationDeadlineMinutes: number;
 
   @ApiProperty({
     example: 'Bienvenidos a ...',

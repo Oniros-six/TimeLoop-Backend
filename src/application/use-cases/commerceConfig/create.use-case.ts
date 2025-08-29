@@ -44,7 +44,7 @@ export class CreateCommerceConfig {
 
     const commerceConfig = CommerceConfigDomain.create({
       commerceId: commerceId,
-      standardDurationMinutes: data.standardDurationMinutes,
+      cancellationDeadlineMinutes: data.cancellationDeadlineMinutes,
       allowNotifications: data.allowNotifications,
       openTime: data.openTime,
       closeTime: data.closeTime,

@@ -2,7 +2,7 @@ export class CommerceConfig {
   constructor(
     public readonly id: number,
     public readonly commerceId: number,
-    public standardDurationMinutes: number,
+    public cancellationDeadlineMinutes: number,
     public allowNotifications: boolean,
     public openTime: string,
     public closeTime: string,
@@ -12,7 +12,7 @@ export class CommerceConfig {
   // Factory method
   static create(props: {
     commerceId: number;
-    standardDurationMinutes: number;
+    cancellationDeadlineMinutes: number;
     allowNotifications: boolean;
     openTime: string;
     closeTime: string;
@@ -32,8 +32,8 @@ export class CommerceConfig {
       );
     }
 
-    if (!props.standardDurationMinutes || props.standardDurationMinutes <= 0) {
-      throw new Error('La duración estándar debe ser un número positivo.');
+    if (!props.cancellationDeadlineMinutes || props.cancellationDeadlineMinutes <= 0) {
+      throw new Error('El tiempo debe ser un número positivo.');
     }
 
     if (props.openTime >= props.closeTime) {
@@ -45,7 +45,7 @@ export class CommerceConfig {
     return new CommerceConfig(
       0,
       props.commerceId,
-      props.standardDurationMinutes,
+      props.cancellationDeadlineMinutes,
       props.allowNotifications,
       props.openTime,
       props.closeTime,

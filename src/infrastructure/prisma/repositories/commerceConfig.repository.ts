@@ -12,7 +12,7 @@ export class PrismaCommerceConfigRepository
   private toDomain(commerce: {
     id: number;
     commerceId: number;
-    standardDurationMinutes: number;
+    cancellationDeadlineMinutes: number;
     allowNotifications: boolean;
     openTime: string;
     closeTime: string;
@@ -21,7 +21,7 @@ export class PrismaCommerceConfigRepository
     return new DomainClient(
       commerce.id,
       commerce.commerceId,
-      commerce.standardDurationMinutes,
+      commerce.cancellationDeadlineMinutes,
       commerce.allowNotifications,
       commerce.openTime,
       commerce.closeTime,

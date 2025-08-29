@@ -54,8 +54,8 @@ export class UpdateCommerceConfig {
 
     const updatedConfigData = CommerceConfigDomain.create({
       commerceId: commerceId,
-      standardDurationMinutes:
-        data.standardDurationMinutes ?? commerceConfig.standardDurationMinutes,
+      cancellationDeadlineMinutes:
+        data.cancellationDeadlineMinutes ?? commerceConfig.cancellationDeadlineMinutes,
       allowNotifications:
         data.allowNotifications ?? commerceConfig.allowNotifications,
       openTime: data.openTime ?? commerceConfig.openTime,
