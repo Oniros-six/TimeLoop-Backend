@@ -3,7 +3,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
   BookingCreatedEvent,
-  BookingCancelledEvent,
+  BookingCanceledEvent,
   BookingRescheduledEvent,
 } from '@/domain/common/booking.events';
 import { Booking } from '@/domain/entities/booking.entity';
@@ -18,7 +18,7 @@ import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';
 
 export const BOOKING_EVENTS = {
   CREATED: 'booking.created',
-  CANCELLED: 'booking.cancelled',
+  CANCELED: 'booking.canceled',
   RESCHEDULED: 'booking.rescheduled',
 } as const;
 
@@ -30,7 +30,7 @@ export const NOTIFICATION_SERVICE = 'NOTIFICATION_SERVICE';
 
 export interface INotificationService {
   notifyBookingCreated(booking: Booking): Promise<void>;
-  notifyBookingCancelled(booking: Booking): Promise<void>;
+  notifyBookingCanceled(booking: Booking): Promise<void>;
   notifyBookingRescheduled(booking: Booking, newDate: Date): Promise<void>;
 }
 @Injectable()
@@ -55,12 +55,12 @@ export class NotificationService {
     }
   }
 
-  @OnEvent(BOOKING_EVENTS.CANCELLED)
-  async handleBookingCancelled(event: BookingCancelledEvent) {
+  @OnEvent(BOOKING_EVENTS.CANCELED)
+  async handleBookingCanceled(event: BookingCanceledEvent) {
     try {
-      await this.notifyBookingCancelled(event.booking);
+      await this.notifyBookingCanceled(event.booking);
     } catch (err: unknown) {
-      this.logError(err, event.booking.id, 'BookingCancelledEvent');
+      this.logError(err, event.booking.id, 'BookingCanceledEvent');
     }
   }
 
@@ -101,8 +101,8 @@ export class NotificationService {
     await this.provider.sendEmail(commerce.email, 'Nueva reserva', message);
   }
 
-  async notifyBookingCancelled(booking: Booking): Promise<void> {
-    this.logger.log(`Notifying booking cancelled: ${booking.id}`);
+  async notifyBookingCanceled(booking: Booking): Promise<void> {
+    this.logger.log(`Notifying booking canceled: ${booking.id}`);
     const commerce = await this.commerceRepository.findCommerce({
       commerceId: booking.commerceId,
     });

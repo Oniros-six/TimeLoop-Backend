@@ -18,6 +18,7 @@ import { NotificationModule } from './domain/services/notifications/notification
 import { RemindersModule } from './domain/services/reminders/reminders.module';
 import { AuthModule } from './interfaces/controllers/auth/auth.module';
 import { BookingHistoryModule } from './interfaces/controllers/bookingHistory/bookingHistory.module';
+import { InvoiceModule } from './interfaces/controllers/invoices/invoice.module';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { BookingHistoryModule } from './interfaces/controllers/bookingHistory/bo
     NotificationModule,
     RemindersModule,
     AuthModule,
-    BookingHistoryModule
+    BookingHistoryModule,
+    InvoiceModule
   ],
 })
 export class AppModule {}

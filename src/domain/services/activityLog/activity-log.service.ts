@@ -25,7 +25,7 @@ export class ActivityLogService {
     return this.log(log);
   }
 
-  async cancelled(props: Parameters<typeof ActivityLog.cancelLog>[0]) {
+  async canceled(props: Parameters<typeof ActivityLog.cancelLog>[0]) {
     const log = ActivityLog.cancelLog(props);
     return this.log(log);
   }

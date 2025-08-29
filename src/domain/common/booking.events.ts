@@ -5,7 +5,7 @@ export class BookingCreatedEvent {
   constructor(public readonly booking: Booking) {}
 }
 
-export class BookingCancelledEvent {
+export class BookingCanceledEvent {
   constructor(public readonly booking: Booking) {}
 }
 

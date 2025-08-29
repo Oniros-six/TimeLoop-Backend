@@ -43,7 +43,7 @@ describe('NotificationModule', () => {
   it('debería proporcionar NotificationService', () => {
     expect(notificationService).toBeDefined();
     expect(typeof notificationService.notifyBookingCreated).toBe('function');
-    expect(typeof notificationService.notifyBookingCancelled).toBe('function');
+    expect(typeof notificationService.notifyBookingCanceled).toBe('function');
     expect(typeof notificationService.notifyBookingRescheduled).toBe(
       'function',
     );

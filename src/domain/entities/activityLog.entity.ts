@@ -55,7 +55,7 @@ export class ActivityLog {
   static cancelLog(
     props: Parameters<typeof ActivityLog.create>[1],
   ): ActivityLog {
-    return this.create(ChangeType.CANCELLED, props);
+    return this.create(ChangeType.CANCELED, props);
   }
 
   static suspendLog(

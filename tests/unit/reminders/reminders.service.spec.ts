@@ -10,10 +10,10 @@ describe('RemindersService', () => {
   let mockNotificationService: {
     notifyBookingReminder: jest.Mock;
     notifyBookingCreated: jest.Mock;
-    notifyBookingCancelled: jest.Mock;
+    notifyBookingCanceled: jest.Mock;
     notifyBookingRescheduled: jest.Mock;
     handleBookingCreated: jest.Mock;
-    handleBookingCancelled: jest.Mock;
+    handleBookingCanceled: jest.Mock;
     handleBookingRescheduled: jest.Mock;
   };
   let mockReminderRepository: jest.Mocked<IReminderRepository>;
@@ -33,10 +33,10 @@ describe('RemindersService', () => {
     mockNotificationService = {
       notifyBookingReminder: jest.fn(),
       notifyBookingCreated: jest.fn(),
-      notifyBookingCancelled: jest.fn(),
+      notifyBookingCanceled: jest.fn(),
       notifyBookingRescheduled: jest.fn(),
       handleBookingCreated: jest.fn(),
-      handleBookingCancelled: jest.fn(),
+      handleBookingCanceled: jest.fn(),
       handleBookingRescheduled: jest.fn(),
     };
 

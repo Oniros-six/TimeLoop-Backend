@@ -4,7 +4,7 @@ import { Booking } from '@/domain/entities/booking.entity';
 import { NotificationService } from '../../../src/domain/services/notifications/notifications.service';
 import {
   BookingCreatedEvent,
-  BookingCancelledEvent,
+  BookingCanceledEvent,
   BookingRescheduledEvent,
 } from '@/domain/common/booking.events';
 import { BookingDate } from '@/domain/value-objects/booking/booking-date.vo';
@@ -109,11 +109,11 @@ describe('NotificationService', () => {
       expect(spy).toHaveBeenCalledWith(mockBooking);
     });
 
-    it('debería manejar el evento booking.cancelled', async () => {
-      const spy = jest.spyOn(service, 'notifyBookingCancelled');
-      const event = new BookingCancelledEvent(mockBooking);
+    it('debería manejar el evento booking.canceled', async () => {
+      const spy = jest.spyOn(service, 'notifyBookingCanceled');
+      const event = new BookingCanceledEvent(mockBooking);
 
-      await service.handleBookingCancelled(event);
+      await service.handleBookingCanceled(event);
 
       expect(spy).toHaveBeenCalledWith(mockBooking);
     });
@@ -156,11 +156,11 @@ describe('NotificationService', () => {
     it('debería notificar la cancelación de una reserva', async () => {
       const loggerSpy = jest.spyOn(service['logger'], 'log');
 
-      await service.notifyBookingCancelled(mockBooking);
+      await service.notifyBookingCanceled(mockBooking);
 
       expect(loggerSpy).toHaveBeenCalledWith(
         expect.stringContaining(
-          `Notifying booking cancelled: ${mockBooking.id}`,
+          `Notifying booking canceled: ${mockBooking.id}`,
         ),
       );
       expect(mockCommerceRepository.findCommerce).toHaveBeenCalledWith({
@@ -229,28 +229,28 @@ describe('NotificationService', () => {
       );
     });
 
-    it('debería capturar y loggear errores en el manejador de booking.cancelled sin re-lanzarlos', async () => {
+    it('debería capturar y loggear errores en el manejador de booking.canceled sin re-lanzarlos', async () => {
       const error = new Error('Error de prueba');
       const errorSpy = jest
         .spyOn(service['logger'], 'error')
         .mockImplementation(() => {});
 
-      // Mock para que falle el método notifyBookingCancelled
+      // Mock para que falle el método notifyBookingcanceled
       jest
-        .spyOn(service, 'notifyBookingCancelled')
+        .spyOn(service, 'notifyBookingCanceled')
         .mockRejectedValueOnce(error);
 
-      const event = new BookingCancelledEvent(mockBooking);
+      const event = new BookingCanceledEvent(mockBooking);
 
       // El manejador de eventos debe capturar el error y no re-lanzarlo
       await expect(
-        service.handleBookingCancelled(event),
+        service.handleBookingCanceled(event),
       ).resolves.toBeUndefined();
 
       // Verificar que se registró el error
       expect(errorSpy).toHaveBeenCalledWith(
         expect.stringContaining(
-          'Failed to handle BookingCancelledEvent for booking',
+          'Failed to handle BookingCanceledEvent for booking',
         ),
         expect.anything(),
       );

@@ -58,12 +58,13 @@ enum EntityType {
   COMMERCE_WORKING_OVERRIDE
   USER_WORKING_PATTERN
   COMMERCE_WORKING_PATTERN
+  INVOICE
 }
 
 enum ChangeType {
   CREATED
   UPDATED
-  CANCELLED
+  CANCELED
   SUSPENDED
   REINSTATED
 }
@@ -87,6 +88,13 @@ enum BookingStatus {
   RESCHEDULED
 }
 
+enum InvoiceStatus {
+  PENDING
+  SENT
+  PAID
+}
+
+
 // =========================================
 // Core
 // =========================================
@@ -106,6 +114,7 @@ model Commerce {
   reminders        Reminder[]                @relation("CommerceReminders")
   services         Service[]                 @relation("CommerceServices")
   users            User[]                    @relation("CommerceUsers")
+  Invoice          Invoice[]
 
   @@map("commerces")
 }
@@ -273,7 +282,7 @@ model CommerceWorkingOverride {
 }
 
 // =========================================
-// logging, History and Reminders
+// logging, History, Invoices and Reminders
 // =========================================
 model ActivityLog {
   id         Int        @id @default(autoincrement())
@@ -319,4 +328,28 @@ model BookingHistory {
   timeEnd           DateTime
   status            BookingStatus
   notes             String
+}
+
+model Invoice {
+  id         Int @id @default(autoincrement())
+  commerceId Int
+
+  periodStart DateTime
+  periodEnd   DateTime
+
+  totalBookings  Int @default(0)
+  totalCanceled Int @default(0)
+
+  totalIncome Float @default(0.0) // ingreso bruto
+
+  feePercentage Float @default(0.0) // porcentaje del total income
+  serviceFee    Float @default(0.0) // monto a cobrar
+
+  status InvoiceStatus @default(PENDING)
+
+  generatedAt DateTime @default(now())
+
+  commerce Commerce @relation(fields: [commerceId], references: [id])
+
+  @@index([commerceId, periodStart, periodEnd])
 }

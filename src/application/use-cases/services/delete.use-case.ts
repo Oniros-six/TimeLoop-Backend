@@ -50,7 +50,7 @@ export class DeleteService {
         );
       }
 
-      await this.activityLogService.cancelled({
+      await this.activityLogService.canceled({
         entityType: EntityType.SERVICE,
         entityId: result.id,
         userId: null,

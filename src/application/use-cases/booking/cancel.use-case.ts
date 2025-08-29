@@ -5,7 +5,7 @@ import { BOOKING_REPOSITORY } from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { BookingCancelledEvent } from '@/domain/common/booking.events';
+import { BookingCanceledEvent } from '@/domain/common/booking.events';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
 import { RemindersService } from '@/domain/services/reminders/reminders.service';
 
@@ -40,7 +40,7 @@ export class CancelBooking {
     }
 
     // Delegate cancellation validation to domain method
-    if (!booking.canBeCancelled()) {
+    if (!booking.canBeCanceled()) {
       throw new HttpException(
         'No se puede cancelar esta reserva',
         HttpStatus.BAD_REQUEST,
@@ -58,7 +58,7 @@ export class CancelBooking {
     }
 
     //* Guardamos la actividad
-    await this.activityLogService.cancelled({
+    await this.activityLogService.canceled({
       entityType: EntityType.BOOKING,
       entityId: result.id,
       userId: null,
@@ -72,8 +72,8 @@ export class CancelBooking {
 
     //* Emitir evento de cancelación
     this.eventEmitter.emit(
-      BOOKING_EVENTS.CANCELLED,
-      new BookingCancelledEvent(result),
+      BOOKING_EVENTS.CANCELED,
+      new BookingCanceledEvent(result),
     );
 
     return {

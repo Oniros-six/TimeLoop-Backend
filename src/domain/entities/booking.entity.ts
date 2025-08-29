@@ -44,7 +44,7 @@ export class Booking {
     return validStatus && diffHours > 1;
   }
 
-  canBeCancelled(): boolean {
+  canBeCanceled(): boolean {
     return this.isActiveAndOnTime();
   }
 
