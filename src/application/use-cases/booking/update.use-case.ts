@@ -1,4 +1,4 @@
-import { BOOKING_HISTORY_REPOSITORY, BOOKING_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
+import { BOOKING_HISTORY_REPOSITORY, BOOKING_REPOSITORY, COMMERCE_CONFIG_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
 import { BookingHistoryUpdateData } from '@/domain/common/BookingHistoryUpdateData';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
@@ -13,6 +13,7 @@ import { Service } from '@/domain/entities/service.entity';
 import { User } from '@/domain/entities/user.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { IBookingHistoryRepository } from '@/domain/repositories/bookingHistory.repository';
+import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.repository';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
 import { IUserRepository } from '@/domain/repositories/user.repository';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
@@ -38,6 +39,9 @@ export class UpdateBooking {
     @Inject(BOOKING_HISTORY_REPOSITORY)
     private readonly bookingHistoryRepository: IBookingHistoryRepository,
 
+    @Inject(COMMERCE_CONFIG_REPOSITORY)
+    private readonly commerceConfigRepository: ICommerceConfigRepository,
+
     private readonly activityLogService: ActivityLogService,
     private readonly eventEmitter: EventEmitter2,
     private readonly remindersService: RemindersService,
@@ -59,7 +63,9 @@ export class UpdateBooking {
     }
 
     // Se valida que sea reagendable
-    if (!booking.canBeRescheduled()) {
+    const commerceConfig = await this.commerceConfigRepository.findCommerceConfig({ commerceId: booking.commerceId })
+
+    if (!booking.canBeRescheduled(commerceConfig.cancellationDeadlineMinutes)) {
       throw new HttpException(
         'Esta reserva no se puede reagendar',
         HttpStatus.BAD_REQUEST,

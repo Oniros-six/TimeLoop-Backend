@@ -11,11 +11,13 @@ import { FindBusySlots } from '@/application/use-cases/booking/find-busy-slots.u
 import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-commerce.use-case';
 import { FindAllByUser } from '@/application/use-cases/booking/find-all-by-user.use-case';
 import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
+import { FindCommerceConfig } from '@/application/use-cases/commerceConfig/find.use-case';
 
 // Tokens
 import {
   BOOKING_HISTORY_REPOSITORY,
   BOOKING_REPOSITORY,
+  COMMERCE_CONFIG_REPOSITORY,
   SERVICE_REPOSITORY,
   USER_REPOSITORY
 } from '@/application/providers';
@@ -25,6 +27,7 @@ import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/bo
 import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/services.repository';
 import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';
 import { PrismaBookingHistoryRepository } from '@/infrastructure/prisma/repositories/bookingHistory.repository';
+import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/repositories/commerceConfig.repository';
 
 @Module({
   imports: [PrismaModule, NotificationModule],
@@ -46,6 +49,10 @@ import { PrismaBookingHistoryRepository } from '@/infrastructure/prisma/reposito
       provide: BOOKING_HISTORY_REPOSITORY,
       useClass: PrismaBookingHistoryRepository,
     },
+    {
+      provide: COMMERCE_CONFIG_REPOSITORY,
+      useClass: PrismaCommerceConfigRepository,
+    },
 
     // usesCases
     CreateBooking,
@@ -55,6 +62,7 @@ import { PrismaBookingHistoryRepository } from '@/infrastructure/prisma/reposito
     FindAllByCommerce,
     FindAllByUser,
     CancelBooking,
+    FindCommerceConfig
   ],
 })
 export class BookingModule {}

@@ -1,19 +1,23 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { CancelBookingDto } from '@/interfaces/controllers/booking/dto/cancel-booking.dto';
-import { BOOKING_REPOSITORY } from '@/application/providers';
+import { BOOKING_REPOSITORY, COMMERCE_CONFIG_REPOSITORY } from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BookingCanceledEvent } from '@/domain/common/booking.events';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
 import { RemindersService } from '@/domain/services/reminders/reminders.service';
+import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.repository';
 
 @Injectable()
 export class CancelBooking {
   constructor(
     @Inject(BOOKING_REPOSITORY)
     private readonly bookingRepository: IBookingRepository,
+
+    @Inject(COMMERCE_CONFIG_REPOSITORY)
+    private readonly commerceConfigRepository: ICommerceConfigRepository,
 
     private readonly activityLogService: ActivityLogService,
 
@@ -39,8 +43,10 @@ export class CancelBooking {
       );
     }
 
+    const commerceConfig = await this.commerceConfigRepository.findCommerceConfig({commerceId})
+
     // Delegate cancellation validation to domain method
-    if (!booking.canBeCanceled()) {
+    if (!booking.canBeCanceled(commerceConfig.cancellationDeadlineMinutes)) {
       throw new HttpException(
         'No se puede cancelar esta reserva',
         HttpStatus.BAD_REQUEST,

@@ -38,18 +38,22 @@ export class Booking {
     return services.reduce((total, service) => total + service.price, 0);
   }
 
-  private isActiveAndOnTime(): boolean {
-    const validStatus = this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
-    const diffHours = (this.timeStart.getTime() - Date.now()) / 1000 / 60 / 60;
-    return validStatus && diffHours > 1;
+  private isActiveAndOnTime(cancellationDeadlineMinutes: number): boolean {
+    const validStatus =
+      this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
+  
+    const diffMinutes = (this.timeStart.getTime() - Date.now()) / 1000 / 60;
+  
+    return validStatus && diffMinutes > cancellationDeadlineMinutes;
+  }
+  
+
+  canBeCanceled(cancellationDeadlineMinutes: number): boolean {
+    return this.isActiveAndOnTime(cancellationDeadlineMinutes);
   }
 
-  canBeCanceled(): boolean {
-    return this.isActiveAndOnTime();
-  }
-
-  canBeRescheduled(): boolean {
-    return this.isActiveAndOnTime();
+  canBeRescheduled(cancellationDeadlineMinutes: number): boolean {
+    return this.isActiveAndOnTime(cancellationDeadlineMinutes);
   }
 
   static createPending(
@@ -65,7 +69,7 @@ export class Booking {
     const totalDuration = this.calcServicesDuration(services)
     const timeEnd = addMinutesToTime(timeStart, totalDuration);
     const totalprice = this.calcTotalPrice(services)
-    
+
     const booking = new Booking(
       0, // ID será asignado por la DB
       customerId,

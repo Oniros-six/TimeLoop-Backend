@@ -29,11 +29,11 @@ export class PrismaCommerceConfigRepository
 
   async findCommerceConfig(data: {
     commerceId: number;
-  }): Promise<DomainClient | null> {
-    const result = await this.prisma.commerceConfig.findUnique({
+  }): Promise<DomainClient> {
+    const result = await this.prisma.commerceConfig.findUniqueOrThrow({
       where: { commerceId: data.commerceId },
     });
-    if (!result) return null;
+
     return this.toDomain(result);
   }
 
