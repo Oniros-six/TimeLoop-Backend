@@ -48,6 +48,7 @@ export class CreateCommerceConfig {
       openTime: data.openTime,
       closeTime: data.closeTime,
       welcomeMessage: data.welcomeMessage,
+      acceptedPaymentMethods: data.acceptedPaymentMethods
     });
 
     try {

@@ -59,6 +59,7 @@ export class UpdateCommerceConfig {
       openTime: data.openTime ?? commerceConfig.openTime,
       closeTime: data.closeTime ?? commerceConfig.closeTime,
       welcomeMessage: data.welcomeMessage ?? commerceConfig.welcomeMessage,
+      acceptedPaymentMethods: data.acceptedPaymentMethods ?? commerceConfig.acceptedPaymentMethods
     });
 
     try {

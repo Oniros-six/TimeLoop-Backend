@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.repository';
 import { CommerceConfig as DomainClient } from '@/domain/entities/commerceConfig.entity';
+import { PaymentMethod } from '@/domain/dbEnums/paymentMethods';
 
 @Injectable()
 export class PrismaCommerceConfigRepository
@@ -16,6 +17,7 @@ export class PrismaCommerceConfigRepository
     openTime: string;
     closeTime: string;
     welcomeMessage: string;
+    acceptedPaymentMethods: PaymentMethod[];
   }): DomainClient {
     return new DomainClient(
       commerce.id,
@@ -24,6 +26,7 @@ export class PrismaCommerceConfigRepository
       commerce.openTime,
       commerce.closeTime,
       commerce.welcomeMessage,
+      commerce.acceptedPaymentMethods
     );
   }
 

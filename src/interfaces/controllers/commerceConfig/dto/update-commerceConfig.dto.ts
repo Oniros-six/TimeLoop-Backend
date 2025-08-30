@@ -1,7 +1,8 @@
+import { PaymentMethod } from '@/domain/dbEnums/paymentMethods';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsBoolean,
+  IsEnum,
   IsNumber,
   IsString,
   Matches,
@@ -42,5 +43,14 @@ export class UpdateCommerceConfigDto {
     message: 'El formato debe ser HH:mm:ss',
   })
   closeTime?: string;
+
+  @ApiProperty({
+    example: [PaymentMethod.MERCADO_PAGO, PaymentMethod.CASH],
+    description: 'Métodos de pago habilitados por el comercio',
+    enum: PaymentMethod,
+    isArray: true,
+  })
+  @IsEnum(PaymentMethod, { each: true, message: 'Método de pago no válido' })
+  acceptedPaymentMethods?: PaymentMethod[];
 }
 

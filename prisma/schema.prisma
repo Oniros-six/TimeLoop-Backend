@@ -94,6 +94,13 @@ enum InvoiceStatus {
   PAID
 }
 
+enum PaymentMethod {
+  MERCADO_PAGO
+  CASH
+  // PAYPAL
+  // STRIPE
+  // BANK_TRANSFER
+}
 
 // =========================================
 // Core
@@ -195,13 +202,15 @@ model BookingService {
 // =========================================
 
 model CommerceConfig {
-  id                      Int      @id @default(autoincrement())
-  commerceId              Int      @unique
+  id                          Int             @id @default(autoincrement())
+  commerceId                  Int             @unique
   cancellationDeadlineMinutes Int
-  openTime                String
-  closeTime               String
-  welcomeMessage          String
-  commerce                Commerce @relation("CommerceConfig", fields: [commerceId], references: [id])
+  openTime                    String
+  closeTime                   String
+  welcomeMessage              String
+  acceptedPaymentMethods      PaymentMethod[]
+
+  commerce Commerce @relation("CommerceConfig", fields: [commerceId], references: [id])
 
   @@map("commerce_configs")
 }
@@ -336,7 +345,7 @@ model Invoice {
   periodStart DateTime
   periodEnd   DateTime
 
-  totalBookings  Int @default(0)
+  totalBookings Int @default(0)
   totalCanceled Int @default(0)
 
   totalIncome Float @default(0.0) // ingreso bruto
