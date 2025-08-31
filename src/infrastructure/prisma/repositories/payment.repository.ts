@@ -19,7 +19,7 @@ export class PrismaPaymentRepository implements IPaymentRepository {
         status: PaymentStatus;
         method: PaymentMethod;
         createdAt: Date;
-        updatedAt: Date;
+        updatedAt: Date | null;
         providerRef: string | null;
         refundedAt: Date | null;
     }): DomainClient {
@@ -57,14 +57,21 @@ export class PrismaPaymentRepository implements IPaymentRepository {
     }
 
     async findById(id: number): Promise<DomainClient | null> {
-        return this.prisma.payment.findUnique({ where: { id } });
+        const pay = await this.prisma.payment.findUnique({ where: { id } });
+
+        if (!pay) return null;
+        return this.toDomain(pay)
     }
 
     async findByBookingId(bookingId: number): Promise<DomainClient[]> {
-        return this.prisma.payment.findMany({ where: { bookingId } });
+        const pay = await this.prisma.payment.findMany({ where: { bookingId } });
+        
+        return pay.map((p) => this.toDomain(p));
     }
 
     async updateStatus(id: number, status: PaymentStatus): Promise<DomainClient> {
-        return this.prisma.payment.update({ where: { id }, data: { status } });
+        const pay = await this.prisma.payment.update({ where: { id }, data: { status } });
+
+        return this.toDomain(pay)
     }
 }
