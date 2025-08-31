@@ -18,7 +18,6 @@ enum BusinessCategory {
   EntrenamientoPersonal
   Spa
   Fotografia
-  Tatuajes
   Otros
 }
 
@@ -59,6 +58,7 @@ enum EntityType {
   USER_WORKING_PATTERN
   COMMERCE_WORKING_PATTERN
   INVOICE
+  PAYMENT
 }
 
 enum ChangeType {
@@ -102,17 +102,31 @@ enum PaymentMethod {
   // BANK_TRANSFER
 }
 
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  FAILED
+  REFUNDED
+}
+
+enum Currency {
+  UYU
+  USD
+  EUR
+}
+
 // =========================================
 // Core
 // =========================================
 model Commerce {
-  id               Int                       @id @default(autoincrement())
+  id               Int              @id @default(autoincrement())
   name             String
-  email            String                    @unique
-  phone            String                    @unique
+  email            String           @unique
+  phone            String           @unique
   address          String
   businessCategory BusinessCategory
   active           Boolean
+
   logs             ActivityLog[]             @relation("CommerceLogs")
   bookings         Booking[]                 @relation("CommerceBookings")
   config           CommerceConfig?           @relation("CommerceConfig")
@@ -122,6 +136,7 @@ model Commerce {
   services         Service[]                 @relation("CommerceServices")
   users            User[]                    @relation("CommerceUsers")
   Invoice          Invoice[]
+  Payment          Payment[]
 
   @@map("commerces")
 }
@@ -157,20 +172,22 @@ model User {
 }
 
 model Booking {
-  id              Int              @id @default(autoincrement())
-  duration        Int
-  customerId      Int
-  commerceId      Int
-  userId          Int
-  totalPrice      Float
-  notes           String
-  status          BookingStatus
-  timeEnd         DateTime
-  timeStart       DateTime
+  id         Int           @id @default(autoincrement())
+  duration   Int
+  customerId Int
+  commerceId Int
+  userId     Int
+  totalPrice Float
+  notes      String
+  status     BookingStatus
+  timeEnd    DateTime
+  timeStart  DateTime
+
   bookingServices BookingService[]
   commerce        Commerce         @relation("CommerceBookings", fields: [commerceId], references: [id])
   customer        Customer         @relation("CustomerBookings", fields: [customerId], references: [id])
   user            User             @relation("UserBookings", fields: [userId], references: [id])
+  Payment         Payment[]
 
   @@map("bookings")
 }
@@ -360,4 +377,27 @@ model Invoice {
   commerce Commerce @relation(fields: [commerceId], references: [id])
 
   @@index([commerceId, periodStart, periodEnd])
+}
+
+// =========================================
+// Payment
+// =========================================
+model Payment {
+  id          Int           @id @default(autoincrement())
+  bookingId   Int
+  commerceId  Int
+  amount      Float
+  currency    Currency      @default(UYU)
+  status      PaymentStatus @default(PENDING)
+  method      PaymentMethod
+  providerRef String? // referencia de MercadoPago u otro proveedor
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime?      @updatedAt
+  refundedAt  DateTime?
+
+  Commerce Commerce @relation(fields: [commerceId], references: [id])
+  Booking  Booking  @relation(fields: [bookingId], references: [id])
+
+  @@index([bookingId])
+  @@index([commerceId])
 }

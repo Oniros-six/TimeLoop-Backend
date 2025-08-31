@@ -15,6 +15,7 @@ import { PrismaCommerceWorkingOverrideRepository } from './repositories/commerce
 import { PrismaReminderRepository } from './repositories/reminder.repository';
 import { PrismaBookingHistoryRepository } from './repositories/bookingHistory.repository';
 import { PrismaInvoiceRepository } from './repositories/invoice.repository';
+import { PrismaPaymentRepository } from './repositories/payment.repository';
 
 @Global()
 @Module({
@@ -80,7 +81,12 @@ import { PrismaInvoiceRepository } from './repositories/invoice.repository';
       provide: 'IInvoiceRepository',
       useClass: PrismaInvoiceRepository,
     },
+    {
+      provide: 'IPaymentRepository',
+      useClass: PrismaPaymentRepository,
+    },
   ],
+
   exports: [
     PrismaService,
     'ICustomerRepository',
@@ -97,7 +103,8 @@ import { PrismaInvoiceRepository } from './repositories/invoice.repository';
     'ICommerceWorkingOverrideRepository',
     'IReminderRepository',
     'IBookingHistoryRepository',
-    'IInvoiceRepository'
+    'IInvoiceRepository',
+    'IPaymentRepository'
   ],
 })
 export class PrismaModule { }
