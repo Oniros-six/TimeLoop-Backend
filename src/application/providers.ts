@@ -17,4 +17,5 @@ export const REMINDER_REPOSITORY = 'IReminderRepository';
 export const BOOKING_HISTORY_REPOSITORY = 'IBookingHistoryRepository';
 export const INVOICE_REPOSITORY = 'IInvoiceRepository';
 export const PAYMENT_REPOSITORY = 'IPaymentRepository';
+export const MERCADO_PAGO_REPOSITORY = 'IMercadoPagoRepository';
 export const RESEND_PROVIDER = 'RESEND_PROVIDER';

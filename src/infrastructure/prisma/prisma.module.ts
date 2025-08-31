@@ -16,6 +16,7 @@ import { PrismaReminderRepository } from './repositories/reminder.repository';
 import { PrismaBookingHistoryRepository } from './repositories/bookingHistory.repository';
 import { PrismaInvoiceRepository } from './repositories/invoice.repository';
 import { PrismaPaymentRepository } from './repositories/payment.repository';
+import { PrismaMercadoPagoRepository } from './repositories/mercadoPago.repository';
 
 @Global()
 @Module({
@@ -85,6 +86,10 @@ import { PrismaPaymentRepository } from './repositories/payment.repository';
       provide: 'IPaymentRepository',
       useClass: PrismaPaymentRepository,
     },
+    {
+      provide: 'IMercadoPagoRepository',
+      useClass: PrismaMercadoPagoRepository,
+    },
   ],
 
   exports: [
@@ -104,7 +109,8 @@ import { PrismaPaymentRepository } from './repositories/payment.repository';
     'IReminderRepository',
     'IBookingHistoryRepository',
     'IInvoiceRepository',
-    'IPaymentRepository'
+    'IPaymentRepository',
+    'IMercadoPagoRepository'
   ],
 })
 export class PrismaModule { }

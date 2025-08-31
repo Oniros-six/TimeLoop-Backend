@@ -20,6 +20,7 @@ import { AuthModule } from './interfaces/controllers/auth/auth.module';
 import { BookingHistoryModule } from './interfaces/controllers/bookingHistory/bookingHistory.module';
 import { InvoiceModule } from './interfaces/controllers/invoices/invoice.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MercadoPagoModule } from './interfaces/controllers/mercadoPago/mercadoPago.module';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     RemindersModule,
     AuthModule,
     BookingHistoryModule,
-    InvoiceModule
+    InvoiceModule,
+    MercadoPagoModule
   ],
 })
 export class AppModule {}

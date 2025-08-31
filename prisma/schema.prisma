@@ -401,3 +401,15 @@ model Payment {
   @@index([bookingId])
   @@index([commerceId])
 }
+
+model MercadoPago {
+  id           Int      @id @default(autoincrement())
+  commerceId   Int      @unique
+  accessToken  String
+  refreshToken String
+  publicKey    String?
+  mpUserId     String 
+  tokenExpires DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
