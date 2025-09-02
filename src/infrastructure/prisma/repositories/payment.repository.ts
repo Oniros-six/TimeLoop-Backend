@@ -63,14 +63,35 @@ export class PrismaPaymentRepository implements IPaymentRepository {
         return this.toDomain(pay)
     }
 
+    async findByProviderRef(ref: string): Promise<DomainClient> {
+        const pay = await this.prisma.payment.findFirstOrThrow({
+            where: { providerRef: ref },
+          });
+          
+          return this.toDomain(pay)
+    }
+
+
     async findByBookingId(bookingId: number): Promise<DomainClient[]> {
         const pay = await this.prisma.payment.findMany({ where: { bookingId } });
-        
+
         return pay.map((p) => this.toDomain(p));
     }
 
     async updateStatus(id: number, status: PaymentStatus): Promise<DomainClient> {
         const pay = await this.prisma.payment.update({ where: { id }, data: { status } });
+
+        return this.toDomain(pay)
+    }
+
+    async update(id: number, { externalPaymentId, status }: { externalPaymentId: string | undefined; status: PaymentStatus; }): Promise<DomainClient> {
+        const pay = await this.prisma.payment.update({
+            where: { id },
+            data: {
+                providerRef: externalPaymentId,
+                status: status
+            }
+        });
 
         return this.toDomain(pay)
     }

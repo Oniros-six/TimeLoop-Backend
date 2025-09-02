@@ -5,6 +5,7 @@ import { Booking as DomainClient } from '@/domain/entities/booking.entity';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { BookingService } from '@/domain/entities/bookingService.entity';
+import { BookingDetail } from '@/domain/common/BookingDetail.type';
 
 @Injectable()
 export class PrismaBookingRepository implements IBookingRepository {
@@ -219,6 +220,22 @@ export class PrismaBookingRepository implements IBookingRepository {
 
     if (!result) return null;
     return this.toDomain(result);
+  }
+
+  async findBookingData(bookingId: number): Promise<BookingDetail> {
+    const result = await this.prisma.booking.findFirstOrThrow({
+      where: { id: bookingId },
+      include: {
+        commerce: true,
+        customer: true, // Para traer datos del cliente
+      },
+    });
+
+    return {
+      id: result.id,
+      customer: result.customer,
+      commerce: result.commerce,
+    };
   }
 
   async cancelSchedule(data: { id: number }): Promise<DomainClient | null> {

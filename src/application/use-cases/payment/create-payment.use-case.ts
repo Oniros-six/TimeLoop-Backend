@@ -34,7 +34,7 @@ export class CreatePayment {
         }
 
         const previousPayment = await this.paymentRepository.findByBookingId(booking.id)
-        const hasApproved = previousPayment.some(p => p.status === PaymentStatus.APPROVED);
+        const hasApproved = previousPayment.some(p => p.status === PaymentStatus.approved);
 
         if(hasApproved){
             return {
@@ -48,7 +48,7 @@ export class CreatePayment {
             commerceId: booking.commerceId,
             amount: booking.totalPrice,
             currency: data.currency,
-            status: PaymentStatus.PENDING,
+            status: PaymentStatus.pending,
             method: data.paymentProvider,
             createdAt: new Date(),
             updatedAt: null,

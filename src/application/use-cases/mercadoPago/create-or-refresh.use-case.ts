@@ -1,7 +1,7 @@
 import { MERCADO_PAGO_REPOSITORY } from '@/application/providers';
 import { MercadoPago } from '@/domain/entities/mercadoPago.entity';
 import { IMercadoPagoRepository } from '@/domain/repositories/mercadoPago.repository';
-import { exchangeCodeForTokens } from '@/domain/services/mercadoPago/mercadoPago.service'
+import { MercadoPagoService } from '@/domain/services/mercadoPago/mercadoPago.service'
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -9,6 +9,8 @@ export class CreateOrRefresh {
     constructor(
         @Inject(MERCADO_PAGO_REPOSITORY)
         private readonly mercadoPagoRepository: IMercadoPagoRepository,
+
+        private readonly mercadoPagoService: MercadoPagoService,
     ) { }
 
     async execute(data: { commerceId: number, code: string }) {
@@ -17,7 +19,7 @@ export class CreateOrRefresh {
             const existing = await this.mercadoPagoRepository.findByCommerceId(data.commerceId);
 
             //* Obtenemos los tokens de MercadoPago
-            const token = await exchangeCodeForTokens(data.commerceId, data.code);
+            const token = await this.mercadoPagoService.exchangeCodeForTokens(data.commerceId, data.code);
 
             let result: MercadoPago;
             if (existing) {

@@ -1,3 +1,4 @@
+import { BookingDetail } from '../common/BookingDetail.type';
 import { BookingUpdateData } from '../common/BookingUpdateData';
 import { Booking } from '../entities/booking.entity';
 
@@ -45,4 +46,6 @@ export interface IBookingRepository {
 
   //* General use
   findOne(data: { id: number }): Promise<Booking | null>;
+
+  findBookingData(bookingId: number): Promise<BookingDetail>;
 }

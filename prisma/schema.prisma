@@ -103,10 +103,10 @@ enum PaymentMethod {
 }
 
 enum PaymentStatus {
-  PENDING
-  APPROVED
-  FAILED
-  REFUNDED
+  pending
+  approved
+  rejected
+  refunded
 }
 
 enum Currency {
@@ -388,7 +388,7 @@ model Payment {
   commerceId  Int
   amount      Float
   currency    Currency      @default(UYU)
-  status      PaymentStatus @default(PENDING)
+  status      PaymentStatus @default(pending)
   method      PaymentMethod
   providerRef String? // referencia de MercadoPago u otro proveedor
   createdAt   DateTime      @default(now())

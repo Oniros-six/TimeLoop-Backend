@@ -1,29 +1,78 @@
 import { MercadoPago } from "@/domain/entities/mercadoPago.entity";
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
-export async function exchangeCodeForTokens(commerceId: number, code: string) {
-    const response = await fetch('https://api.mercadopago.com/oauth/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            client_secret: process.env.MP_CLIENT_SECRET,
-            grant_type: 'authorization_code',
-            code,
-            redirect_uri: process.env.MP_REDIRECT_URI,
+@Injectable()
+export class MercadoPagoService {
+  constructor(private readonly httpService: HttpService) {}
+
+  async exchangeCodeForTokens(commerceId: number, code: string) {
+    try {
+      const url = 'https://api.mercadopago.com/oauth/token';
+
+      const response = await firstValueFrom(
+        this.httpService.post(url, {
+          client_secret: process.env.MP_CLIENT_SECRET,
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: process.env.MP_REDIRECT_URI,
+        }, {
+          headers: { 'Content-Type': 'application/json' },
         }),
-    });
+      );
 
-    if (!response.ok) throw new Error('Error al obtener tokens de MP');
+      const data = response.data;
 
-    const data = await response.json();
-
-    const tokenInstance = MercadoPago.createTokens({
+      const tokenInstance =  MercadoPago.createTokens({
         commerceId: commerceId,
         accessToken: data.access_token,
         refreshToken: data.refresh_token ?? null,
         publicKey: data.public_key ?? null,
         mpUserId: data.user_id,
         tokenExpires: new Date(Date.now() + data.expires_in * 1000),
-    });
+      });
+      return tokenInstance;
+    } catch (error) {
+      const message =
+        error?.response?.data?.message || error.message || 'Error al obtener tokens de MP';
+      throw new HttpException(message, HttpStatus.BAD_GATEWAY);
+    }
+  }
 
-    return tokenInstance;
+  async getPayment(paymentId: string, accessToken: string): Promise<any> {
+    try {
+      const url = `https://api.mercadopago.com/v1/payments/${paymentId}`;
+
+      const response = await firstValueFrom(
+        this.httpService.get(url, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
+      );
+
+      return response.data;
+    } catch (error) {
+      const message =
+        error?.response?.data?.message || error.message || 'Error al consultar pago en MercadoPago';
+      throw new HttpException(message, HttpStatus.BAD_GATEWAY);
+    }
+  }
+
+  async getPreference(preferenceId: string, accessToken: string): Promise<any> {
+    try {
+      const url = `https://api.mercadopago.com/checkout/preferences/${preferenceId}`;
+
+      const response = await firstValueFrom(
+        this.httpService.get(url, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
+      );
+
+      return response.data;
+    } catch (error) {
+      const message =
+        error?.response?.data?.message || error.message || 'Error al consultar preference en MercadoPago';
+      throw new HttpException(message, HttpStatus.BAD_GATEWAY);
+    }
+  }
 }

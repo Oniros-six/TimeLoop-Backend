@@ -45,10 +45,9 @@ export class PrismaMercadoPagoRepository implements IMercadoPagoRepository {
         return this.toDomain(mp)
     }
 
-    async findByCommerceId(commerceId: number): Promise<DomainClient | null> {
-        const mp = await this.prisma.mercadoPago.findFirst({ where: { commerceId: commerceId } });
+    async findByCommerceId(commerceId: number): Promise<DomainClient> {
+        const mp = await this.prisma.mercadoPago.findFirstOrThrow({ where: { commerceId: commerceId } });
 
-        if (!mp) return null;
         return this.toDomain(mp);
     }
 
