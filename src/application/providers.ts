@@ -19,3 +19,4 @@ export const INVOICE_REPOSITORY = 'IInvoiceRepository';
 export const PAYMENT_REPOSITORY = 'IPaymentRepository';
 export const MERCADO_PAGO_REPOSITORY = 'IMercadoPagoRepository';
 export const RESEND_PROVIDER = 'RESEND_PROVIDER';
+export const PAYMENT_PROVIDERS = 'PAYMENT_PROVIDERS';
