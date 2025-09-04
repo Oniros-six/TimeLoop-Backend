@@ -75,4 +75,34 @@ export class MercadoPagoService {
       throw new HttpException(message, HttpStatus.BAD_GATEWAY);
     }
   }
+
+  async refreshAccessToken(refreshToken: string) {
+    try {
+      const url = 'https://api.mercadopago.com/oauth/token';
+
+      const response = await firstValueFrom(
+        this.httpService.post(url, {
+          client_secret: process.env.MP_CLIENT_SECRET,
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        }, {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
+
+      const data = response.data;
+
+      return {
+        accessToken: data.access_token,
+        refreshToken: data.refresh_token ?? refreshToken, // Mantener el anterior si no hay uno nuevo
+        publicKey: data.public_key ?? null,
+        mpUserId: data.user_id,
+        tokenExpires: new Date(Date.now() + data.expires_in * 1000),
+      };
+    } catch (error) {
+      const message =
+        error?.response?.data?.message || error.message || 'Error al refrescar token de MP';
+      throw new HttpException(message, HttpStatus.BAD_GATEWAY);
+    }
+  }
 }

@@ -6,6 +6,7 @@ import { HttpModule } from '@nestjs/axios';
 // Use cases
 import { CreateOrRefresh } from '@/application/use-cases/mercadoPago/create-or-refresh.use-case';
 import { VerifyPayment } from '@/application/use-cases/mercadoPago/verify-payment.use-case';
+import { VerifyWebhook } from '@/application/use-cases/mercadoPago/verify-webhook.use-case';
 
 // Tokens
 import {
@@ -14,8 +15,11 @@ import {
     BOOKING_REPOSITORY
 } from '@/application/providers';
 
-// Repositories
+// Services
 import { MercadoPagoService } from '@/domain/services/mercadoPago/mercadoPago.service';
+import { TokenEncryptionService } from '@/infrastructure/payments/TokenEncryptationService';
+
+// Repositories
 import { PrismaMercadoPagoRepository } from '@/infrastructure/prisma/repositories/mercadoPago.repository';
 import { PrismaPaymentRepository } from '@/infrastructure/prisma/repositories/payment.repository';
 import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/booking.repository';
@@ -36,9 +40,11 @@ import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/bo
             provide: BOOKING_REPOSITORY,
             useClass: PrismaBookingRepository,
         },
+        TokenEncryptionService,
         MercadoPagoService,
         CreateOrRefresh,
-        VerifyPayment
+        VerifyPayment,
+        VerifyWebhook
     ],
 })
 export class MercadoPagoModule { }

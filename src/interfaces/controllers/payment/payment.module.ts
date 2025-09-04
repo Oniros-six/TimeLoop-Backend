@@ -47,10 +47,10 @@ import { PrismaMercadoPagoRepository } from '@/infrastructure/prisma/repositorie
         },
         {
             provide: PAYMENT_PROVIDERS,
-            useFactory: (mercadoPagoRepo, bookingRepo, paymentRepo, activityLog) => {
+            useFactory: (mercadoPagoRepo, bookingRepo, paymentRepo) => {
                 const providers = new Map<PaymentMethod, IPaymentProvider>();
                 providers.set(PaymentMethod.MERCADO_PAGO, new MercadoPagoProvider(
-                    mercadoPagoRepo, bookingRepo, paymentRepo, activityLog
+                    mercadoPagoRepo, bookingRepo, paymentRepo
                 ));
                 providers.set(PaymentMethod.CASH, new CashProvider());
                 return providers;

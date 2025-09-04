@@ -7,17 +7,18 @@ import {
     Post,
     Query,
     Req,
+    Headers,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateOrRefresh } from '@/application/use-cases/mercadoPago/create-or-refresh.use-case'
-import { VerifyPayment } from '@/application/use-cases/mercadoPago/verify-payment.use-case'
+import { VerifyWebhook } from '@/application/use-cases/mercadoPago/verify-webhook.use-case'
 
 @ApiTags('Mercado pago')
 @Controller('mercadopago')
 export class MercadoPagoController {
     constructor(
         private readonly createOrRefreshUseCase: CreateOrRefresh,
-        private readonly verifyPaymentUseCase: VerifyPayment
+        private readonly verifyWebhookUseCase: VerifyWebhook
     ) { }
 
     @ApiOperation({ summary: 'Callback de OAuth de MercadoPago' })
@@ -46,23 +47,16 @@ export class MercadoPagoController {
         }
     }
 
-    @ApiOperation({ summary: 'Webhook de MercadoPago' })
+    @ApiOperation({ summary: 'Webhook de MercadoPago (validado)' })
     @Post()
-    async mercadopagoWebhook(@Body() body: any) {
+    async mercadopagoWebhook(
+        @Body() body: any,
+        @Headers() headers: any
+    ) {
         try {
-            const { type, data } = body;
-
-            if (type === 'payment' && data?.id) {
-                const paymentId = data.id;
-
-                await this.verifyPaymentUseCase.execute(paymentId);
-                return { received: true };
-            }
-
-            return { received: true };
+            return await this.verifyWebhookUseCase.execute(body, headers);
         } catch (err: unknown) {
-            const message =
-                err instanceof Error ? err.message : 'Error desconocido';
+            const message = err instanceof Error ? err.message : 'Error desconocido';
             throw new HttpException(
                 `Error procesando webhook: ${message}`,
                 HttpStatus.INTERNAL_SERVER_ERROR,

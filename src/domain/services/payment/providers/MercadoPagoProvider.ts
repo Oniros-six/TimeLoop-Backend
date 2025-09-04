@@ -4,11 +4,10 @@ import { Injectable, Inject } from "@nestjs/common";
 import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus";
 import { RefundResponse } from "mercadopago/dist/clients/paymentRefund/commonTypes";
 import { MercadoPagoConfig, PaymentRefund, Preference } from 'mercadopago';
-import { MERCADO_PAGO_REPOSITORY, BOOKING_REPOSITORY, PAYMENT_REPOSITORY } from "@/application/providers";
+import { MERCADO_PAGO_REPOSITORY, BOOKING_REPOSITORY } from "@/application/providers";
 import { IMercadoPagoRepository } from "@/domain/repositories/mercadoPago.repository";
 import { IBookingRepository } from "@/domain/repositories/booking.repository";
-import { ActivityLogService } from "../../activityLog/activity-log.service";
-import { IPaymentRepository } from "@/domain/repositories/payment.repository";
+import { TokenValidationService } from "@/domain/services/mercadoPago/TokenValidationService";
 
 @Injectable()
 export class MercadoPagoProvider implements IPaymentProvider {
@@ -18,24 +17,20 @@ export class MercadoPagoProvider implements IPaymentProvider {
 
         @Inject(BOOKING_REPOSITORY)
         private readonly bookingRepository: IBookingRepository,
-
-        @Inject(PAYMENT_REPOSITORY)
-        private readonly paymentRepository: IPaymentRepository,
-
-        private readonly activityLogService: ActivityLogService,
+        private readonly tokenValidationService: TokenValidationService,
     ) { }
 
     async processPayment(payment: Payment): Promise<PaymentResult> {
         try {
-            // 1. Obtener credenciales del comercio
-            const credentials = await this.mercadoPagoRepository.findByCommerceId(payment.commerceId);
+            // 1. Validar y refrescar token si es necesario
+            const accessToken = await this.tokenValidationService.validateAndRefreshToken(payment.commerceId);
 
             // 2. Obtener datos del booking
             const bookingData = await this.bookingRepository.findBookingData(payment.bookingId);
 
             // 3. Crear cliente de MercadoPago
             const client = new MercadoPagoConfig({
-                accessToken: credentials.accessToken
+                accessToken: accessToken
             });
 
             const preference = new Preference(client);
@@ -99,10 +94,10 @@ export class MercadoPagoProvider implements IPaymentProvider {
             }
 
             // 2. Crear cliente de MercadoPago
-            const client = new MercadoPagoConfig({ 
-                accessToken: credentials.accessToken 
+            const client = new MercadoPagoConfig({
+                accessToken: credentials.accessToken
             });
-            
+
             const paymentRefund = new PaymentRefund(client);
 
             // 3. Procesar reembolso en MercadoPago
