@@ -1,12 +1,13 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { IPaymentRepository } from '@/domain/repositories/payment.repository';
-import { CreatePaymentDto } from '@/interfaces/controllers/payment/dto/create-payment.dto';
-import { Payment as PaymentDomain } from '@/domain/entities/payment.entity';
 import { BOOKING_REPOSITORY, PAYMENT_REPOSITORY } from '@/application/providers';
-import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus';
+import { Payment as PaymentDomain } from '@/domain/entities/payment.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
-import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus'
+import { IPaymentRepository } from '@/domain/repositories/payment.repository';
+import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
+import { PaymentOrchestratorService } from '@/domain/services/payment/PaymentOrchestratorService';
+import { CreatePaymentDto } from '@/interfaces/controllers/payment/dto/create-payment.dto';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CreatePayment {
@@ -16,6 +17,8 @@ export class CreatePayment {
 
         @Inject(BOOKING_REPOSITORY)
         private readonly bookingRepository: IBookingRepository,
+
+        private readonly paymentOrchestrator: PaymentOrchestratorService,
 
         private readonly activityLogService: ActivityLogService,
     ) { }
@@ -36,7 +39,7 @@ export class CreatePayment {
         const previousPayment = await this.paymentRepository.findByBookingId(booking.id)
         const hasApproved = previousPayment.some(p => p.status === PaymentStatus.approved);
 
-        if(hasApproved){
+        if (hasApproved) {
             return {
                 message: 'Esta reserva ya fue paga',
                 statusCode: HttpStatus.CONFLICT,
@@ -66,6 +69,16 @@ export class CreatePayment {
                 };
             }
 
+            //* Derivar al proveedor específico
+            const paymentResult = await this.paymentOrchestrator.processPaymentWithProvider(savedPayment);
+
+            if (paymentResult.providerRef) {
+                await this.paymentRepository.update(savedPayment.id, {
+                    externalPaymentId: paymentResult.providerRef,
+                    status: paymentResult.status
+                });
+            }
+
             await this.activityLogService.created({
                 entityType: EntityType.PAYMENT,
                 entityId: savedPayment.id,
@@ -76,9 +89,8 @@ export class CreatePayment {
             });
 
             return {
-                message: 'Pago registrado con exito',
-                statusCode: HttpStatus.OK,
-                data: savedPayment,
+                message: 'Pago procesado exitosamente',
+                data: { payment: savedPayment, paymentResult }
             };
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : 'Error desconocido';
