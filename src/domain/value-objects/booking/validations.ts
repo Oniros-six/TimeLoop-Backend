@@ -10,7 +10,10 @@ export function addMinutesToTime(dateTime: Date, minutes: number): Date {
 export function ensureNotPast(date: Date): Date {
   const now = new Date();
   if (date < now) {
-    throw new HttpException('La fecha/hora está en el pasado', HttpStatus.BAD_REQUEST);
+    throw new HttpException(
+      'La fecha/hora está en el pasado',
+      HttpStatus.BAD_REQUEST,
+    );
   }
   return date;
 }

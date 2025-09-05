@@ -7,14 +7,8 @@ import { UserConfig as DomainClient } from '@/domain/entities/userConfig.entity'
 export class PrismaUserConfigRepository implements IUserConfigRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  private toDomain(user: {
-    id: number;
-    userId: number;
-  }): DomainClient {
-    return new DomainClient(
-      user.id,
-      user.userId,
-    );
+  private toDomain(user: { id: number; userId: number }): DomainClient {
+    return new DomainClient(user.id, user.userId);
   }
 
   async findUserConfig(data: { userId: number }): Promise<DomainClient | null> {

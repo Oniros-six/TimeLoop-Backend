@@ -1,4 +1,10 @@
-import { BOOKING_HISTORY_REPOSITORY, BOOKING_REPOSITORY, COMMERCE_CONFIG_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
+import {
+  BOOKING_HISTORY_REPOSITORY,
+  BOOKING_REPOSITORY,
+  COMMERCE_CONFIG_REPOSITORY,
+  SERVICE_REPOSITORY,
+  USER_REPOSITORY,
+} from '@/application/providers';
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
 import { BookingHistoryUpdateData } from '@/domain/common/BookingHistoryUpdateData';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
@@ -10,7 +16,6 @@ import {
 import { BookingService } from '@/domain/entities/bookingService.entity';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { Service } from '@/domain/entities/service.entity';
-import { User } from '@/domain/entities/user.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { IBookingHistoryRepository } from '@/domain/repositories/bookingHistory.repository';
 import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.repository';
@@ -19,7 +24,10 @@ import { IUserRepository } from '@/domain/repositories/user.repository';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
 import { RemindersService } from '@/domain/services/reminders/reminders.service';
-import { addMinutesToTime, ensureNotPast } from '@/domain/value-objects/booking/validations';
+import {
+  addMinutesToTime,
+  ensureNotPast,
+} from '@/domain/value-objects/booking/validations';
 import { UpdateBookingDto } from '@/interfaces/controllers/booking/dto/update-booking.dto';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -45,16 +53,15 @@ export class UpdateBooking {
     private readonly activityLogService: ActivityLogService,
     private readonly eventEmitter: EventEmitter2,
     private readonly remindersService: RemindersService,
-  ) { }
+  ) {}
 
   async execute(id: number, newData: UpdateBookingDto) {
-
     //* 1) Cargar booking y autorizar
     const booking = await this.bookingRepository.findOne({ id });
     if (
       !booking || // Se valida que exista
       booking.commerceId !== newData.commerceId || // Se valida que el comercio sea el mismo donde se realizo la reserva
-      booking.customerId !== newData.customerId  // Se valida que el usuario que pide, sea el mismo que realizo la reserva
+      booking.customerId !== newData.customerId // Se valida que el usuario que pide, sea el mismo que realizo la reserva
     ) {
       throw new HttpException(
         'No autorizado o reserva no encontrada',
@@ -63,7 +70,10 @@ export class UpdateBooking {
     }
 
     // Se valida que sea reagendable
-    const commerceConfig = await this.commerceConfigRepository.findCommerceConfig({ commerceId: booking.commerceId })
+    const commerceConfig =
+      await this.commerceConfigRepository.findCommerceConfig({
+        commerceId: booking.commerceId,
+      });
 
     if (!booking.canBeRescheduled(commerceConfig.cancellationDeadlineMinutes)) {
       throw new HttpException(
@@ -92,7 +102,9 @@ export class UpdateBooking {
       nextServices = services;
     } else {
       // Mantenemos los servicios actuales del booking
-      const currentServiceIds = booking.bookingServices.map(bs => bs.serviceId);
+      const currentServiceIds = booking.bookingServices.map(
+        (bs) => bs.serviceId,
+      );
       const services = await this.serviceRepository.findServices({
         serviceIds: currentServiceIds,
         commerceId: booking.commerceId,
@@ -101,27 +113,31 @@ export class UpdateBooking {
       nextServices = services;
     }
 
-
     //* 3) Definir el nuevo usuario (o dejar el que ya estaba)
     const userIdToCheck = newData.userId ?? booking.userId;
     const nextUser = await this.userRepository.findUserByCommerce({
       userId: userIdToCheck,
       commerceId: newData.commerceId,
     });
-    if (!nextUser) throw new HttpException('El usuario no existe o no pertenece al comercio', HttpStatus.NOT_FOUND);
-
+    if (!nextUser)
+      throw new HttpException(
+        'El usuario no existe o no pertenece al comercio',
+        HttpStatus.NOT_FOUND,
+      );
 
     //* 4) Determinar fecha y hora de inicio y fin
-    const nextTimeStart = newData.timeStart ? ensureNotPast(newData.timeStart) : booking.timeStart;
+    const nextTimeStart = newData.timeStart
+      ? ensureNotPast(newData.timeStart)
+      : booking.timeStart;
 
-    const totalDuration = booking.calcServicesDuration(nextServices)
-    const totalPrice = booking.calcTotalPrice(nextServices)
+    const totalDuration = booking.calcServicesDuration(nextServices);
+    const totalPrice = booking.calcTotalPrice(nextServices);
     const nextTimeEnd = addMinutesToTime(nextTimeStart, totalDuration);
 
     //* 5) Construir diff (solo campos que realmente cambian)
     const dataToUpdate: BookingUpdateData = {
-      serviceIds: nextServices.map(service =>
-        new BookingService(booking.id, service.id)
+      serviceIds: nextServices.map(
+        (service) => new BookingService(booking.id, service.id),
       ),
       totalPrice: totalPrice,
       duration: totalDuration,
@@ -129,7 +145,6 @@ export class UpdateBooking {
       timeStart: nextTimeStart,
       timeEnd: nextTimeEnd,
     };
-
 
     if (newData.notes !== undefined && newData.notes !== booking.notes) {
       dataToUpdate.notes = newData.notes;
@@ -145,8 +160,10 @@ export class UpdateBooking {
     }
 
     //* 7) Chequeo de solapamiento (si cambió fecha, hora o servicio)
-    if (nextTimeStart.getTime() !== booking.timeStart.getTime() ||
-      nextTimeEnd.getTime() !== booking.timeEnd.getTime()) {
+    if (
+      nextTimeStart.getTime() !== booking.timeStart.getTime() ||
+      nextTimeEnd.getTime() !== booking.timeEnd.getTime()
+    ) {
       const overlapping = await this.bookingRepository.findOverlapping({
         id, // id de la reserva actual para excluirla si es necesario
         commerceId: newData.commerceId,
@@ -160,7 +177,10 @@ export class UpdateBooking {
     }
 
     //* 8) Persistencia + efectos laterales
-    const result = await this.bookingRepository.updateSchedule({ id, dataToUpdate });
+    const result = await this.bookingRepository.updateSchedule({
+      id,
+      dataToUpdate,
+    });
     if (result === null) {
       throw new HttpException(
         'Error al actualizar la reserva, intenta de nuevo en unos minutos.',
@@ -176,10 +196,12 @@ export class UpdateBooking {
       durationAtBooking: result.duration,
       userId: result.userId,
       notes: result.notes,
-    }
+    };
 
-    await this.bookingHistoryRepository.update({ id: result.id, history: history })
-
+    await this.bookingHistoryRepository.update({
+      id: result.id,
+      history: history,
+    });
 
     //* 10) Crear el activity log
     const updatedFields = Object.keys(dataToUpdate).join(', ');

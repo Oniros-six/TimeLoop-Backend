@@ -19,7 +19,7 @@ import {
   BOOKING_REPOSITORY,
   COMMERCE_CONFIG_REPOSITORY,
   SERVICE_REPOSITORY,
-  USER_REPOSITORY
+  USER_REPOSITORY,
 } from '@/application/providers';
 
 // Repositories
@@ -62,7 +62,7 @@ import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/reposito
     FindAllByCommerce,
     FindAllByUser,
     CancelBooking,
-    FindCommerceConfig
+    FindCommerceConfig,
   ],
 })
 export class BookingModule {}

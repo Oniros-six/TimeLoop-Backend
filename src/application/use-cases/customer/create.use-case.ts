@@ -13,7 +13,7 @@ export class CreateCustomer {
     private readonly customerRepository: ICustomerRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(data: CreateCustomerDto) {
     const found = await this.customerRepository.findCustomerByEmail({

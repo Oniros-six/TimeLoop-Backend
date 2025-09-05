@@ -13,10 +13,10 @@ import { GetPaymentsByBooking } from '@/application/use-cases/payment/get-paymen
 
 // Tokens
 import {
-    BOOKING_REPOSITORY,
-    MERCADO_PAGO_REPOSITORY,
-    PAYMENT_PROVIDERS,
-    PAYMENT_REPOSITORY
+  BOOKING_REPOSITORY,
+  MERCADO_PAGO_REPOSITORY,
+  PAYMENT_PROVIDERS,
+  PAYMENT_REPOSITORY,
 } from '@/application/providers';
 
 // Providers
@@ -30,39 +30,40 @@ import { ProcessRefunds } from '@/application/use-cases/payment/process-refunds.
 import { PrismaMercadoPagoRepository } from '@/infrastructure/prisma/repositories/mercadoPago.repository';
 
 @Module({
-    imports: [PrismaModule],
-    controllers: [PaymentsController],
-    providers: [
-        {
-            provide: PAYMENT_REPOSITORY,
-            useClass: PrismaPaymentRepository,
-        },
-        {
-            provide: BOOKING_REPOSITORY,
-            useClass: PrismaBookingRepository,
-        },
-        {
-            provide: MERCADO_PAGO_REPOSITORY,
-            useClass: PrismaMercadoPagoRepository,
-        },
-        {
-            provide: PAYMENT_PROVIDERS,
-            useFactory: (mercadoPagoRepo, bookingRepo, paymentRepo) => {
-                const providers = new Map<PaymentMethod, IPaymentProvider>();
-                providers.set(PaymentMethod.MERCADO_PAGO, new MercadoPagoProvider(
-                    mercadoPagoRepo, bookingRepo, paymentRepo
-                ));
-                providers.set(PaymentMethod.CASH, new CashProvider());
-                return providers;
-            },
-            inject: [MERCADO_PAGO_REPOSITORY, BOOKING_REPOSITORY, PAYMENT_REPOSITORY]
-        },
-        PaymentLogger,
-        PaymentSecurityValidator,
-        PaymentOrchestratorService,
-        CreatePayment,
-        GetPaymentsByBooking,
-        ProcessRefunds
-    ],
+  imports: [PrismaModule],
+  controllers: [PaymentsController],
+  providers: [
+    {
+      provide: PAYMENT_REPOSITORY,
+      useClass: PrismaPaymentRepository,
+    },
+    {
+      provide: BOOKING_REPOSITORY,
+      useClass: PrismaBookingRepository,
+    },
+    {
+      provide: MERCADO_PAGO_REPOSITORY,
+      useClass: PrismaMercadoPagoRepository,
+    },
+    {
+      provide: PAYMENT_PROVIDERS,
+      useFactory: (mercadoPagoRepo, bookingRepo, paymentRepo) => {
+        const providers = new Map<PaymentMethod, IPaymentProvider>();
+        providers.set(
+          PaymentMethod.MERCADO_PAGO,
+          new MercadoPagoProvider(mercadoPagoRepo, bookingRepo, paymentRepo),
+        );
+        providers.set(PaymentMethod.CASH, new CashProvider());
+        return providers;
+      },
+      inject: [MERCADO_PAGO_REPOSITORY, BOOKING_REPOSITORY, PAYMENT_REPOSITORY],
+    },
+    PaymentLogger,
+    PaymentSecurityValidator,
+    PaymentOrchestratorService,
+    CreatePayment,
+    GetPaymentsByBooking,
+    ProcessRefunds,
+  ],
 })
-export class PaymentModule { }
+export class PaymentModule {}

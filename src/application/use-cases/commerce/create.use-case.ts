@@ -13,10 +13,9 @@ export class CreateCommerce {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(data: CreateCommerceDto) {
-
     // Validacion de name existente
     if (await this.commerceRepository.findCommerceByName({ name: data.name })) {
       throw new HttpException(
@@ -26,7 +25,9 @@ export class CreateCommerce {
     }
 
     // Validacion de email existente
-    if (await this.commerceRepository.findCommerceByEmail({ email: data.email })) {
+    if (
+      await this.commerceRepository.findCommerceByEmail({ email: data.email })
+    ) {
       throw new HttpException(
         'Ya existe un comercio con este email.',
         HttpStatus.BAD_REQUEST,
@@ -34,7 +35,9 @@ export class CreateCommerce {
     }
 
     // Validacion de phone existente
-    if (await this.commerceRepository.findCommerceByPhone({ phone: data.phone })) {
+    if (
+      await this.commerceRepository.findCommerceByPhone({ phone: data.phone })
+    ) {
       throw new HttpException(
         'Ya existe un comercio con este número de telefono.',
         HttpStatus.BAD_REQUEST,

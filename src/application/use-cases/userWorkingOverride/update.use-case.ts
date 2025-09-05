@@ -14,7 +14,7 @@ export class UpdateUserWorkingOverride {
     @Inject(USER_WORKING_OVERRIDE_REPOSITORY)
     private readonly userWorkingOverrideRepository: IUserWorkingOverrideRepository,
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(id: number, data: UpdateUserOverrideDto) {
     const existingOverride =
@@ -34,8 +34,8 @@ export class UpdateUserWorkingOverride {
       morningStart: data.morningStart,
       morningEnd: data.morningEnd,
       afternoonStart: data.afternoonStart,
-      afternoonEnd: data.afternoonEnd
-    })
+      afternoonEnd: data.afternoonEnd,
+    });
 
     const userWorkingOverride = UserWorkingOverrideDomain.create({
       userId: existingOverride.userId,

@@ -12,10 +12,9 @@ export class UpdateCustomer {
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: ICustomerRepository,
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(id: number, data: UpdateCustomerDto) {
-
     // Validate customer existence
     const customer = await this.customerRepository.findCustomer({ id: id });
 
@@ -25,7 +24,9 @@ export class UpdateCustomer {
 
     // Validate customer email not in use
     if (data.email && data.email !== customer.email) {
-      const exists = await this.customerRepository.findCustomerByEmail({ email: data.email });
+      const exists = await this.customerRepository.findCustomerByEmail({
+        email: data.email,
+      });
 
       if (exists) {
         throw new HttpException(

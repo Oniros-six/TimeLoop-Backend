@@ -1,19 +1,19 @@
 // src/interfaces/controllers/payment/payment.controller.ts
-import { CreatePayment } from '@/application/use-cases/payment/create-payment.use-case'
-import { GetPaymentsByBooking } from '@/application/use-cases/payment/get-payments-by-booking.use-case'
-import { ProcessRefunds } from '@/application/use-cases/payment/process-refunds.use-case' // NUEVO
+import { CreatePayment } from '@/application/use-cases/payment/create-payment.use-case';
+import { GetPaymentsByBooking } from '@/application/use-cases/payment/get-payments-by-booking.use-case';
+import { ProcessRefunds } from '@/application/use-cases/payment/process-refunds.use-case'; // NUEVO
 
 import {
-    Body,
-    Controller,
-    Get,
-    Param,
-    ParseIntPipe,
-    Post,
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-import { ProcessRefundDto } from './dto/process-refund.dto'; 
+import { ProcessRefundDto } from './dto/process-refund.dto';
 
 @ApiTags('Payments')
 @Controller('payment')

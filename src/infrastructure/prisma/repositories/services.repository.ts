@@ -6,7 +6,7 @@ import { ServiceUpdateData } from '@/domain/common/ServiceUpdateData';
 
 @Injectable()
 export class PrismaServicesRepository implements IServiceRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private toDomain(service: {
     id: number;

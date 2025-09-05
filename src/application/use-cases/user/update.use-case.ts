@@ -16,7 +16,7 @@ export class UpdateUser {
     private readonly activityLogService: ActivityLogService,
 
     private readonly authService: AuthService,
-  ) { }
+  ) {}
 
   async execute(id: number, data: UpdateUserDto) {
     const user = await this.userRepository.findUser({

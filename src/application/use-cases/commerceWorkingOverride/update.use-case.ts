@@ -17,7 +17,10 @@ export class UpdateCommerceWorkingOverride {
   ) {}
 
   async execute(id: number, data: UpdateCommerceOverrideDto) {
-    const existingOverride = await this.commerceWorkingOverrideRepository.findCommerceWorkingOverrideById({id});
+    const existingOverride =
+      await this.commerceWorkingOverrideRepository.findCommerceWorkingOverrideById(
+        { id },
+      );
 
     if (!existingOverride) {
       throw new HttpException(
@@ -31,9 +34,9 @@ export class UpdateCommerceWorkingOverride {
       morningStart: data.morningStart,
       morningEnd: data.morningEnd,
       afternoonStart: data.afternoonStart,
-      afternoonEnd: data.afternoonEnd
-    })
-    
+      afternoonEnd: data.afternoonEnd,
+    });
+
     const commerceWorkingOverride = CommerceWorkingOverrideDomain.create({
       commerceId: existingOverride.commerceId,
       date: data.date ?? existingOverride.date,

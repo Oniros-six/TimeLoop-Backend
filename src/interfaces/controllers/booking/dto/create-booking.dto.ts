@@ -28,7 +28,11 @@ export class CreateBookingDto {
   @IsNotEmpty({ message: 'El empleado es requerido' })
   userId: number;
 
-  @ApiProperty({ description: 'IDs de servicios', example: [1, 3], required: true })
+  @ApiProperty({
+    description: 'IDs de servicios',
+    example: [1, 3],
+    required: true,
+  })
   @IsNumber({}, { each: true })
   serviceIds: number[];
 

@@ -1,7 +1,15 @@
 import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
-import { BOOKING_HISTORY_REPOSITORY, BOOKING_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
+import {
+  BOOKING_HISTORY_REPOSITORY,
+  BOOKING_REPOSITORY,
+  SERVICE_REPOSITORY,
+  USER_REPOSITORY,
+} from '@/application/providers';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
-import { ReminderChannel, ReminderStatus } from '@/domain/dbEnums/Reminder.enum';
+import {
+  ReminderChannel,
+  ReminderStatus,
+} from '@/domain/dbEnums/Reminder.enum';
 import { Booking } from '@/domain/entities/booking.entity';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
@@ -37,7 +45,7 @@ export class CreateBooking {
     private readonly remindersService: RemindersService,
 
     private readonly eventEmitter: EventEmitter2,
-  ) { }
+  ) {}
 
   async execute(data: CreateBookingDto) {
     //* 1) Validación de fecha y hora
@@ -119,10 +127,10 @@ export class CreateBooking {
       timeStart: result.timeStart,
       timeEnd: result.timeEnd,
       status: result.status,
-      notes: result.notes
-    })
+      notes: result.notes,
+    });
 
-    await this.bookingHistoryRepository.create(history)
+    await this.bookingHistoryRepository.create(history);
 
     //* 8) Crear recordatorio
     const reminder = Reminder.create({
@@ -137,9 +145,11 @@ export class CreateBooking {
 
     await this.remindersService.create(reminder);
 
-
     //* 9) Emitir evento de creación
-    this.eventEmitter.emit(BOOKING_EVENTS.CREATED, new BookingCreatedEvent(result));
+    this.eventEmitter.emit(
+      BOOKING_EVENTS.CREATED,
+      new BookingCreatedEvent(result),
+    );
 
     return {
       message: 'Su reserva ha sido agendada con éxito.',

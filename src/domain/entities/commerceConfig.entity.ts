@@ -1,4 +1,4 @@
-import { PaymentMethod } from "../dbEnums/PaymentMethods.enum";
+import { PaymentMethod } from '../dbEnums/PaymentMethods.enum';
 
 export class CommerceConfig {
   constructor(
@@ -8,8 +8,8 @@ export class CommerceConfig {
     public openTime: string,
     public closeTime: string,
     public welcomeMessage: string,
-    public acceptedPaymentMethods: PaymentMethod[]
-  ) { }
+    public acceptedPaymentMethods: PaymentMethod[],
+  ) {}
 
   // Factory method
   static create(props: {
@@ -30,7 +30,10 @@ export class CommerceConfig {
       );
     }
 
-    if (!props.cancellationDeadlineMinutes || props.cancellationDeadlineMinutes <= 0) {
+    if (
+      !props.cancellationDeadlineMinutes ||
+      props.cancellationDeadlineMinutes <= 0
+    ) {
       throw new Error('El tiempo debe ser un número positivo.');
     }
 
@@ -47,7 +50,7 @@ export class CommerceConfig {
       props.openTime,
       props.closeTime,
       props.welcomeMessage,
-      props.acceptedPaymentMethods
+      props.acceptedPaymentMethods,
     );
   }
 }

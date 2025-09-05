@@ -21,7 +21,8 @@ export class CreateCommerceConfigDto {
 
   @ApiProperty({
     example: 45,
-    description: 'Tiempo límite (en minutos) antes de la reserva en el que aún se permite cancelar o reprogramar',
+    description:
+      'Tiempo límite (en minutos) antes de la reserva en el que aún se permite cancelar o reprogramar',
   })
   @Type(() => Number)
   @IsNumber({}, { message: 'El tiempo debe ser un número' })
@@ -57,7 +58,7 @@ export class CreateCommerceConfigDto {
     message: 'El formato debe ser HH:mm:ss',
   })
   closeTime: string;
-  
+
   @ApiProperty({
     example: [PaymentMethod.MERCADO_PAGO, PaymentMethod.CASH],
     description: 'Métodos de pago habilitados por el comercio',

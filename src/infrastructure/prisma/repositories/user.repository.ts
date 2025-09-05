@@ -6,7 +6,7 @@ import { Roles } from '@/domain/dbEnums/UserRoles.enum';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private toDomain(user: {
     id: number;
@@ -37,11 +37,14 @@ export class PrismaUserRepository implements IUserRepository {
     return this.toDomain(result);
   }
 
-  async findUserByCommerce(data: { userId: number, commerceId: number }): Promise<DomainClient | null> {
+  async findUserByCommerce(data: {
+    userId: number;
+    commerceId: number;
+  }): Promise<DomainClient | null> {
     const result = await this.prisma.user.findUnique({
       where: {
         id: data.userId,
-        commerceId: data.commerceId
+        commerceId: data.commerceId,
       },
     });
 

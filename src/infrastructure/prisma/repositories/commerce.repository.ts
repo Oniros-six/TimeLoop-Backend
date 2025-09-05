@@ -7,7 +7,7 @@ import { CommerceUpdateData } from '@/domain/common/CommerceUpdateData';
 
 @Injectable()
 export class PrismaCommerceRepository implements ICommerceRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private toDomain(commerce: {
     id: number;
@@ -43,7 +43,7 @@ export class PrismaCommerceRepository implements ICommerceRepository {
   async findAllActive(): Promise<DomainClient[] | null> {
     const result = await this.prisma.commerce.findMany({
       where: {
-        active: true
+        active: true,
       },
     });
 
@@ -70,7 +70,7 @@ export class PrismaCommerceRepository implements ICommerceRepository {
     return !!result;
   }
 
-  async findCommerceByPhone(data: { phone: string; }): Promise<boolean> {
+  async findCommerceByPhone(data: { phone: string }): Promise<boolean> {
     const result = await this.prisma.commerce.findUnique({
       where: { phone: data.phone },
     });

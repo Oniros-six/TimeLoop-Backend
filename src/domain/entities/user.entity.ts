@@ -9,7 +9,7 @@ export class User {
     public role: Roles,
     public readonly commerceId: number,
     public active: boolean,
-  ) { }
+  ) {}
 
   // Factory method
   static create(props: {
@@ -32,7 +32,9 @@ export class User {
     );
   }
 
-  update(props: Partial<Pick<User, 'name' | 'email' | 'password' | 'role'>>): boolean {
+  update(
+    props: Partial<Pick<User, 'name' | 'email' | 'password' | 'role'>>,
+  ): boolean {
     let hasChanges = false;
 
     if (props.name !== undefined && props.name !== this.name) {

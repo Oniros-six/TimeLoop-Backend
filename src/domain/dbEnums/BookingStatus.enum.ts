@@ -1,1 +1,1 @@
-export {BookingStatus} from '@prisma/client';
+export { BookingStatus } from '@prisma/client';

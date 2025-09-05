@@ -10,9 +10,9 @@ import { VerifyWebhook } from '@/application/use-cases/mercadoPago/verify-webhoo
 
 // Tokens
 import {
-    MERCADO_PAGO_REPOSITORY,
-    PAYMENT_REPOSITORY,
-    BOOKING_REPOSITORY
+  MERCADO_PAGO_REPOSITORY,
+  PAYMENT_REPOSITORY,
+  BOOKING_REPOSITORY,
 } from '@/application/providers';
 
 // Services
@@ -25,27 +25,26 @@ import { PrismaPaymentRepository } from '@/infrastructure/prisma/repositories/pa
 import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/booking.repository';
 
 @Module({
-    imports: [PrismaModule, HttpModule],
-    controllers: [MercadoPagoController],
-    providers: [
-        {
-            provide: MERCADO_PAGO_REPOSITORY,
-            useClass: PrismaMercadoPagoRepository,
-        },
-        {
-            provide: PAYMENT_REPOSITORY,
-            useClass: PrismaPaymentRepository,
-        },
-        {
-            provide: BOOKING_REPOSITORY,
-            useClass: PrismaBookingRepository,
-        },
-        TokenEncryptionService,
-        MercadoPagoService,
-        CreateOrRefresh,
-        VerifyPayment,
-        VerifyWebhook
-    ],
+  imports: [PrismaModule, HttpModule],
+  controllers: [MercadoPagoController],
+  providers: [
+    {
+      provide: MERCADO_PAGO_REPOSITORY,
+      useClass: PrismaMercadoPagoRepository,
+    },
+    {
+      provide: PAYMENT_REPOSITORY,
+      useClass: PrismaPaymentRepository,
+    },
+    {
+      provide: BOOKING_REPOSITORY,
+      useClass: PrismaBookingRepository,
+    },
+    TokenEncryptionService,
+    MercadoPagoService,
+    CreateOrRefresh,
+    VerifyPayment,
+    VerifyWebhook,
+  ],
 })
-export class MercadoPagoModule { }
-
+export class MercadoPagoModule {}

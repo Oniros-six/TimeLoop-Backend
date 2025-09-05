@@ -48,7 +48,7 @@ import { UserWorkingPatternModule } from './interfaces/controllers/userWorkingPa
     AuthModule,
     BookingHistoryModule,
     InvoiceModule,
-    MercadoPagoModule
+    MercadoPagoModule,
   ],
 })
 export class AppModule {}

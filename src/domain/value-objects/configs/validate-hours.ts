@@ -1,7 +1,10 @@
 import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
-export function validateOpenCloseTime(openTime: string, closeTime: string): void {
+export function validateOpenCloseTime(
+  openTime: string,
+  closeTime: string,
+): void {
   const [openH, openM] = openTime.split(':').map(Number);
   const [closeH, closeM] = closeTime.split(':').map(Number);
 
@@ -27,11 +30,19 @@ export function validateAvailabilityTimes(data: {
     if (data.afternoonStart && data.afternoonEnd) {
       validateOpenCloseTime(data.afternoonStart, data.afternoonEnd);
     }
-  } // Validate half time (mañana) 
-  if (data.availabilityType === AvailabilityType.half && data.morningStart && data.morningEnd) {
+  } // Validate half time (mañana)
+  if (
+    data.availabilityType === AvailabilityType.half &&
+    data.morningStart &&
+    data.morningEnd
+  ) {
     validateOpenCloseTime(data.morningStart, data.morningEnd);
   } // Validate half time (tarde)
-  if (data.availabilityType === AvailabilityType.half && data.afternoonStart && data.afternoonEnd) {
+  if (
+    data.availabilityType === AvailabilityType.half &&
+    data.afternoonStart &&
+    data.afternoonEnd
+  ) {
     validateOpenCloseTime(data.afternoonStart, data.afternoonEnd);
   }
 }

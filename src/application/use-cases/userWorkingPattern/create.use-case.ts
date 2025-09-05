@@ -22,22 +22,26 @@ export class CreateUserWorkingPattern {
     private readonly userRepository: IUserRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(data: CreateUserPatternDto) {
-    const user = await this.userRepository.findUser({ userId: data.userId, });
+    const user = await this.userRepository.findUser({ userId: data.userId });
 
     if (!user) {
       throw new HttpException('El usuario no existe.', HttpStatus.NOT_FOUND);
     }
 
-    const patternExist = await this.userWorkingPatternRepository.verifyUserWorkingPattern({
-      userId: data.userId,
-      weekday: data.weekday
-    })
+    const patternExist =
+      await this.userWorkingPatternRepository.verifyUserWorkingPattern({
+        userId: data.userId,
+        weekday: data.weekday,
+      });
 
     if (patternExist) {
-      throw new HttpException('Ya hay una configuración para este día.', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'Ya hay una configuración para este día.',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     validateAvailabilityTimes({
@@ -45,23 +49,17 @@ export class CreateUserWorkingPattern {
       morningStart: data.morningStart,
       morningEnd: data.morningEnd,
       afternoonStart: data.afternoonStart,
-      afternoonEnd: data.afternoonEnd
-    })
+      afternoonEnd: data.afternoonEnd,
+    });
 
     const userWorkingPattern = UserWorkingPatternDomain.create({
       userId: data.userId,
       weekday: data.weekday,
       availabilityType: data.availabilityType,
-      morningStart: data.morningStart
-        ? data.morningStart
-        : null,
+      morningStart: data.morningStart ? data.morningStart : null,
       morningEnd: data.morningEnd ? data.morningEnd : null,
-      afternoonStart: data.afternoonStart
-        ? data.afternoonStart
-        : null,
-      afternoonEnd: data.afternoonEnd
-        ? data.afternoonEnd
-        : null,
+      afternoonStart: data.afternoonStart ? data.afternoonStart : null,
+      afternoonEnd: data.afternoonEnd ? data.afternoonEnd : null,
     });
 
     try {

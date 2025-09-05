@@ -1,17 +1,13 @@
 import { PaymentMethod } from '@/domain/dbEnums/PaymentMethods.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsEnum,
-  IsNumber,
-  IsString,
-  Matches,
-} from 'class-validator';
+import { IsEnum, IsNumber, IsString, Matches } from 'class-validator';
 
 export class UpdateCommerceConfigDto {
   @ApiProperty({
     example: 45,
-    description: 'Tiempo límite (en minutos) antes de la reserva en el que aún se permite cancelar o reprogramar',
+    description:
+      'Tiempo límite (en minutos) antes de la reserva en el que aún se permite cancelar o reprogramar',
   })
   @Type(() => Number)
   @IsNumber({}, { message: 'El tiempo debe ser un número' })
@@ -53,4 +49,3 @@ export class UpdateCommerceConfigDto {
   @IsEnum(PaymentMethod, { each: true, message: 'Método de pago no válido' })
   acceptedPaymentMethods?: PaymentMethod[];
 }
-

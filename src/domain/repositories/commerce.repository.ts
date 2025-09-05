@@ -6,9 +6,9 @@ export interface ICommerceRepository {
 
   findCommerceByName(data: { name: string }): Promise<Commerce | null>;
 
-  findCommerceByEmail(data: { email: string}): Promise<boolean>;
+  findCommerceByEmail(data: { email: string }): Promise<boolean>;
 
-  findCommerceByPhone(data: { phone: string}): Promise<boolean>;
+  findCommerceByPhone(data: { phone: string }): Promise<boolean>;
 
   suspendCommerce(data: { commerceId: number }): Promise<Commerce | null>;
 
@@ -17,7 +17,7 @@ export interface ICommerceRepository {
   createCommerce(data: Commerce): Promise<Commerce | null>;
 
   findAllActive(): Promise<Commerce[] | null>;
-  
+
   updateCommerce(data: {
     id: number;
     newCommerceData: CommerceUpdateData;

@@ -110,7 +110,7 @@ import { PrismaMercadoPagoRepository } from './repositories/mercadoPago.reposito
     'IBookingHistoryRepository',
     'IInvoiceRepository',
     'IPaymentRepository',
-    'IMercadoPagoRepository'
+    'IMercadoPagoRepository',
   ],
 })
-export class PrismaModule { }
+export class PrismaModule {}

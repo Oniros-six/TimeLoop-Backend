@@ -22,7 +22,8 @@ export class CreateUserConfig {
     private readonly activityLogService: ActivityLogService,
   ) {}
 
-  async execute(userId: number, data: CreateUserConfigDto) {
+  //** El parametro data no se usa porque no hay una configuraciòn para user */
+  async execute(userId: number, _data: CreateUserConfigDto) {
     const user = await this.userRepository.findUser({
       userId: userId,
     });
@@ -36,7 +37,10 @@ export class CreateUserConfig {
     });
 
     if (configExistence) {
-      throw new HttpException('El usuario ya tiene una configuración.', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'El usuario ya tiene una configuración.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const userConfig = UserConfigDomain.create({

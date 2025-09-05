@@ -14,7 +14,7 @@ export class FindService {
 
     @Inject(COMMERCE_REPOSITORY)
     private readonly commerceRepository: ICommerceRepository,
-  ) { }
+  ) {}
 
   async execute(id: number, commerceId: number) {
     const commerce = await this.commerceRepository.findCommerce({

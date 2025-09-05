@@ -1,15 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
   IsEmail,
-  IsNumber,
   IsOptional,
   IsString,
   Matches,
   MaxLength,
 } from 'class-validator';
 
-export class UpdateCustomerDto {  
+export class UpdateCustomerDto {
   @ApiProperty({ example: 'Leandro', description: 'Nombre del cliente' })
   @IsOptional()
   @IsString({ message: 'El nombre tiene que contener solo letras' })

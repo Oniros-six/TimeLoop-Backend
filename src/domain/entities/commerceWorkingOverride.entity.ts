@@ -11,7 +11,7 @@ export class CommerceWorkingOverride {
     public afternoonStart: string | null,
     public afternoonEnd: string | null,
     public readonly notes: string,
-  ) { }
+  ) {}
 
   // Factory method
   static create(props: {
@@ -28,7 +28,10 @@ export class CommerceWorkingOverride {
       throw new Error('El ID de comercio no es válido.');
     }
 
-    if (!props.overrideType || !Object.values(AvailabilityType).includes(props.overrideType)) {
+    if (
+      !props.overrideType ||
+      !Object.values(AvailabilityType).includes(props.overrideType)
+    ) {
       throw new Error('El valor de overrideType debe ser full, off o half.');
     }
 
@@ -37,7 +40,9 @@ export class CommerceWorkingOverride {
       const hasAfternoon = props.afternoonStart && props.afternoonEnd;
 
       if (!hasMorning || !hasAfternoon) {
-        throw new Error('Debes enviar horarios de mañana y de tarde para tipo full.');
+        throw new Error(
+          'Debes enviar horarios de mañana y de tarde para tipo full.',
+        );
       }
     }
 
@@ -46,10 +51,14 @@ export class CommerceWorkingOverride {
       const hasAfternoon = props.afternoonStart && props.afternoonEnd;
 
       if (!hasMorning && !hasAfternoon) {
-        throw new Error('Debes enviar horarios de mañana o de tarde para tipo half.');
+        throw new Error(
+          'Debes enviar horarios de mañana o de tarde para tipo half.',
+        );
       }
       if (hasMorning && hasAfternoon) {
-        throw new Error('Para tipo half solo se permite mañana o tarde, no ambos.');
+        throw new Error(
+          'Para tipo half solo se permite mañana o tarde, no ambos.',
+        );
       }
     }
 

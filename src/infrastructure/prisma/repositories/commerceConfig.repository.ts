@@ -26,7 +26,7 @@ export class PrismaCommerceConfigRepository
       commerce.openTime,
       commerce.closeTime,
       commerce.welcomeMessage,
-      commerce.acceptedPaymentMethods
+      commerce.acceptedPaymentMethods,
     );
   }
 

@@ -28,7 +28,10 @@ export class UserWorkingOverride {
       throw new Error('El ID de usuario no es válido.');
     }
 
-    if (!props.overrideType || !Object.values(AvailabilityType).includes(props.overrideType)) {
+    if (
+      !props.overrideType ||
+      !Object.values(AvailabilityType).includes(props.overrideType)
+    ) {
       throw new Error(
         'El valor de availabilityType debe ser full, off o half.',
       );
@@ -39,7 +42,9 @@ export class UserWorkingOverride {
       const hasAfternoon = props.afternoonStart && props.afternoonEnd;
 
       if (!hasMorning || !hasAfternoon) {
-        throw new Error('Debes enviar horarios de mañana y de tarde para tipo full.');
+        throw new Error(
+          'Debes enviar horarios de mañana y de tarde para tipo full.',
+        );
       }
     }
 
@@ -48,10 +53,14 @@ export class UserWorkingOverride {
       const hasAfternoon = props.afternoonStart && props.afternoonEnd;
 
       if (!hasMorning && !hasAfternoon) {
-        throw new Error('Debes enviar horarios de mañana o de tarde para tipo half.');
+        throw new Error(
+          'Debes enviar horarios de mañana o de tarde para tipo half.',
+        );
       }
       if (hasMorning && hasAfternoon) {
-        throw new Error('Para tipo half solo se permite mañana o tarde, no ambos.');
+        throw new Error(
+          'Para tipo half solo se permite mañana o tarde, no ambos.',
+        );
       }
     }
 

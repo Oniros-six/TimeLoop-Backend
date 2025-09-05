@@ -8,9 +8,7 @@ export interface ICustomerRepository {
 
   findCustomer(data: { id: number }): Promise<Customer | null>;
 
-  findCustomerByEmail(data: {
-    email: string;
-  }): Promise<Customer | null>;
+  findCustomerByEmail(data: { email: string }): Promise<Customer | null>;
 
   updateCustomer(data: {
     id: number;

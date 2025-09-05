@@ -13,11 +13,6 @@ export class Customer {
     email: string;
     phone: string;
   }): Customer {
-    return new Customer(
-      props.id ?? 0,
-      props.name,
-      props.email,
-      props.phone,
-    );
+    return new Customer(props.id ?? 0, props.name, props.email, props.phone);
   }
 }

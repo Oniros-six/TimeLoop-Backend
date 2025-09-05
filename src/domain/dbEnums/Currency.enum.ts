@@ -1,1 +1,1 @@
-export { Currency } from '@prisma/client'
+export { Currency } from '@prisma/client';

@@ -11,9 +11,9 @@ import { FindByUserDate } from '@/application/use-cases/bookingHistory/find-by-d
 
 // Tokens
 import {
-    COMMERCE_REPOSITORY,
-    BOOKING_HISTORY_REPOSITORY,
-    USER_REPOSITORY,
+  COMMERCE_REPOSITORY,
+  BOOKING_HISTORY_REPOSITORY,
+  USER_REPOSITORY,
 } from '@/application/providers';
 
 // Repositories
@@ -22,27 +22,27 @@ import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.
 import { PrismaBookingHistoryRepository } from '@/infrastructure/prisma/repositories/bookingHistory.repository';
 
 @Module({
-    imports: [PrismaModule],
-    controllers: [BookingHistoryController],
-    providers: [
-        {
-            provide: COMMERCE_REPOSITORY,
-            useClass: PrismaCommerceRepository,
-        },
-        {
-            provide: USER_REPOSITORY,
-            useClass: PrismaUserRepository,
-        },
-        {
-            provide: BOOKING_HISTORY_REPOSITORY,
-            useClass: PrismaBookingHistoryRepository,
-        },
-        
-        FindByCommerce,
-        FindByUser,
-        FindByDates,
-        FindByCommerceDate,
-        FindByUserDate
-    ],
+  imports: [PrismaModule],
+  controllers: [BookingHistoryController],
+  providers: [
+    {
+      provide: COMMERCE_REPOSITORY,
+      useClass: PrismaCommerceRepository,
+    },
+    {
+      provide: USER_REPOSITORY,
+      useClass: PrismaUserRepository,
+    },
+    {
+      provide: BOOKING_HISTORY_REPOSITORY,
+      useClass: PrismaBookingHistoryRepository,
+    },
+
+    FindByCommerce,
+    FindByUser,
+    FindByDates,
+    FindByCommerceDate,
+    FindByUserDate,
+  ],
 })
-export class BookingHistoryModule { }
+export class BookingHistoryModule {}

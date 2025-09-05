@@ -113,7 +113,10 @@ export class BookingController {
   @ApiBody({ type: CancelBookingDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Patch(':id')
-  cancelBooking(@Param('id', ParseIntPipe) id: number, @Body() dto: CancelBookingDto) {
+  cancelBooking(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CancelBookingDto,
+  ) {
     return this.cancelBookingUseCase.execute(id, dto);
   }
 

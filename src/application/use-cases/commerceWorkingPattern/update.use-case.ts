@@ -36,8 +36,8 @@ export class UpdateCommerceWorkingPattern {
       morningStart: data.morningStart,
       morningEnd: data.morningEnd,
       afternoonStart: data.afternoonStart,
-      afternoonEnd: data.afternoonEnd
-    })
+      afternoonEnd: data.afternoonEnd,
+    });
 
     const commerceWorkingPattern = CommerceWorkingPatternDomain.create({
       commerceId: existingPattern.commerceId,

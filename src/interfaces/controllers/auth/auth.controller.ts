@@ -11,7 +11,7 @@ import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
-import { AuthenticatedRequest, LoginRequest } from '@/domain/common/auth.types';
+import { AuthenticatedRequest } from '@/domain/common/auth.types';
 import { LoginUserDto } from './dto/login-user.dto';
 
 @ApiTags('Auth')
@@ -50,7 +50,9 @@ export class AuthController {
         req.session.save((saveErr) => {
           if (saveErr) {
             console.error('Error guardando sesión:', saveErr);
-            return reject(new InternalServerErrorException('Error guardando sesión'));
+            return reject(
+              new InternalServerErrorException('Error guardando sesión'),
+            );
           }
 
           resolve({

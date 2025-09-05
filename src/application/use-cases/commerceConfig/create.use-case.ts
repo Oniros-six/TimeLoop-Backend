@@ -21,7 +21,7 @@ export class CreateCommerceConfig {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(commerceId: number, data: CreateCommerceConfigDto) {
     const commerce = await this.commerceRepository.findCommerce({
@@ -32,15 +32,19 @@ export class CreateCommerceConfig {
       throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
     }
 
-    const configExistence = await this.commerceConfigRepository.findCommerceConfig({
-      commerceId: commerceId,
-    });
+    const configExistence =
+      await this.commerceConfigRepository.findCommerceConfig({
+        commerceId: commerceId,
+      });
 
     if (configExistence) {
-      throw new HttpException('El comercio ya tiene una configuración.', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'El comercio ya tiene una configuración.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    validateOpenCloseTime(data.openTime, data.closeTime)
+    validateOpenCloseTime(data.openTime, data.closeTime);
 
     const commerceConfig = CommerceConfigDomain.create({
       commerceId: commerceId,
@@ -48,7 +52,7 @@ export class CreateCommerceConfig {
       openTime: data.openTime,
       closeTime: data.closeTime,
       welcomeMessage: data.welcomeMessage,
-      acceptedPaymentMethods: data.acceptedPaymentMethods
+      acceptedPaymentMethods: data.acceptedPaymentMethods,
     });
 
     try {

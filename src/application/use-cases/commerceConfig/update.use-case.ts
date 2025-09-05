@@ -21,7 +21,7 @@ export class UpdateCommerceConfig {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(commerceId: number, data: UpdateCommerceConfigDto) {
     const commerce = await this.commerceRepository.findCommerce({
@@ -45,21 +45,23 @@ export class UpdateCommerceConfig {
     }
 
     if (data.openTime) {
-      validateOpenCloseTime(data.openTime, commerceConfig.closeTime)
+      validateOpenCloseTime(data.openTime, commerceConfig.closeTime);
     }
 
     if (data.closeTime) {
-      validateOpenCloseTime(commerceConfig.openTime, data.closeTime)
+      validateOpenCloseTime(commerceConfig.openTime, data.closeTime);
     }
 
     const updatedConfigData = CommerceConfigDomain.create({
       commerceId: commerceId,
       cancellationDeadlineMinutes:
-        data.cancellationDeadlineMinutes ?? commerceConfig.cancellationDeadlineMinutes,
+        data.cancellationDeadlineMinutes ??
+        commerceConfig.cancellationDeadlineMinutes,
       openTime: data.openTime ?? commerceConfig.openTime,
       closeTime: data.closeTime ?? commerceConfig.closeTime,
       welcomeMessage: data.welcomeMessage ?? commerceConfig.welcomeMessage,
-      acceptedPaymentMethods: data.acceptedPaymentMethods ?? commerceConfig.acceptedPaymentMethods
+      acceptedPaymentMethods:
+        data.acceptedPaymentMethods ?? commerceConfig.acceptedPaymentMethods,
     });
 
     try {

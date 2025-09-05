@@ -1,7 +1,7 @@
-import { BookingStatus } from "@/domain/dbEnums/BookingStatus.enum"
-import { BookingService } from "./bookingService.entity";
-import { Service } from "./service.entity";
-import { addMinutesToTime } from "../value-objects/booking/validations";
+import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
+import { BookingService } from './bookingService.entity';
+import { Service } from './service.entity';
+import { addMinutesToTime } from '../value-objects/booking/validations';
 
 export class Booking {
   constructor(
@@ -16,18 +16,26 @@ export class Booking {
     public notes: string,
     public totalPrice: number,
     public bookingServices: BookingService[],
-  ) { }
+  ) {}
 
   updateServices(serviceIds: number[]) {
-    this.bookingServices = serviceIds.map(id => new BookingService(this.id, id));
+    this.bookingServices = serviceIds.map(
+      (id) => new BookingService(this.id, id),
+    );
   }
 
   static calcServicesDuration(services: Service[]): number {
-    return services.reduce((total, service) => total + service.durationMinutes, 0);
+    return services.reduce(
+      (total, service) => total + service.durationMinutes,
+      0,
+    );
   }
 
   calcServicesDuration(services: Service[]): number {
-    return services.reduce((total, service) => total + service.durationMinutes, 0);
+    return services.reduce(
+      (total, service) => total + service.durationMinutes,
+      0,
+    );
   }
 
   static calcTotalPrice(services: Service[]): number {
@@ -40,13 +48,13 @@ export class Booking {
 
   private isActiveAndOnTime(cancellationDeadlineMinutes: number): boolean {
     const validStatus =
-      this.status === BookingStatus.CONFIRMED || this.status === BookingStatus.PENDING;
-  
+      this.status === BookingStatus.CONFIRMED ||
+      this.status === BookingStatus.PENDING;
+
     const diffMinutes = (this.timeStart.getTime() - Date.now()) / 1000 / 60;
-  
+
     return validStatus && diffMinutes > cancellationDeadlineMinutes;
   }
-  
 
   canBeCanceled(cancellationDeadlineMinutes: number): boolean {
     return this.isActiveAndOnTime(cancellationDeadlineMinutes);
@@ -65,10 +73,12 @@ export class Booking {
     services: Service[],
   ): Booking {
     // Creamos la relación con los servicios
-    const newServices = services.map(service => new BookingService(0, service.id));
-    const totalDuration = this.calcServicesDuration(services)
+    const newServices = services.map(
+      (service) => new BookingService(0, service.id),
+    );
+    const totalDuration = this.calcServicesDuration(services);
     const timeEnd = addMinutesToTime(timeStart, totalDuration);
-    const totalprice = this.calcTotalPrice(services)
+    const totalprice = this.calcTotalPrice(services);
 
     const booking = new Booking(
       0, // ID será asignado por la DB
@@ -86,5 +96,4 @@ export class Booking {
 
     return booking;
   }
-
 }

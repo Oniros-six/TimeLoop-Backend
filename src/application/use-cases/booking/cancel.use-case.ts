@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { CancelBookingDto } from '@/interfaces/controllers/booking/dto/cancel-booking.dto';
-import { BOOKING_REPOSITORY, COMMERCE_CONFIG_REPOSITORY } from '@/application/providers';
+import {
+  BOOKING_REPOSITORY,
+  COMMERCE_CONFIG_REPOSITORY,
+} from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -24,7 +27,7 @@ export class CancelBooking {
     private readonly eventEmitter: EventEmitter2,
 
     private readonly remindersService: RemindersService,
-  ) { }
+  ) {}
 
   async execute(id: number, data: CancelBookingDto) {
     const { commerceId, customerId } = data;
@@ -43,7 +46,8 @@ export class CancelBooking {
       );
     }
 
-    const commerceConfig = await this.commerceConfigRepository.findCommerceConfig({commerceId})
+    const commerceConfig =
+      await this.commerceConfigRepository.findCommerceConfig({ commerceId });
 
     // Delegate cancellation validation to domain method
     if (!booking.canBeCanceled(commerceConfig.cancellationDeadlineMinutes)) {

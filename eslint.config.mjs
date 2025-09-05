@@ -35,7 +35,19 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-return': 'warn',
       '@typescript-eslint/no-unsafe-function-type': 'warn',
       '@typescript-eslint/require-await': 'warn',
-      '@typescript-eslint/no-misused-promises': 'warn'
+      '@typescript-eslint/no-misused-promises': 'warn',
+      // Ignorar variables no utilizadas en destructuring
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          'argsIgnorePattern': '^_',
+          'varsIgnorePattern': '^_',
+          'destructuredArrayIgnorePattern': '^_',
+          'ignoreRestSiblings': true
+        }
+      ],
+      // Ignorar errores de Promise rejection
+      '@typescript-eslint/prefer-promise-reject-errors': 'off'
     },
   },
 );

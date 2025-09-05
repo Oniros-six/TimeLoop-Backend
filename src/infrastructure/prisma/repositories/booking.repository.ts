@@ -9,7 +9,7 @@ import { BookingDetail } from '@/domain/common/BookingDetail.type';
 
 @Injectable()
 export class PrismaBookingRepository implements IBookingRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private toDomain(booking: {
     id: number;
@@ -53,7 +53,7 @@ export class PrismaBookingRepository implements IBookingRepository {
           notes: data.notes,
           totalPrice: data.totalPrice,
           bookingServices: {
-            create: data.bookingServices.map(bs => ({
+            create: data.bookingServices.map((bs) => ({
               serviceId: bs.serviceId,
             })),
           },
@@ -84,13 +84,18 @@ export class PrismaBookingRepository implements IBookingRepository {
         id: { not: data.id },
         commerceId: data.commerceId,
         status: {
-          in: [BookingStatus.CONFIRMED, BookingStatus.PENDING, BookingStatus.RESCHEDULED],
+          in: [
+            BookingStatus.CONFIRMED,
+            BookingStatus.PENDING,
+            BookingStatus.RESCHEDULED,
+          ],
         },
         AND: [
-          { timeStart: { lt: data.timeEnd } },  // startDB < endNew
-          { timeEnd: { gt: data.timeStart } },  // endDB > startNew
+          { timeStart: { lt: data.timeEnd } }, // startDB < endNew
+          { timeEnd: { gt: data.timeStart } }, // endDB > startNew
         ],
-      }, include: {
+      },
+      include: {
         bookingServices: true,
       },
     });
@@ -157,9 +162,29 @@ export class PrismaBookingRepository implements IBookingRepository {
   }): Promise<DomainClient[] | null> {
     const date = data.timeStart;
 
-    const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
+    const start = new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        0,
+        0,
+        0,
+        0,
+      ),
+    );
 
-    const end = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999));
+    const end = new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        23,
+        59,
+        59,
+        999,
+      ),
+    );
 
     const result = await this.prisma.booking.findMany({
       where: {
@@ -185,9 +210,29 @@ export class PrismaBookingRepository implements IBookingRepository {
   }): Promise<DomainClient[] | null> {
     const date = data.timeStart;
 
-    const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
+    const start = new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        0,
+        0,
+        0,
+        0,
+      ),
+    );
 
-    const end = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999));
+    const end = new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        23,
+        59,
+        59,
+        999,
+      ),
+    );
 
     const result = await this.prisma.booking.findMany({
       where: {
@@ -197,7 +242,11 @@ export class PrismaBookingRepository implements IBookingRepository {
         },
         commerceId: data.commerceId,
         status: {
-          in: [BookingStatus.CONFIRMED, BookingStatus.PENDING, BookingStatus.RESCHEDULED],
+          in: [
+            BookingStatus.CONFIRMED,
+            BookingStatus.PENDING,
+            BookingStatus.RESCHEDULED,
+          ],
         },
       },
       include: {
@@ -260,12 +309,10 @@ export class PrismaBookingRepository implements IBookingRepository {
     id: number;
     dataToUpdate: BookingUpdateData;
   }): Promise<DomainClient | null> {
-
     const result = await this.prisma.$transaction(async (tx) => {
-
       // Borrar los servicios antiguos
       await tx.bookingService.deleteMany({
-        where: { bookingId: data.id }
+        where: { bookingId: data.id },
       });
 
       // Actualizar la reserva y crear los nuevos bookingServices
@@ -280,7 +327,7 @@ export class PrismaBookingRepository implements IBookingRepository {
           notes: data.dataToUpdate.notes,
           totalPrice: data.dataToUpdate.totalPrice,
           bookingServices: {
-            create: data.dataToUpdate.serviceIds.map(bs => ({
+            create: data.dataToUpdate.serviceIds.map((bs) => ({
               serviceId: bs.serviceId,
             })),
           },
@@ -291,11 +338,9 @@ export class PrismaBookingRepository implements IBookingRepository {
           },
         },
       });
-
     });
 
     if (!result) return null;
     return this.toDomain(result);
   }
-
 }

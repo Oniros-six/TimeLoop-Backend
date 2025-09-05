@@ -6,8 +6,9 @@ import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType.enum';
 
 @Injectable()
 export class PrismaCommerceWorkingOverrideRepository
-  implements ICommerceWorkingOverrideRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  implements ICommerceWorkingOverrideRepository
+{
+  constructor(private readonly prisma: PrismaService) {}
 
   private toDomain(pattern: {
     id: number;

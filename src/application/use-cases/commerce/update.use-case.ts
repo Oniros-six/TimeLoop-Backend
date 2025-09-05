@@ -13,10 +13,9 @@ export class UpdateCommerce {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(id: number, data: UpdateCommerceDto) {
-
     // Validacion de existencia
     const found = await this.commerceRepository.findCommerce({
       commerceId: id,
@@ -28,7 +27,9 @@ export class UpdateCommerce {
 
     // Validacion de email existente
     if (data.email && data.email !== found.email) {
-      const exists = await this.commerceRepository.findCommerceByEmail({ email: data.email })
+      const exists = await this.commerceRepository.findCommerceByEmail({
+        email: data.email,
+      });
 
       if (exists) {
         throw new HttpException(
@@ -40,7 +41,9 @@ export class UpdateCommerce {
 
     // Validacion de phone existente
     if (data.phone && data.phone !== found.phone) {
-      const exists = await this.commerceRepository.findCommerceByPhone({ phone: data.phone })
+      const exists = await this.commerceRepository.findCommerceByPhone({
+        phone: data.phone,
+      });
 
       if (exists) {
         throw new HttpException(

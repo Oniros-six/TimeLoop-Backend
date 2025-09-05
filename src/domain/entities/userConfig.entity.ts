@@ -5,16 +5,11 @@ export class UserConfig {
   ) {}
 
   // Factory method
-  static create(props: {
-    userId: number;
-  }): UserConfig {
+  static create(props: { userId: number }): UserConfig {
     if (!props.userId || props.userId <= 0) {
       throw new Error('El ID de usuario no es válido.');
     }
 
-    return new UserConfig(
-      0,
-      props.userId,
-    );
+    return new UserConfig(0, props.userId);
   }
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsNumber, IsOptional, Matches } from 'class-validator';
+import { IsDate, IsNumber, IsOptional } from 'class-validator';
 
 export class UpdateBookingDto {
   @ApiProperty({
@@ -16,11 +16,15 @@ export class UpdateBookingDto {
   @IsNumber({}, { message: 'El ID del cliente debe ser un número' })
   customerId: number;
 
-  @ApiProperty({ description: 'IDs de servicios', example: [1, 3], required: false })
+  @ApiProperty({
+    description: 'IDs de servicios',
+    example: [1, 3],
+    required: false,
+  })
   @IsOptional()
   @IsNumber({}, { each: true })
   serviceIds?: number[];
-  
+
   @ApiProperty({ example: 1, description: 'ID del empleado que atiende' })
   @IsNumber({}, { message: 'El ID de empleado debe ser un número' })
   userId: number;

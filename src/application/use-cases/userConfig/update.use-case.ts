@@ -22,7 +22,8 @@ export class UpdateUserConfig {
     private readonly activityLogService: ActivityLogService,
   ) {}
 
-  async execute(userId: number, data: UpdateUserConfigDto) {
+  //** El parametro data no se usa porque no hay una configuraciòn para user */
+  async execute(userId: number, _data: UpdateUserConfigDto) {
     const user = await this.userRepository.findUser({
       userId: userId,
     });

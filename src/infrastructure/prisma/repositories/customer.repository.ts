@@ -6,7 +6,7 @@ import { CustomerUpdateData } from '@/domain/common/CustomerUpdateData';
 
 @Injectable()
 export class PrismaCustomerRepository implements ICustomerRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private toDomain(customer: {
     id: number;
@@ -32,7 +32,7 @@ export class PrismaCustomerRepository implements ICustomerRepository {
         data: {
           name: data.name,
           email: data.email,
-          phone: data.phone
+          phone: data.phone,
         },
       });
     });
@@ -74,7 +74,9 @@ export class PrismaCustomerRepository implements ICustomerRepository {
     return this.toDomain(result);
   }
 
-  async findCustomerByEmail(data: { email: string; }): Promise<DomainClient | null> {
+  async findCustomerByEmail(data: {
+    email: string;
+  }): Promise<DomainClient | null> {
     const result = await this.prisma.customer.findFirst({
       where: {
         email: data.email,

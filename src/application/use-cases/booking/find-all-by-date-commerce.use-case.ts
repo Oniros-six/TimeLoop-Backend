@@ -25,7 +25,7 @@ export class FindAllByCommerceAndDate {
         };
       }
       return {
-        message: `Reservas obtenidas con exito para la fecha: ${data.date}`,
+        message: `Reservas obtenidas con exito para la fecha: ${data.date.toISOString()}`,
         statusCode: HttpStatus.OK,
         data: result,
       };

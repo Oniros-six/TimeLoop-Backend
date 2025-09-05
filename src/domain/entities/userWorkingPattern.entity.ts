@@ -11,7 +11,7 @@ export class UserWorkingPattern {
     public readonly morningEnd: string | null,
     public readonly afternoonStart: string | null,
     public readonly afternoonEnd: string | null,
-  ) { }
+  ) {}
 
   // Factory method
   static create(props: {
@@ -33,7 +33,10 @@ export class UserWorkingPattern {
       );
     }
 
-    if (!props.availabilityType || !Object.values(AvailabilityType).includes(props.availabilityType)) {
+    if (
+      !props.availabilityType ||
+      !Object.values(AvailabilityType).includes(props.availabilityType)
+    ) {
       throw new Error(
         'El valor de availabilityType debe ser full, off o half.',
       );
@@ -44,7 +47,9 @@ export class UserWorkingPattern {
       const hasAfternoon = props.afternoonStart && props.afternoonEnd;
 
       if (!hasMorning || !hasAfternoon) {
-        throw new Error('Debes enviar horarios de mañana y de tarde para tipo full.');
+        throw new Error(
+          'Debes enviar horarios de mañana y de tarde para tipo full.',
+        );
       }
     }
 
@@ -53,10 +58,14 @@ export class UserWorkingPattern {
       const hasAfternoon = props.afternoonStart && props.afternoonEnd;
 
       if (!hasMorning && !hasAfternoon) {
-        throw new Error('Debes enviar horarios de mañana o de tarde para tipo half.');
+        throw new Error(
+          'Debes enviar horarios de mañana o de tarde para tipo half.',
+        );
       }
       if (hasMorning && hasAfternoon) {
-        throw new Error('Para tipo half solo se permite mañana o tarde, no ambos.');
+        throw new Error(
+          'Para tipo half solo se permite mañana o tarde, no ambos.',
+        );
       }
     }
 
@@ -66,7 +75,6 @@ export class UserWorkingPattern {
       props.afternoonStart = null;
       props.afternoonEnd = null;
     }
-
 
     return new UserWorkingPattern(
       0,

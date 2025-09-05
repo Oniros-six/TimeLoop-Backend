@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateUserConfigDto {
   @ApiProperty({
@@ -11,5 +11,4 @@ export class CreateUserConfigDto {
   @IsNumber({}, { message: 'El ID del usuario debe ser un número' })
   @IsNotEmpty({ message: 'El ID del usuario es requerido' })
   userId: number;
-
 }

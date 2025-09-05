@@ -14,10 +14,13 @@ export class UpdateUserWorkingPattern {
     @Inject(USER_WORKING_PATTERN_REPOSITORY)
     private readonly userWorkingPatternRepository: IUserWorkingPatternRepository,
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(id: number, data: UpdateUserPatternDto) {
-    const existingPattern = await this.userWorkingPatternRepository.findUserWorkingPatternById({ id });
+    const existingPattern =
+      await this.userWorkingPatternRepository.findUserWorkingPatternById({
+        id,
+      });
 
     if (!existingPattern) {
       throw new HttpException(
@@ -31,8 +34,8 @@ export class UpdateUserWorkingPattern {
       morningStart: data.morningStart,
       morningEnd: data.morningEnd,
       afternoonStart: data.afternoonStart,
-      afternoonEnd: data.afternoonEnd
-    })
+      afternoonEnd: data.afternoonEnd,
+    });
 
     const userWorkingPattern = UserWorkingPatternDomain.create({
       userId: existingPattern.userId,

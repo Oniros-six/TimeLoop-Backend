@@ -14,9 +14,9 @@ import { InvoiceCron } from '@/domain/services/invoices/generate-invoice.job';
 
 // Tokens
 import {
-    COMMERCE_REPOSITORY,
-    INVOICE_REPOSITORY,
-    BOOKING_HISTORY_REPOSITORY
+  COMMERCE_REPOSITORY,
+  INVOICE_REPOSITORY,
+  BOOKING_HISTORY_REPOSITORY,
 } from '@/application/providers';
 
 // Repositories
@@ -25,29 +25,29 @@ import { PrismaInvoiceRepository } from '@/infrastructure/prisma/repositories/in
 import { PrismaBookingHistoryRepository } from '@/infrastructure/prisma/repositories/bookingHistory.repository';
 
 @Module({
-    imports: [PrismaModule],
-    controllers: [InvoiceController],
-    providers: [
-        {
-            provide: INVOICE_REPOSITORY,
-            useClass: PrismaInvoiceRepository,
-        },
-        {
-            provide: COMMERCE_REPOSITORY,
-            useClass: PrismaCommerceRepository,
-        },
-        {
-            provide: BOOKING_HISTORY_REPOSITORY,
-            useClass: PrismaBookingHistoryRepository,
-        },
-        CreateInvoice,
-        FindAllByCommerce,
-        FindAllByCommerceDate,
-        UpdateSent,
-        UpdatePaid,
+  imports: [PrismaModule],
+  controllers: [InvoiceController],
+  providers: [
+    {
+      provide: INVOICE_REPOSITORY,
+      useClass: PrismaInvoiceRepository,
+    },
+    {
+      provide: COMMERCE_REPOSITORY,
+      useClass: PrismaCommerceRepository,
+    },
+    {
+      provide: BOOKING_HISTORY_REPOSITORY,
+      useClass: PrismaBookingHistoryRepository,
+    },
+    CreateInvoice,
+    FindAllByCommerce,
+    FindAllByCommerceDate,
+    UpdateSent,
+    UpdatePaid,
 
-        // cron
-        InvoiceCron,
-    ],
+    // cron
+    InvoiceCron,
+  ],
 })
-export class InvoiceModule { }
+export class InvoiceModule {}

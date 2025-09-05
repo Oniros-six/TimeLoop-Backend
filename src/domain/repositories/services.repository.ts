@@ -7,7 +7,7 @@ export interface IServiceRepository {
     commerceId: number;
   }): Promise<Service[]>;
 
-  findOne (data: {
+  findOne(data: {
     serviceId: number;
     commerceId: number;
   }): Promise<Service | null>;

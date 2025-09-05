@@ -22,7 +22,7 @@ export class CreateUserWorkingOverride {
     private readonly userRepository: IUserRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) { }
+  ) {}
 
   async execute(data: CreateUserOverrideDto) {
     const user = await this.userRepository.findUser({
@@ -51,23 +51,17 @@ export class CreateUserWorkingOverride {
       morningStart: data.morningStart,
       morningEnd: data.morningEnd,
       afternoonStart: data.afternoonStart,
-      afternoonEnd: data.afternoonEnd
-    })
+      afternoonEnd: data.afternoonEnd,
+    });
 
     const userWorkingOverride = UserWorkingOverrideDomain.create({
       userId: data.userId,
       date: data.date,
       overrideType: data.availabilityType,
-      morningStart: data.morningStart
-        ? data.morningStart
-        : null,
+      morningStart: data.morningStart ? data.morningStart : null,
       morningEnd: data.morningEnd ? data.morningEnd : null,
-      afternoonStart: data.afternoonStart
-        ? data.afternoonStart
-        : null,
-      afternoonEnd: data.afternoonEnd
-        ? data.afternoonEnd
-        : null,
+      afternoonStart: data.afternoonStart ? data.afternoonStart : null,
+      afternoonEnd: data.afternoonEnd ? data.afternoonEnd : null,
       notes: data.notes || '',
     });
 

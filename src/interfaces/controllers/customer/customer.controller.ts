@@ -9,12 +9,7 @@ import {
   ValidationPipe,
   ParseIntPipe,
 } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateCustomer } from '@/application/use-cases/customer/create.use-case';
 import { FindCustomer } from '@/application/use-cases/customer/find.use-case';
 import { FindAllCustomers } from '@/application/use-cases/customer/find-all.use-case';
@@ -44,8 +39,7 @@ export class CustomerController {
 
   // Get all clients
   @ApiOperation({
-    summary:
-      'Obtener todos los clientes',
+    summary: 'Obtener todos los clientes',
   })
   @Get()
   findAll() {
