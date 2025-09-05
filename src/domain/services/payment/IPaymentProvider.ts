@@ -4,11 +4,12 @@ import { RefundResponse } from 'mercadopago/dist/clients/paymentRefund/commonTyp
 
 export interface IPaymentProvider {
   processPayment(payment: Payment): Promise<PaymentResult>;
-  processRefund(
+  processRefund?(
     paymentProviderRef: string,
     refundAmount: number,
     commerceId: number,
   ): Promise<RefundResponse>;
+  verifyPayment?(paymentId: string): Promise<PaymentStatus>;
   // getPaymentDetails(paymentId: string): Promise<PaymentDetails>;
 }
 
