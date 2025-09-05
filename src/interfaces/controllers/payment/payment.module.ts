@@ -1,6 +1,8 @@
 import { PaymentMethod } from '@/domain/dbEnums/paymentMethods';
 import { IPaymentProvider } from '@/domain/services/payment/IPaymentProvider';
 import { PaymentOrchestratorService } from '@/domain/services/payment/PaymentOrchestratorService';
+import { PaymentSecurityValidator } from '@/domain/services/payment/PaymentSecurityValidator';
+import { PaymentLogger } from '@/infrastructure/logging/PaymentLogger';
 import { PrismaModule } from '@/infrastructure/prisma/prisma.module';
 import { Module } from '@nestjs/common';
 import { PaymentsController } from './payment.controller';
@@ -16,8 +18,6 @@ import {
     PAYMENT_PROVIDERS,
     PAYMENT_REPOSITORY
 } from '@/application/providers';
-
-// Services
 
 // Providers
 import { CashProvider } from '@/domain/services/payment/providers/CashProvider';
@@ -57,7 +57,8 @@ import { PrismaMercadoPagoRepository } from '@/infrastructure/prisma/repositorie
             },
             inject: [MERCADO_PAGO_REPOSITORY, BOOKING_REPOSITORY, PAYMENT_REPOSITORY]
         },
-
+        PaymentLogger,
+        PaymentSecurityValidator,
         PaymentOrchestratorService,
         CreatePayment,
         GetPaymentsByBooking,
