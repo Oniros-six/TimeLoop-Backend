@@ -17,7 +17,7 @@ import {
   COMMERCE_REPOSITORY,
   REMINDER_REPOSITORY,
 } from '@/application/providers';
-import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory';
+import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory.enum';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 
 describe('NotificationService', () => {

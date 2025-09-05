@@ -4,7 +4,7 @@ import { CreateCustomerDto } from '@/interfaces/controllers/customer/dto/create-
 import { Customer as CustomerDomain } from '@/domain/entities/customer.entity';
 import { CUSTOMER_REPOSITORY } from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 
 @Injectable()
 export class CreateCustomer {

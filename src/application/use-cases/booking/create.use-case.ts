@@ -1,7 +1,7 @@
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { BOOKING_HISTORY_REPOSITORY, BOOKING_REPOSITORY, SERVICE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
-import { ReminderChannel, ReminderStatus } from '@/domain/dbEnums/ReminderConstants';
+import { ReminderChannel, ReminderStatus } from '@/domain/dbEnums/Reminder.enum';
 import { Booking } from '@/domain/entities/booking.entity';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';

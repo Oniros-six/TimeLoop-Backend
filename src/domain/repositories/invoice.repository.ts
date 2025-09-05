@@ -1,4 +1,4 @@
-import { InvoiceStatus } from "../dbEnums/invoiceStatus";
+import { InvoiceStatus } from "../dbEnums/InvoiceStatus.enum";
 import { Invoice } from "../entities/invoice.entity";
 
 export interface IInvoiceRepository {

@@ -1,12 +1,12 @@
 import { BOOKING_HISTORY_REPOSITORY, COMMERCE_REPOSITORY, INVOICE_REPOSITORY } from '@/application/providers';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { Invoice } from '@/domain/entities/invoice.entity';
 import { IBookingHistoryRepository } from '@/domain/repositories/bookingHistory.repository';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { IInvoiceRepository } from '@/domain/repositories/invoice.repository';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { BookingStatus } from '@/domain/dbEnums/BookingStatus';
+import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { ConfigService } from '@nestjs/config';
 import { calculateFee } from '@/domain/value-objects/invoice/helper';
 

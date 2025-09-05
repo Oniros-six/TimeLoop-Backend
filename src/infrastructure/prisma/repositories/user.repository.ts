@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IUserRepository } from '@/domain/repositories/user.repository';
 import { User as DomainClient, User } from '@/domain/entities/user.entity';
-import { Roles } from '@/domain/dbEnums/user-roles.constants';
+import { Roles } from '@/domain/dbEnums/UserRoles.enum';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {

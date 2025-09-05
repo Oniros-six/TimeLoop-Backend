@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IPaymentRepository } from '@/domain/repositories/payment.repository';
 import { Payment as DomainClient } from '@/domain/entities/payment.entity';
-import { Currency } from "@/domain/dbEnums/Currency";
-import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus";
-import { PaymentMethod } from "@/domain/dbEnums/paymentMethods";
+import { Currency } from "@/domain/dbEnums/Currency.enum";
+import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus.enum";
+import { PaymentMethod } from "@/domain/dbEnums/PaymentMethods.enum";
 
 @Injectable()
 export class PrismaPaymentRepository implements IPaymentRepository {

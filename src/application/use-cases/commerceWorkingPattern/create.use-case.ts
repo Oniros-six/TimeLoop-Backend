@@ -8,7 +8,7 @@ import {
 
 import { CommerceWorkingPattern as CommerceWorkingPatternDomain } from '@/domain/entities/commerceWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { CreateCommercePatternDto } from '@/interfaces/controllers/commerceWorkingPattern/dto/create-commercePattern.dto';
 import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { Booking as DomainClient } from '@/domain/entities/booking.entity';
-import { BookingStatus } from '@/domain/dbEnums/BookingStatus';
+import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { BookingService } from '@/domain/entities/bookingService.entity';
 import { BookingDetail } from '@/domain/common/BookingDetail.type';

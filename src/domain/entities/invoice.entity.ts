@@ -1,4 +1,4 @@
-import { InvoiceStatus } from "../dbEnums/invoiceStatus";
+import { InvoiceStatus } from "../dbEnums/InvoiceStatus.enum";
 
 export class Invoice {
     constructor(

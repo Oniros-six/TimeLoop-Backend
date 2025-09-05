@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus';
+import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus.enum';
 
 export interface PaymentLogContext {
     paymentId?: number;

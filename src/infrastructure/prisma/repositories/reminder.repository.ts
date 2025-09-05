@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Reminder as DomainClient } from '@/domain/entities/reminder.entity';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 import { PrismaService } from '../prisma.service';
-import { ReminderStatus } from '@/domain/dbEnums/ReminderConstants';
+import { ReminderStatus } from '@/domain/dbEnums/Reminder.enum';
 import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';
 
 type ReminderWithRelations = DomainClient & {

@@ -1,4 +1,4 @@
-import { BookingStatus } from "@/domain/dbEnums/BookingStatus"
+import { BookingStatus } from "@/domain/dbEnums/BookingStatus.enum"
 import { BookingService } from "./bookingService.entity";
 import { Service } from "./service.entity";
 import { addMinutesToTime } from "../value-objects/booking/validations";

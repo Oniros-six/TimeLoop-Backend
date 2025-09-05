@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from '@/domain/repositories/user.repository';
 import { USER_REPOSITORY } from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { StateUserDto } from '@/interfaces/controllers/user/dto/state-user.dto';
 
 @Injectable()

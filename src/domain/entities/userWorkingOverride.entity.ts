@@ -1,4 +1,4 @@
-import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType';
+import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType.enum';
 
 export class UserWorkingOverride {
   constructor(

@@ -7,7 +7,7 @@ import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { CommerceConfig as CommerceConfigDomain } from '@/domain/entities/commerceConfig.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { CreateCommerceConfigDto } from '@/interfaces/controllers/commerceConfig/dto/create-commerceConfig.dto';
 import { validateOpenCloseTime } from '@/domain/value-objects/configs/validate-hours';
 

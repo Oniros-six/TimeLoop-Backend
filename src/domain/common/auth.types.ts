@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { Roles } from '@/domain/dbEnums/user-roles.constants';
+import { Roles } from '@/domain/dbEnums/UserRoles.enum';
 
 export interface User {
   id: number;

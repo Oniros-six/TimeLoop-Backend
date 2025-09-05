@@ -1,7 +1,7 @@
 import { Payment } from "@/domain/entities/payment.entity";
 import { IPaymentProvider, PaymentResult } from "../IPaymentProvider";
 import { Injectable, Inject } from "@nestjs/common";
-import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus";
+import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus.enum";
 import { RefundResponse } from "mercadopago/dist/clients/paymentRefund/commonTypes";
 import { MercadoPagoConfig, PaymentRefund, Preference } from 'mercadopago';
 import { MERCADO_PAGO_REPOSITORY, BOOKING_REPOSITORY } from "@/application/providers";

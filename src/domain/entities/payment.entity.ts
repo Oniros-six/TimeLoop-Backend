@@ -1,6 +1,6 @@
-import { Currency } from "@/domain/dbEnums/Currency";
-import { PaymentMethod } from "@/domain/dbEnums/paymentMethods";
-import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus";
+import { Currency } from "@/domain/dbEnums/Currency.enum";
+import { PaymentMethod } from "@/domain/dbEnums/PaymentMethods.enum";
+import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus.enum";
 
 export class Payment {
     constructor(

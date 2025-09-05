@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
-import { Currency } from "@/domain/dbEnums/Currency";
-import { PaymentMethod } from "@/domain/dbEnums/paymentMethods";
+import { Currency } from "@/domain/dbEnums/Currency.enum";
+import { PaymentMethod } from "@/domain/dbEnums/PaymentMethods.enum";
 
 export class CreatePaymentDto {
     @ApiProperty({

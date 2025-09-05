@@ -1,7 +1,7 @@
 import {
   ReminderChannel,
   ReminderStatus,
-} from '@/domain/dbEnums/ReminderConstants';
+} from '@/domain/dbEnums/Reminder.enum';
 
 export class Reminder {
   constructor(

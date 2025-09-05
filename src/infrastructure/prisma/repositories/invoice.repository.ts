@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IInvoiceRepository } from '@/domain/repositories/invoice.repository';
 import { Invoice as DomainClient } from '@/domain/entities/invoice.entity';
-import { InvoiceStatus } from '@/domain/dbEnums/invoiceStatus';
+import { InvoiceStatus } from '@/domain/dbEnums/InvoiceStatus.enum';
 
 @Injectable()
 export class PrismaInvoiceRepository implements IInvoiceRepository {

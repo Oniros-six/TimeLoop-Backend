@@ -1,5 +1,5 @@
 import { INVOICE_REPOSITORY } from '@/application/providers';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IInvoiceRepository } from '@/domain/repositories/invoice.repository';

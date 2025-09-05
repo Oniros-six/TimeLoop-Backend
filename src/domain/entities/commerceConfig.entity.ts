@@ -1,4 +1,4 @@
-import { PaymentMethod } from "../dbEnums/paymentMethods";
+import { PaymentMethod } from "../dbEnums/PaymentMethods.enum";
 
 export class CommerceConfig {
   constructor(

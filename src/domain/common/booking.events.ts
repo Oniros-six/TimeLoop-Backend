@@ -1,6 +1,5 @@
 import { Booking } from '../entities/booking.entity';
 
-// booking.events.ts
 export class BookingCreatedEvent {
   constructor(public readonly booking: Booking) {}
 }

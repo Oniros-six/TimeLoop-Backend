@@ -1,5 +1,5 @@
-import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType';
-import { WeekDays } from '../dbEnums/weekdays';
+import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType.enum';
+import { WeekDays } from '../dbEnums/Weekdays.enum';
 
 export class UserWorkingPattern {
   constructor(

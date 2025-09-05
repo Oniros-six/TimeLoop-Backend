@@ -8,7 +8,7 @@ import {
 
 import { UserWorkingOverride as UserWorkingOverrideDomain } from '@/domain/entities/userWorkingOverride.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { CreateUserOverrideDto } from '@/interfaces/controllers/userWorkingOverride/dto/create-userOverride.dto';
 import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 

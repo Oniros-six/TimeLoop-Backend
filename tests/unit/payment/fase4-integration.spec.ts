@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaymentSecurityValidator } from '@/domain/services/payment/PaymentSecurityValidator';
 import { PaymentLogger } from '@/infrastructure/logging/PaymentLogger';
-import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus';
+import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus.enum';
 
 describe('PaymentSecurityValidator', () => {
     let validator: PaymentSecurityValidator;

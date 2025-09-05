@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus";
+import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus.enum";
 
 export class PaymentStateMachine {
     private static readonly VALID_TRANSITIONS = {

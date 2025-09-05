@@ -1,4 +1,4 @@
-import { PaymentMethod } from '@/domain/dbEnums/paymentMethods';
+import { PaymentMethod } from '@/domain/dbEnums/PaymentMethods.enum';
 import { IPaymentProvider } from '@/domain/services/payment/IPaymentProvider';
 import { PaymentOrchestratorService } from '@/domain/services/payment/PaymentOrchestratorService';
 import { PaymentSecurityValidator } from '@/domain/services/payment/PaymentSecurityValidator';

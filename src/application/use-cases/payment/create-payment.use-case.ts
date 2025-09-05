@@ -1,6 +1,6 @@
 import { BOOKING_REPOSITORY, PAYMENT_REPOSITORY } from '@/application/providers';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
-import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
+import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus.enum';
 import { Payment as PaymentDomain } from '@/domain/entities/payment.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { IPaymentRepository } from '@/domain/repositories/payment.repository';

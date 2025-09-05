@@ -1,4 +1,4 @@
-import { PaymentMethod } from '@/domain/dbEnums/paymentMethods';
+import { PaymentMethod } from '@/domain/dbEnums/PaymentMethods.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {

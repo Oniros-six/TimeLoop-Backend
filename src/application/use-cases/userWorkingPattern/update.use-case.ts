@@ -4,7 +4,7 @@ import { USER_WORKING_PATTERN_REPOSITORY } from '@/application/providers';
 
 import { UserWorkingPattern as UserWorkingPatternDomain } from '@/domain/entities/userWorkingPattern.entity';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { UpdateUserPatternDto } from '@/interfaces/controllers/userWorkingPattern/dto/update-userPattern.dto';
 import { validateAvailabilityTimes } from '@/domain/value-objects/configs/validate-hours';
 

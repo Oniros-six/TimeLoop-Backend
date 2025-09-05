@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { Commerce as DomainClient } from '@/domain/entities/commerce.entity';
-import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory';
+import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory.enum';
 import { CommerceUpdateData } from '@/domain/common/CommerceUpdateData';
 
 @Injectable()

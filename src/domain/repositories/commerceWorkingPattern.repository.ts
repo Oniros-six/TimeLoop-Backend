@@ -1,4 +1,4 @@
-import { WeekDays } from '../dbEnums/weekdays';
+import { WeekDays } from '../dbEnums/Weekdays.enum';
 import { CommerceWorkingPattern } from '../entities/commerceWorkingPattern.entity';
 
 export interface ICommerceWorkingPatternRepository {

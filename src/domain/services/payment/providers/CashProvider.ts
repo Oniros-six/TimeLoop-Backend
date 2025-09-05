@@ -2,7 +2,7 @@ import { Payment } from "@/domain/entities/payment.entity";
 import { Injectable } from "@nestjs/common";
 import { IPaymentProvider, PaymentResult } from "../IPaymentProvider";
 import { RefundResponse } from "mercadopago/dist/clients/paymentRefund/commonTypes";
-import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus";
+import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus.enum";
 
 @Injectable()
 export class CashProvider implements IPaymentProvider {

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { IPaymentProvider, PaymentResult } from "./IPaymentProvider";
-import { PaymentMethod } from "@/domain/dbEnums/paymentMethods";
+import { PaymentMethod } from "@/domain/dbEnums/PaymentMethods.enum";
 import { Payment } from "@/domain/entities/payment.entity";
 import { PAYMENT_PROVIDERS } from "@/application/providers";
 import { RefundResponse } from "mercadopago/dist/clients/paymentRefund/commonTypes";

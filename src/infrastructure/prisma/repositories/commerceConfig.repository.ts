@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.repository';
 import { CommerceConfig as DomainClient } from '@/domain/entities/commerceConfig.entity';
-import { PaymentMethod } from '@/domain/dbEnums/paymentMethods';
+import { PaymentMethod } from '@/domain/dbEnums/PaymentMethods.enum';
 
 @Injectable()
 export class PrismaCommerceConfigRepository

@@ -1,7 +1,7 @@
 import {
   ChangeType,
   EntityType,
-} from '@/domain/dbEnums/activity-log.constants';
+} from '@/domain/dbEnums/Activity-log.enum';
 
 export class ActivityLog {
   constructor(

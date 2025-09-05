@@ -2,11 +2,11 @@ import { BOOKING_HISTORY_REPOSITORY, BOOKING_REPOSITORY, COMMERCE_CONFIG_REPOSIT
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
 import { BookingHistoryUpdateData } from '@/domain/common/BookingHistoryUpdateData';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import {
   ReminderChannel,
   ReminderStatus,
-} from '@/domain/dbEnums/ReminderConstants';
+} from '@/domain/dbEnums/Reminder.enum';
 import { BookingService } from '@/domain/entities/bookingService.entity';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { Service } from '@/domain/entities/service.entity';

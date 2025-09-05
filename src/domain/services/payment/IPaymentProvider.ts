@@ -1,4 +1,4 @@
-import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus";
+import { PaymentStatus } from "@/domain/dbEnums/PaymentStatus.enum";
 import { Payment } from "@/domain/entities/payment.entity";
 import { RefundResponse } from "mercadopago/dist/clients/paymentRefund/commonTypes";
 

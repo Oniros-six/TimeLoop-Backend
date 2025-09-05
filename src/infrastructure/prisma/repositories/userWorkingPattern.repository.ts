@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IUserWorkingPatternRepository } from '@/domain/repositories/userWorkingPattern.repository';
 import { UserWorkingPattern as DomainClient } from '@/domain/entities/userWorkingPattern.entity';
-import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType';
-import { WeekDays } from '@/domain/dbEnums/weekdays';
+import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType.enum';
+import { WeekDays } from '@/domain/dbEnums/Weekdays.enum';
 
 @Injectable()
 export class PrismaUserWorkingPatternRepository

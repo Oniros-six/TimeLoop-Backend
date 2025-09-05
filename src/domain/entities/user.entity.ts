@@ -1,4 +1,4 @@
-import { Roles } from '@/domain/dbEnums/user-roles.constants';
+import { Roles } from '@/domain/dbEnums/UserRoles.enum';
 
 export class User {
   constructor(

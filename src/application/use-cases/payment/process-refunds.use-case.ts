@@ -3,9 +3,9 @@ import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PAYMENT_REPOSITORY } from '@/application/providers';
 import { IPaymentRepository } from '@/domain/repositories/payment.repository';
 import { PaymentStateMachine } from '@/domain/value-objects/payment/PaymentStateMachine';
-import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus';
+import { PaymentStatus } from '@/domain/dbEnums/PaymentStatus.enum';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/domain/dbEnums/activity-log.constants';
+import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { PaymentOrchestratorService } from '@/domain/services/payment/PaymentOrchestratorService';
 
 @Injectable()
