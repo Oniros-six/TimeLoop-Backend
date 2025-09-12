@@ -42,6 +42,13 @@ export class PaymentOrchestratorService {
       );
     }
 
+    if (!provider.processRefund) {
+      throw new HttpException(
+        `El proveedor ${payment.method} no soporta reembolsos`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     return provider.processRefund(
       payment.providerRef,
       refundAmount,

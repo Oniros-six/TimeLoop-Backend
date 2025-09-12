@@ -17,11 +17,13 @@ import { PrismaBookingHistoryRepository } from './repositories/bookingHistory.re
 import { PrismaInvoiceRepository } from './repositories/invoice.repository';
 import { PrismaPaymentRepository } from './repositories/payment.repository';
 import { PrismaMercadoPagoRepository } from './repositories/mercadoPago.repository';
+import { TokenEncryptionService } from '../payments/TokenEncryptationService';
 
 @Global()
 @Module({
   providers: [
     PrismaService,
+    TokenEncryptionService,
     {
       provide: 'ICustomerRepository',
       useClass: PrismaCustomerRepository,
@@ -94,6 +96,7 @@ import { PrismaMercadoPagoRepository } from './repositories/mercadoPago.reposito
 
   exports: [
     PrismaService,
+    TokenEncryptionService,
     'ICustomerRepository',
     'ICommerceRepository',
     'IActivityLogRepository',
