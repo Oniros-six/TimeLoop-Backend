@@ -5,6 +5,11 @@ import { ValidationPipe } from '@nestjs/common';
 import * as cors from 'cors';
 import * as passport from 'passport';
 import * as session from 'express-session';
+import { webcrypto } from 'node:crypto';
+
+if (!globalThis.crypto) {
+  (globalThis as any).crypto = webcrypto;
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
