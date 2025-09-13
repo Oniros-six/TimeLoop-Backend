@@ -23,4 +23,6 @@ export interface ICommerceWorkingPatternRepository {
     id: number;
     newCommerceWorkingPatternData: CommerceWorkingPattern;
   }): Promise<CommerceWorkingPattern | null>;
+
+  deleteCommerceWorkingPattern(data: { id: number }): Promise<boolean>;
 }

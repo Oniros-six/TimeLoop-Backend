@@ -9,4 +9,6 @@ export interface ICommerceConfigRepository {
     commerceId: number;
     newCommerceConfigData: CommerceConfig;
   }): Promise<CommerceConfig | null>;
+
+  deleteCommerceConfig(data: { commerceId: number }): Promise<boolean>;
 }

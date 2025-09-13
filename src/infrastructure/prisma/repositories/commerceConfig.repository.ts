@@ -57,4 +57,15 @@ export class PrismaCommerceConfigRepository
     if (!result) return null;
     return this.toDomain(result);
   }
+  async deleteCommerceConfig(data: { commerceId: number }): Promise<boolean> {
+    try {
+      await this.prisma.commerceConfig.delete({
+        where: { commerceId: data.commerceId },
+      });
+      return true;
+    } catch (error) {
+      console.error('Error eliminando configuración de comercio:', error);
+      return false;
+    }
+  }
 }

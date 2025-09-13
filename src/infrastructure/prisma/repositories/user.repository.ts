@@ -138,4 +138,15 @@ export class PrismaUserRepository implements IUserRepository {
     if (!result) return null;
     return this.toDomain(result);
   }
+  async deleteUser(data: { userId: number }): Promise<boolean> {
+    try {
+      await this.prisma.user.delete({
+        where: { id: data.userId },
+      });
+      return true;
+    } catch (error) {
+      console.error('Error eliminando usuario:', error);
+      return false;
+    }
+  }
 }

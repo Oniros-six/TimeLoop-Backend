@@ -143,4 +143,16 @@ export class PrismaCommerceRepository implements ICommerceRepository {
 
     return this.toDomain(result);
   }
+
+  async deleteCommerce(data: { commerceId: number }): Promise<boolean> {
+    try {
+      await this.prisma.commerce.delete({
+        where: { id: data.commerceId },
+      });
+      return true;
+    } catch (error) {
+      console.error('Error eliminando comercio:', error);
+      return false;
+    }
+  }
 }

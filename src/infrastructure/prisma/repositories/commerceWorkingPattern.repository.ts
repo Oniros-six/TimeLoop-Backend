@@ -87,4 +87,16 @@ export class PrismaCommerceWorkingPatternRepository
     if (!result) return null;
     return this.toDomain(result);
   }
+
+  async deleteCommerceWorkingPattern(data: { id: number }): Promise<boolean> {
+    try {
+      await this.prisma.commerceWorkingPattern.delete({
+        where: { id: data.id },
+      });
+      return true;
+    } catch (error) {
+      console.error('Error eliminando patrón de trabajo:', error);
+      return false;
+    }
+  }
 }

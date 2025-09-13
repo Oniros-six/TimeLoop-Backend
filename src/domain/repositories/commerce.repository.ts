@@ -22,4 +22,6 @@ export interface ICommerceRepository {
     id: number;
     newCommerceData: CommerceUpdateData;
   }): Promise<Commerce | null>;
+
+  deleteCommerce(data: { commerceId: number }): Promise<boolean>;
 }

@@ -24,4 +24,6 @@ export interface IUserRepository {
   createUser(data: User): Promise<User | null>;
 
   updateUser(data: { userId: number; newUserData: User }): Promise<User | null>;
+
+  deleteUser(data: { userId: number }): Promise<boolean>;
 }
