@@ -9,11 +9,17 @@ import * as session from 'express-session';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(cors({
-    origin: ['http://localhost:4321', 'http://localhost:3000', 'http://www.timeloop.com.uy'], // Puerto de Astro
-    credentials: true
-  }))
-  
+  app.use(
+    cors({
+      origin: [
+        'http://localhost:4321',
+        'http://localhost:3000',
+        'http://www.timeloop.com.uy',
+      ], // Puerto de Astro
+      credentials: true,
+    }),
+  );
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

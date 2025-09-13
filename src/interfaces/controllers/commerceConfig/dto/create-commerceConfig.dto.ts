@@ -1,13 +1,7 @@
 import { PaymentMethod } from '@/domain/dbEnums/PaymentMethods.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  Matches,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateCommerceConfigDto {
   @ApiProperty({
