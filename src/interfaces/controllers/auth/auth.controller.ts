@@ -6,6 +6,7 @@ import {
   Req,
   Res,
   InternalServerErrorException,
+  Body,
 } from '@nestjs/common';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
@@ -13,10 +14,13 @@ import { Response } from 'express';
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
 import { AuthenticatedRequest } from '@/domain/common/auth.types';
 import { LoginUserDto } from './dto/login-user.dto';
+import { CreateBusinessDto } from './dto/signup.dto';
+import { Signup } from '@/application/use-cases/auth/signup.use-case';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly signupUseCase: Signup) {}
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
@@ -107,5 +111,19 @@ export class AuthController {
         });
       });
     });
+  }
+
+  @ApiOperation({
+    summary: 'Registro completo de comercio',
+    description:
+      'Crea un nuevo comercio con su dueño (usuario ADMIN) y configuraciones por defecto',
+  })
+  @ApiBody({
+    type: CreateBusinessDto,
+    description: 'Datos completos para el registro del comercio y su dueño',
+  })
+  @Post('signup')
+  async signup(@Body() signupDto: CreateBusinessDto) {
+    return await this.signupUseCase.execute(signupDto);
   }
 }
