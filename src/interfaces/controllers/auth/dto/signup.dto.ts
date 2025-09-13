@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Matches,
   MaxLength,
@@ -14,32 +15,37 @@ import { WeekDays } from '@/domain/dbEnums/Weekdays.enum';
 import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory.enum';
 
 class ShiftDto {
+  @IsOptional()
   @ApiProperty({ example: '09:00', description: 'Hora de apertura (HH:mm)' })
   @IsString()
   @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
     message: 'El formato de la hora debe ser HH:mm',
   })
-  morningOpen: string;
+  morningOpen: string | null;
 
+  @IsOptional()
   @ApiProperty({ example: '18:00', description: 'Hora de cierre (HH:mm)' })
   @IsString()
   @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
     message: 'El formato de la hora debe ser HH:mm',
   })
-  morningClose: string;
+  morningClose: string | null;
+  @IsOptional()
+  @IsOptional()
   @ApiProperty({ example: '09:00', description: 'Hora de apertura (HH:mm)' })
   @IsString()
   @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
     message: 'El formato de la hora debe ser HH:mm',
   })
-  afternoonOpen: string;
+  afternoonOpen: string | null;
 
+  @IsOptional()
   @ApiProperty({ example: '18:00', description: 'Hora de cierre (HH:mm)' })
   @IsString()
   @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
     message: 'El formato de la hora debe ser HH:mm',
   })
-  afternoonClose: string;
+  afternoonClose: string | null;
 }
 
 class WorkingDayDto {
@@ -51,10 +57,10 @@ class WorkingDayDto {
   @IsEnum(WeekDays, { message: 'El día de la semana debe estar en inglés' })
   weekday: WeekDays;
 
-  @ApiProperty({ type: [ShiftDto] })
-  @ValidateNested({ each: true })
+  @ApiProperty({ type: ShiftDto })
+  @ValidateNested()
   @Type(() => ShiftDto)
-  shifts: ShiftDto[];
+  shifts: ShiftDto;
 }
 
 export class CreateBusinessDto {
@@ -63,7 +69,7 @@ export class CreateBusinessDto {
   @IsString({ message: 'El nombre tiene que contener solo letras' })
   @IsNotEmpty({ message: 'El nombre es requerido' })
   @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-  @MaxLength(15, { message: 'El nombre no debe tener más de 15 caracteres' })
+  @MaxLength(50, { message: 'El nombre no debe tener más de 50 caracteres' })
   ownerName: string;
 
   @ApiProperty({

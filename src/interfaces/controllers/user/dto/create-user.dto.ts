@@ -26,7 +26,7 @@ export class CreateUserDto {
   @IsString({ message: 'El nombre tiene que contener solo letras' })
   @IsNotEmpty({ message: 'El nombre es requerido' })
   @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-  @MaxLength(15, { message: 'El nombre no debe tener más de 15 caracteres' })
+  @MaxLength(50, { message: 'El nombre no debe tener más de 50 caracteres' })
   name: string;
 
   @ApiProperty({

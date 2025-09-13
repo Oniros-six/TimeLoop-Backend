@@ -108,36 +108,35 @@ export class Signup {
           continue;
         }
 
-        for (const shift of schedule.shifts) {
-          const hasMorning = !!(shift.morningOpen && shift.morningClose);
-          const hasAfternoon = !!(shift.afternoonOpen && shift.afternoonClose);
+        const shift = schedule.shifts;
+        const hasMorning = !!(shift.morningOpen && shift.morningClose);
+        const hasAfternoon = !!(shift.afternoonOpen && shift.afternoonClose);
 
-          let availabilityType: AvailabilityType;
+        let availabilityType: AvailabilityType;
 
-          if (hasMorning && hasAfternoon) {
-            availabilityType = AvailabilityType.full;
-          } else if (hasMorning || hasAfternoon) {
-            availabilityType = AvailabilityType.half;
-          } else {
-            availabilityType = AvailabilityType.off;
-          }
-
-          const commerceWP = CommerceWorkingPattern.create({
-            commerceId: commerceResult!.id,
-            weekday: weekday,
-            availabilityType,
-            morningStart: shift.morningOpen,
-            morningEnd: shift.morningClose,
-            afternoonStart: shift.afternoonOpen,
-            afternoonEnd: shift.afternoonClose,
-          });
-
-          const wpResult =
-            await this.commerceWorkingPatternRepository.createCommerceWorkingPattern(
-              commerceWP,
-            );
-          createdIds.workingPatternIds.push(wpResult!.id);
+        if (hasMorning && hasAfternoon) {
+          availabilityType = AvailabilityType.full;
+        } else if (hasMorning || hasAfternoon) {
+          availabilityType = AvailabilityType.half;
+        } else {
+          availabilityType = AvailabilityType.off;
         }
+
+        const commerceWP = CommerceWorkingPattern.create({
+          commerceId: commerceResult!.id,
+          weekday: weekday,
+          availabilityType,
+          morningStart: shift.morningOpen,
+          morningEnd: shift.morningClose,
+          afternoonStart: shift.afternoonOpen,
+          afternoonEnd: shift.afternoonClose,
+        });
+
+        const wpResult =
+          await this.commerceWorkingPatternRepository.createCommerceWorkingPattern(
+            commerceWP,
+          );
+        createdIds.workingPatternIds.push(wpResult!.id);
       }
 
       return {
