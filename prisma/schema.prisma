@@ -222,8 +222,6 @@ model CommerceConfig {
   id                          Int             @id @default(autoincrement())
   commerceId                  Int             @unique
   cancellationDeadlineMinutes Int
-  openTime                    String
-  closeTime                   String
   welcomeMessage              String
   acceptedPaymentMethods      PaymentMethod[]
 

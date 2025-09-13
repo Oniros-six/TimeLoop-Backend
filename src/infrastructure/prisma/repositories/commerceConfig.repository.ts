@@ -14,8 +14,6 @@ export class PrismaCommerceConfigRepository
     id: number;
     commerceId: number;
     cancellationDeadlineMinutes: number;
-    openTime: string;
-    closeTime: string;
     welcomeMessage: string;
     acceptedPaymentMethods: PaymentMethod[];
   }): DomainClient {
@@ -23,8 +21,6 @@ export class PrismaCommerceConfigRepository
       commerce.id,
       commerce.commerceId,
       commerce.cancellationDeadlineMinutes,
-      commerce.openTime,
-      commerce.closeTime,
       commerce.welcomeMessage,
       commerce.acceptedPaymentMethods,
     );

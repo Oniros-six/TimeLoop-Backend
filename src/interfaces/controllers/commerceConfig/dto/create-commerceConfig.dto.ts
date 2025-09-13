@@ -38,28 +38,6 @@ export class CreateCommerceConfigDto {
   welcomeMessage: string;
 
   @ApiProperty({
-    example: '09:00:00',
-    description: 'La hora de apertura del comercio',
-  })
-  @IsNotEmpty({ message: 'La fecha de apertura es requerida' })
-  @IsString()
-  @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
-    message: 'El formato debe ser HH:mm:ss',
-  })
-  openTime: string;
-
-  @ApiProperty({
-    example: '21:00:00',
-    description: 'La hora de cierre del comercio',
-  })
-  @IsNotEmpty({ message: 'La fecha de cierre es requerida' })
-  @IsString()
-  @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
-    message: 'El formato debe ser HH:mm:ss',
-  })
-  closeTime: string;
-
-  @ApiProperty({
     example: [PaymentMethod.MERCADO_PAGO, PaymentMethod.CASH],
     description: 'Métodos de pago habilitados por el comercio',
     enum: PaymentMethod,

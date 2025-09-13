@@ -5,8 +5,6 @@ export class CommerceConfig {
     public readonly id: number,
     public readonly commerceId: number,
     public cancellationDeadlineMinutes: number,
-    public openTime: string,
-    public closeTime: string,
     public welcomeMessage: string,
     public acceptedPaymentMethods: PaymentMethod[],
   ) {}
@@ -15,8 +13,6 @@ export class CommerceConfig {
   static create(props: {
     commerceId: number;
     cancellationDeadlineMinutes: number;
-    openTime: string;
-    closeTime: string;
     welcomeMessage: string;
     acceptedPaymentMethods: PaymentMethod[];
   }): CommerceConfig {
@@ -37,18 +33,10 @@ export class CommerceConfig {
       throw new Error('El tiempo debe ser un número positivo.');
     }
 
-    if (props.openTime >= props.closeTime) {
-      throw new Error(
-        'La hora de apertura debe ser anterior a la hora de cierre.',
-      );
-    }
-
     return new CommerceConfig(
       0,
       props.commerceId,
       props.cancellationDeadlineMinutes,
-      props.openTime,
-      props.closeTime,
       props.welcomeMessage,
       props.acceptedPaymentMethods,
     );

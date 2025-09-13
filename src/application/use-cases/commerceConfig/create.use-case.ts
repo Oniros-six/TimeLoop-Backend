@@ -9,7 +9,6 @@ import { CommerceConfig as CommerceConfigDomain } from '@/domain/entities/commer
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { CreateCommerceConfigDto } from '@/interfaces/controllers/commerceConfig/dto/create-commerceConfig.dto';
-import { validateOpenCloseTime } from '@/domain/value-objects/configs/validate-hours';
 
 @Injectable()
 export class CreateCommerceConfig {
@@ -44,13 +43,9 @@ export class CreateCommerceConfig {
       );
     }
 
-    validateOpenCloseTime(data.openTime, data.closeTime);
-
     const commerceConfig = CommerceConfigDomain.create({
       commerceId: commerceId,
       cancellationDeadlineMinutes: data.cancellationDeadlineMinutes,
-      openTime: data.openTime,
-      closeTime: data.closeTime,
       welcomeMessage: data.welcomeMessage,
       acceptedPaymentMethods: data.acceptedPaymentMethods,
     });

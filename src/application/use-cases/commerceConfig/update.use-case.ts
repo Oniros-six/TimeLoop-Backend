@@ -9,7 +9,6 @@ import { CommerceConfig as CommerceConfigDomain } from '@/domain/entities/commer
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { UpdateCommerceConfigDto } from '@/interfaces/controllers/commerceConfig/dto/update-commerceConfig.dto';
-import { validateOpenCloseTime } from '@/domain/value-objects/configs/validate-hours';
 
 @Injectable()
 export class UpdateCommerceConfig {
@@ -21,7 +20,7 @@ export class UpdateCommerceConfig {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
+  ) { }
 
   async execute(commerceId: number, data: UpdateCommerceConfigDto) {
     const commerce = await this.commerceRepository.findCommerce({
@@ -44,21 +43,11 @@ export class UpdateCommerceConfig {
       );
     }
 
-    if (data.openTime) {
-      validateOpenCloseTime(data.openTime, commerceConfig.closeTime);
-    }
-
-    if (data.closeTime) {
-      validateOpenCloseTime(commerceConfig.openTime, data.closeTime);
-    }
-
     const updatedConfigData = CommerceConfigDomain.create({
       commerceId: commerceId,
       cancellationDeadlineMinutes:
         data.cancellationDeadlineMinutes ??
         commerceConfig.cancellationDeadlineMinutes,
-      openTime: data.openTime ?? commerceConfig.openTime,
-      closeTime: data.closeTime ?? commerceConfig.closeTime,
       welcomeMessage: data.welcomeMessage ?? commerceConfig.welcomeMessage,
       acceptedPaymentMethods:
         data.acceptedPaymentMethods ?? commerceConfig.acceptedPaymentMethods,
