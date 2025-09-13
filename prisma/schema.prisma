@@ -15,12 +15,12 @@ enum BusinessCategory {
   Peluqueria
   Barberia
   Estetica
-  EntrenamientoPersonal
   Spa
-  Fotografia
-  Otros
-}
-
+  Salon
+  Masajes
+  Otro
+}  
+  
 enum Roles {
   ADMIN
   EMPLOYEE
