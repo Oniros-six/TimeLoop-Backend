@@ -30,7 +30,7 @@ class ShiftDto {
     message: 'El formato de la hora debe ser HH:mm',
   })
   morningClose: string | null;
-  @IsOptional()
+
   @IsOptional()
   @ApiProperty({ example: '09:00', description: 'Hora de apertura (HH:mm)' })
   @IsString()

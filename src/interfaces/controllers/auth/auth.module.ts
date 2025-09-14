@@ -29,6 +29,10 @@ import { AuthService } from '@/domain/services/auth/auth.service';
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
 import { RolesGuard } from '@/infrastructure/auth/roles.guard';
 import { BcryptPasswordHasher } from '@/infrastructure/auth/bcrypt-password-hasher';
+import { CreateCommerce } from '@/application/use-cases/commerce/create.use-case';
+import { CreateUser } from '@/application/use-cases/user/create.use-case';
+import { CreateCommerceConfig } from '@/application/use-cases/commerceConfig/create.use-case';
+import { CreateCommerceWorkingPattern } from '@/application/use-cases/commerceWorkingPattern/create.use-case';
 
 @Module({
   imports: [PrismaModule, PassportModule.register({ session: true })],
@@ -54,6 +58,11 @@ import { BcryptPasswordHasher } from '@/infrastructure/auth/bcrypt-password-hash
       provide: 'IPasswordHasher',
       useClass: BcryptPasswordHasher,
     },
+    
+    CreateCommerce,
+    CreateUser,
+    CreateCommerceConfig,
+    CreateCommerceWorkingPattern,
     LoginUser,
     FindUser,
     Signup,

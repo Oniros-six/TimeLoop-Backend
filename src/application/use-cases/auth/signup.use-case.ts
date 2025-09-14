@@ -13,15 +13,25 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Commerce } from '@/domain/entities/commerce.entity';
 import { User } from '@/domain/entities/user.entity';
 import { CommerceConfig } from '@/domain/entities/commerceConfig.entity';
-import { CommerceWorkingPattern } from '@/domain/entities/commerceWorkingPattern.entity';
 import { Roles } from '@/domain/dbEnums/UserRoles.enum';
 import { PaymentMethod } from '@/domain/dbEnums/PaymentMethods.enum';
 import { AvailabilityType } from '@/domain/dbEnums/AvailabilityType.enum';
 import { WeekDays } from '@/domain/dbEnums/Weekdays.enum';
+import { CreateCommercePatternDto } from '@/interfaces/controllers/commerceWorkingPattern/dto/create-commercePattern.dto';
+
+import { CreateCommerce } from '../commerce/create.use-case';
+import { CreateUser } from '../user/create.use-case';
+import { CreateCommerceConfig } from '../commerceConfig/create.use-case';
+import { CreateCommerceWorkingPattern } from '../commerceWorkingPattern/create.use-case';
 
 @Injectable()
 export class Signup {
   constructor(
+    private readonly createCommerceUseCase: CreateCommerce,
+    private readonly createUserUseCase: CreateUser,
+    private readonly createCommerceConfigUseCase: CreateCommerceConfig,
+    private readonly createCommerceWorkingPatternUseCase: CreateCommerceWorkingPattern,
+
     @Inject(COMMERCE_REPOSITORY)
     private readonly commerceRepository: ICommerceRepository,
 
@@ -33,7 +43,7 @@ export class Signup {
 
     @Inject(COMMERCE_WORKING_PATTERN_REPOSITORY)
     private readonly commerceWorkingPatternRepository: ICommerceWorkingPatternRepository,
-  ) {}
+  ) { }
 
   async execute(data: CreateBusinessDto) {
     // Tracking de IDs creados para rollback
@@ -44,6 +54,7 @@ export class Signup {
       workingPatternIds: [] as number[],
     };
 
+    //! I will break a Clean Arquitecture rule, and I will call the respective use cases, in order to avoid to repeat code, and miss validate 
     try {
       //* 1. Crear el comercio
       const newCommerce = Commerce.createCommerce({
@@ -54,9 +65,10 @@ export class Signup {
         businessCategory: data.businessCategory,
       });
 
-      const commerceResult =
-        await this.commerceRepository.createCommerce(newCommerce);
-      createdIds.commerceId = commerceResult!.id;
+      const commerceResult = await this.createCommerceUseCase.execute(newCommerce);
+      const commerceData = commerceResult.data
+
+      createdIds.commerceId = commerceData.id;
 
       //* 2. Crear el usuario ADMIN (dueño)
       const ownerUser = User.create({
@@ -64,25 +76,26 @@ export class Signup {
         email: data.email,
         password: data.password,
         role: Roles.ADMIN,
-        commerceId: commerceResult!.id,
+        commerceId: commerceData.id,
       });
 
-      const userResult = await this.userRepository.createUser(ownerUser);
-      createdIds.userId = userResult!.id;
+      const userResult = await this.createUserUseCase.execute(ownerUser);
+      const userData = userResult.data
+
+      createdIds.userId = userData.id;
 
       //* 3. Crear configuración del comercio con valores por defecto
       const commerceConfig = CommerceConfig.create({
-        commerceId: commerceResult!.id,
+        commerceId: commerceData.id,
         cancellationDeadlineMinutes: 60, // Una hora por default
         welcomeMessage: 'Bienvenidos!',
         acceptedPaymentMethods: [PaymentMethod.CASH],
       });
+      const commerceConfigResult = await this.createCommerceConfigUseCase.execute(commerceData.id, commerceConfig);
 
-      const commerceConfigResult =
-        await this.commerceConfigRepository.createCommerceConfig(
-          commerceConfig,
-        );
-      createdIds.commerceConfigId = commerceConfigResult!.id;
+      const commerceConfigData = commerceConfigResult.data
+
+      createdIds.commerceConfigId = commerceConfigData.id;
 
       //* 4. Crear el Working Pattern del comercio con valores por defecto
       for (const weekday of Object.values(WeekDays)) {
@@ -90,21 +103,18 @@ export class Signup {
 
         if (!schedule) {
           // Si no hay config en data para ese día, lo marcamos como "off"
-          const commerceWP = CommerceWorkingPattern.create({
-            commerceId: commerceResult!.id,
-            weekday,
-            availabilityType: AvailabilityType.off,
-            morningStart: null,
-            morningEnd: null,
-            afternoonStart: null,
-            afternoonEnd: null,
-          });
+          const commerceWP = new CreateCommercePatternDto();
+          commerceWP.commerceId = commerceData.id;
+          commerceWP.weekday = weekday;
+          commerceWP.availabilityType = AvailabilityType.off;
+          commerceWP.morningStart = null;
+          commerceWP.morningEnd = null;
+          commerceWP.afternoonStart = null;
+          commerceWP.afternoonEnd = null;
 
-          const wpResult =
-            await this.commerceWorkingPatternRepository.createCommerceWorkingPattern(
-              commerceWP,
-            );
-          createdIds.workingPatternIds.push(wpResult!.id);
+          const wpResult = await this.createCommerceWorkingPatternUseCase.execute(commerceWP);
+          const wpData = wpResult.data
+          createdIds.workingPatternIds.push(wpData.id);
           continue;
         }
 
@@ -122,21 +132,18 @@ export class Signup {
           availabilityType = AvailabilityType.off;
         }
 
-        const commerceWP = CommerceWorkingPattern.create({
-          commerceId: commerceResult!.id,
-          weekday: weekday,
-          availabilityType,
-          morningStart: shift.morningOpen,
-          morningEnd: shift.morningClose,
-          afternoonStart: shift.afternoonOpen,
-          afternoonEnd: shift.afternoonClose,
-        });
+        const commerceWP = new CreateCommercePatternDto();
+        commerceWP.commerceId = commerceData.id;
+        commerceWP.weekday = weekday;
+        commerceWP.availabilityType = AvailabilityType.off;
+        commerceWP.morningStart = shift.morningOpen;
+        commerceWP.morningEnd = shift.morningClose;
+        commerceWP.afternoonStart = shift.afternoonOpen;
+        commerceWP.afternoonEnd = shift.afternoonClose;
 
-        const wpResult =
-          await this.commerceWorkingPatternRepository.createCommerceWorkingPattern(
-            commerceWP,
-          );
-        createdIds.workingPatternIds.push(wpResult!.id);
+        const wpResult = await this.createCommerceWorkingPatternUseCase.execute(commerceWP);
+        const wpData = wpResult.data
+        createdIds.workingPatternIds.push(wpData.id);
       }
 
       return {
@@ -144,30 +151,30 @@ export class Signup {
         statusCode: HttpStatus.CREATED,
         data: {
           commerce: {
-            id: commerceResult!.id,
-            name: commerceResult!.name,
-            email: commerceResult!.email,
-            phone: commerceResult!.phone,
-            address: commerceResult!.address,
-            businessCategory: commerceResult!.businessCategory,
-            active: commerceResult!.active,
+            id: commerceData.id,
+            name: commerceData.name,
+            email: commerceData.email,
+            phone: commerceData.phone,
+            address: commerceData.address,
+            businessCategory: commerceData.businessCategory,
+            active: commerceData.active,
           },
           owner: {
-            id: userResult!.id,
-            name: userResult!.name,
-            email: userResult!.email,
-            role: userResult!.role,
-            commerceId: userResult!.commerceId,
-            active: userResult!.active,
+            id: userData.id,
+            name: userData.name,
+            email: userData.email,
+            role: userData.role,
+            commerceId: userData.commerceId,
+            active: userData.active,
           },
           configs: {
             commerceConfig: {
-              id: commerceConfigResult!.id,
+              id: commerceConfigData.id,
               cancellationDeadlineMinutes:
-                commerceConfigResult!.cancellationDeadlineMinutes,
-              welcomeMessage: commerceConfigResult!.welcomeMessage,
+                commerceConfigData.cancellationDeadlineMinutes,
+              welcomeMessage: commerceConfigData.welcomeMessage,
               acceptedPaymentMethods:
-                commerceConfigResult!.acceptedPaymentMethods,
+                commerceConfigData.acceptedPaymentMethods,
             },
           },
         },
