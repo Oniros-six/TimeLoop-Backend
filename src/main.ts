@@ -19,7 +19,7 @@ async function bootstrap() {
       origin: [
         'http://localhost:4321',
         'http://localhost:3000',
-        'http://www.timeloop.com.uy',
+        'https://www.timeloop.com.uy/'
       ], // Puerto de Astro
       credentials: true,
     }),
