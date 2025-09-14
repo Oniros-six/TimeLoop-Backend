@@ -11,6 +11,12 @@ datasource db {
 // Enums
 // =========================================
 
+enum BillingTypes {
+  FLEXIBLE
+  FLAT
+  FREE
+}
+
 enum BusinessCategory {
   Peluqueria
   Barberia
@@ -19,8 +25,8 @@ enum BusinessCategory {
   Salon
   Masajes
   Otro
-}  
-  
+}
+
 enum Roles {
   ADMIN
   EMPLOYEE
@@ -222,6 +228,7 @@ model CommerceConfig {
   id                          Int             @id @default(autoincrement())
   commerceId                  Int             @unique
   cancellationDeadlineMinutes Int
+  billingType                 BillingTypes
   welcomeMessage              String
   acceptedPaymentMethods      PaymentMethod[]
 
@@ -390,7 +397,7 @@ model Payment {
   method      PaymentMethod
   providerRef String? // referencia de MercadoPago u otro proveedor
   createdAt   DateTime      @default(now())
-  updatedAt   DateTime?      @updatedAt
+  updatedAt   DateTime?     @updatedAt
   refundedAt  DateTime?
 
   Commerce Commerce @relation(fields: [commerceId], references: [id])
@@ -406,7 +413,7 @@ model MercadoPago {
   accessToken  String
   refreshToken String
   publicKey    String?
-  mpUserId     String 
+  mpUserId     String
   tokenExpires DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

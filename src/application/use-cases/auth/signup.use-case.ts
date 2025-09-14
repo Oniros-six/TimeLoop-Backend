@@ -90,6 +90,7 @@ export class Signup {
         cancellationDeadlineMinutes: 60, // Una hora por default
         welcomeMessage: 'Bienvenidos!',
         acceptedPaymentMethods: [PaymentMethod.CASH],
+        billingType: data.billingType
       });
       const commerceConfigResult = await this.createCommerceConfigUseCase.execute(commerceData.id, commerceConfig);
 

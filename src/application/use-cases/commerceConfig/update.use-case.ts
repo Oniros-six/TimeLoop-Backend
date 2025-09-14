@@ -51,6 +51,8 @@ export class UpdateCommerceConfig {
       welcomeMessage: data.welcomeMessage ?? commerceConfig.welcomeMessage,
       acceptedPaymentMethods:
         data.acceptedPaymentMethods ?? commerceConfig.acceptedPaymentMethods,
+      billingType:
+        data.billingType ?? commerceConfig.billingType,
     });
 
     try {

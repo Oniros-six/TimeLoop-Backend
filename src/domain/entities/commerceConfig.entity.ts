@@ -1,3 +1,4 @@
+import { BillingTypes } from '../dbEnums/BillingTypes.enum';
 import { PaymentMethod } from '../dbEnums/PaymentMethods.enum';
 
 export class CommerceConfig {
@@ -7,6 +8,7 @@ export class CommerceConfig {
     public cancellationDeadlineMinutes: number,
     public welcomeMessage: string,
     public acceptedPaymentMethods: PaymentMethod[],
+    public billingType: BillingTypes
   ) {}
 
   // Factory method
@@ -15,6 +17,7 @@ export class CommerceConfig {
     cancellationDeadlineMinutes: number;
     welcomeMessage: string;
     acceptedPaymentMethods: PaymentMethod[];
+    billingType: BillingTypes;
   }): CommerceConfig {
     if (!props.commerceId || props.commerceId <= 0) {
       throw new Error('El ID de comercio no es válido.');
@@ -39,6 +42,7 @@ export class CommerceConfig {
       props.cancellationDeadlineMinutes,
       props.welcomeMessage,
       props.acceptedPaymentMethods,
+      props.billingType
     );
   }
 }

@@ -1,3 +1,4 @@
+import { BillingTypes } from '@/domain/dbEnums/BillingTypes.enum';
 import { PaymentMethod } from '@/domain/dbEnums/PaymentMethods.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -39,4 +40,12 @@ export class CreateCommerceConfigDto {
   })
   @IsEnum(PaymentMethod, { each: true, message: 'Método de pago no válido' })
   acceptedPaymentMethods: PaymentMethod[];
+
+  @ApiProperty({
+    example: [BillingTypes.FLAT, BillingTypes.FLEXIBLE],
+    description: 'Plan facturación escogido por el comercio',
+    enum: BillingTypes,
+  })
+  @IsEnum(BillingTypes, { each: true, message: 'Plan inexistente' })
+  billingType: BillingTypes;
 }

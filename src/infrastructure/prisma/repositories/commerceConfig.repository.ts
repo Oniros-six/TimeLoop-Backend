@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.repository';
 import { CommerceConfig as DomainClient } from '@/domain/entities/commerceConfig.entity';
 import { PaymentMethod } from '@/domain/dbEnums/PaymentMethods.enum';
+import { BillingTypes } from '@/domain/dbEnums/BillingTypes.enum';
 
 @Injectable()
 export class PrismaCommerceConfigRepository
@@ -16,6 +17,7 @@ export class PrismaCommerceConfigRepository
     cancellationDeadlineMinutes: number;
     welcomeMessage: string;
     acceptedPaymentMethods: PaymentMethod[];
+    billingType: BillingTypes;
   }): DomainClient {
     return new DomainClient(
       commerce.id,
@@ -23,6 +25,7 @@ export class PrismaCommerceConfigRepository
       commerce.cancellationDeadlineMinutes,
       commerce.welcomeMessage,
       commerce.acceptedPaymentMethods,
+      commerce.billingType
     );
   }
 

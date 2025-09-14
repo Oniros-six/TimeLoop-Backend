@@ -13,6 +13,7 @@ import {
 } from 'class-validator';
 import { WeekDays } from '@/domain/dbEnums/Weekdays.enum';
 import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory.enum';
+import { BillingTypes } from '@/domain/dbEnums/BillingTypes.enum';
 
 class ShiftDto {
   @IsOptional()
@@ -77,7 +78,7 @@ export class CreateBusinessDto {
     description: 'Email del usuario',
   })
   @IsEmail()
-  @MaxLength(100)
+  @MaxLength(100, { message: 'El mail no debe tener más de 100 caracteres' })
   email: string;
 
   @ApiProperty({
@@ -85,7 +86,7 @@ export class CreateBusinessDto {
     description: 'Contraseña del usuario',
   })
   @IsNotEmpty()
-  @MinLength(10)
+  @MinLength(10, { message: 'La contraseña debe tener al menos 10 caracteres' })
   password: string;
 
   //* Datos del negocio
@@ -95,8 +96,8 @@ export class CreateBusinessDto {
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(50)
+  @MinLength(3, { message: 'El nombre del comercio debe tener al menos 3 caracteres' })
+  @MaxLength(50, { message: 'El nombre del comercio debe tener maximo 50 caracteres' })
   name: string;
 
   @ApiProperty({
@@ -113,8 +114,8 @@ export class CreateBusinessDto {
     description: 'Dirección del comercio',
   })
   @IsString()
-  @MinLength(10)
-  @MaxLength(200)
+  @MinLength(10, { message: 'La dirección debe tener al menos 10 caracteres' })
+  @MaxLength(200, { message: 'La dirección no debe tener más de 200 caracteres' })
   address: string;
 
   @ApiProperty({
@@ -133,4 +134,12 @@ export class CreateBusinessDto {
   @ValidateNested({ each: true })
   @Type(() => WorkingDayDto)
   schedules: WorkingDayDto[];
+
+  @ApiProperty({
+    example: [BillingTypes.FLAT, BillingTypes.FLEXIBLE],
+    description: 'Plan facturación escogido por el comercio',
+    enum: BillingTypes,
+  })
+  @IsEnum(BillingTypes, { each: true, message: 'Plan inexistente' })
+  billingType: BillingTypes;
 }

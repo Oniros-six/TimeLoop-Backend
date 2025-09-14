@@ -37,6 +37,7 @@ export class CreateCommerceConfig {
       cancellationDeadlineMinutes: data.cancellationDeadlineMinutes,
       welcomeMessage: data.welcomeMessage,
       acceptedPaymentMethods: data.acceptedPaymentMethods,
+      billingType: data.billingType
     });
 
     try {
