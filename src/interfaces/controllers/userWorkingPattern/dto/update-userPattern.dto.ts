@@ -24,7 +24,7 @@ export class UpdateUserPatternDto {
   @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
     message: 'El formato debe ser HH:mm:ss',
   })
-  morningStart?: string;
+  morningStart: string | null;
 
   @ApiProperty({
     example: '13:00:00',
@@ -35,7 +35,7 @@ export class UpdateUserPatternDto {
   @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
     message: 'El formato debe ser HH:mm:ss',
   })
-  morningEnd?: string;
+  morningEnd: string | null;
 
   @ApiProperty({
     example: '14:00:00',
@@ -46,7 +46,7 @@ export class UpdateUserPatternDto {
   @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
     message: 'El formato debe ser HH:mm:ss',
   })
-  afternoonStart?: string;
+  afternoonStart: string | null;
 
   @ApiProperty({
     example: '18:00:00',
@@ -57,5 +57,5 @@ export class UpdateUserPatternDto {
   @Matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
     message: 'El formato debe ser HH:mm:ss',
   })
-  afternoonEnd?: string;
+  afternoonEnd: string | null;
 }

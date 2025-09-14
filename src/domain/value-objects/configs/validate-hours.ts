@@ -18,10 +18,10 @@ export function validateOpenCloseTime(
 
 export function validateAvailabilityTimes(data: {
   availabilityType: AvailabilityType;
-  morningStart?: string;
-  morningEnd?: string;
-  afternoonStart?: string;
-  afternoonEnd?: string;
+  morningStart: string | null;
+  morningEnd: string | null;
+  afternoonStart: string | null;
+  afternoonEnd: string | null;
 }) {
   if (data.availabilityType === AvailabilityType.full) {
     if (data.morningStart && data.morningEnd) {
