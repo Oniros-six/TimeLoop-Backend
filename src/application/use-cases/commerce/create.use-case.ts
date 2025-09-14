@@ -13,7 +13,7 @@ export class CreateCommerce {
     private readonly commerceRepository: ICommerceRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
+  ) { }
 
   async execute(data: CreateCommerceDto) {
     // Validacion de name existente
@@ -44,25 +44,8 @@ export class CreateCommerce {
       );
     }
 
-    // Validacion de existencia
-    const found = await this.commerceRepository.findCommerceByName({
-      name: data.name,
-    });
-
-    // Si existe se devuelve, en lugar de crearlo
-    if (found) {
-      const commerce = CommerceDomain.createCommerce({
-        id: found.id,
-        name: found.name,
-        email: found.email,
-        phone: found.phone,
-        address: found.address,
-        businessCategory: found.businessCategory,
-      });
-      return commerce;
-    }
-
     try {
+
       const commerce = CommerceDomain.createCommerce({
         name: data.name,
         email: data.email,

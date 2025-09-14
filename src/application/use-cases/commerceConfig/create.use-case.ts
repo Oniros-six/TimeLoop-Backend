@@ -23,6 +23,7 @@ export class CreateCommerceConfig {
   ) {}
 
   async execute(commerceId: number, data: CreateCommerceConfigDto) {
+
     const commerce = await this.commerceRepository.findCommerce({
       commerceId: commerceId,
     });
@@ -30,19 +31,7 @@ export class CreateCommerceConfig {
     if (!commerce) {
       throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
     }
-
-    const configExistence =
-      await this.commerceConfigRepository.findCommerceConfig({
-        commerceId: commerceId,
-      });
-
-    if (configExistence) {
-      throw new HttpException(
-        'El comercio ya tiene una configuración.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
+    
     const commerceConfig = CommerceConfigDomain.create({
       commerceId: commerceId,
       cancellationDeadlineMinutes: data.cancellationDeadlineMinutes,
