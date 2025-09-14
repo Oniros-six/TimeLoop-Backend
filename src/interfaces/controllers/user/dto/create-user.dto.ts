@@ -56,7 +56,7 @@ export class CreateUserDto {
     description: 'Contraseña del usuario',
   })
   @IsNotEmpty({ message: 'La contraseña es requerida' })
-  @MinLength(10)
+  @MinLength(10, { message: 'La contraseña debe tener al menos 10 caracteres' })
   password: string;
 
   @ApiProperty({

@@ -45,7 +45,7 @@ export class UpdateUserDto {
     example: 'securePass123',
     description: 'Duración del servicio en minutos',
   })
-  @MinLength(10)
+  @MinLength(10, { message: 'La contraseña debe tener al menos 10 caracteres' })
   @IsOptional({})
   password: string;
 
