@@ -18,8 +18,9 @@ async function bootstrap() {
     cors({
       origin: [
         'http://localhost:4321',
-        'http://localhost:3000',
-        'https://www.timeloop.com.uy'
+        'http://localhost:3000', // DEV
+        'https://timeloop-two.vercel.app', // PREPROD
+        'https://www.timeloop.com.uy' // PROD
       ], // Puerto de Astro
       credentials: true,
     }),
