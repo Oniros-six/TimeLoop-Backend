@@ -19,7 +19,7 @@ async function bootstrap() {
       origin: [
         'http://localhost:4321',
         'http://localhost:3000', // DEV
-        'https://timeloop-two.vercel.app/', // PREPROD
+        'https://timeloop-two.vercel.app', // PREPROD
         'https://www.timeloop.com.uy' // PROD
       ], // Puerto de Astro
       credentials: true,
