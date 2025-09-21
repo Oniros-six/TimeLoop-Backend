@@ -89,7 +89,7 @@ export class CreateBooking {
 
     //* 5) Validar solapamiento
     const overlappingBookings = await this.bookingRepository.findOverlapping({
-      commerceId: data.commerceId,
+      userId: data.userId,
       timeStart: data.timeStart,
       timeEnd: booking.timeEnd,
     });

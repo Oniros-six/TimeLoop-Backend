@@ -166,7 +166,7 @@ export class UpdateBooking {
     ) {
       const overlapping = await this.bookingRepository.findOverlapping({
         id, // id de la reserva actual para excluirla si es necesario
-        commerceId: newData.commerceId,
+        userId: nextUser.id,
         timeStart: nextTimeStart,
         timeEnd: nextTimeEnd,
       });

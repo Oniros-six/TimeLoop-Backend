@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
-import { FindByDateAndCommerceDto } from '@/interfaces/controllers/booking/dto/find-by-date-commerce.dto';
+import { FindByDateAndUserDto } from '@/interfaces/controllers/booking/dto/find-by-date-user.dto';
 import { BOOKING_REPOSITORY } from '@/application/providers';
 
 @Injectable()
@@ -10,17 +10,17 @@ export class FindBusySlots {
     private readonly bookingRepository: IBookingRepository,
   ) {}
 
-  async execute(data: FindByDateAndCommerceDto) {
+  async execute(data: FindByDateAndUserDto) {
     try {
       const result = await this.bookingRepository.findBusySlots({
-        commerceId: data.commerceId,
+        userId: data.userId,
         timeStart: data.date,
       });
 
       if (!result || result.length == 0) {
         return {
           message:
-            'No hay lugares disponibles para esta fecha en este comercio.',
+            'No hay horarios ocupados para esta fecha para este usuario.',
           statusCode: HttpStatus.OK,
           data: result,
         };

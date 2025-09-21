@@ -10,10 +10,10 @@ export class FindAllByUser {
     private readonly bookingRepository: IBookingRepository,
   ) {}
 
-  async execute(data: FindByUserDto) {
+  async execute(dto: FindByUserDto) {
     try {
       const result = await this.bookingRepository.findAllByUser({
-        userId: data.userId,
+        userId: dto.userId,
       });
 
       if (!result || result.length == 0) {
@@ -25,7 +25,7 @@ export class FindAllByUser {
       }
 
       return {
-        message: 'Reservas obtenidas con exito',
+        message: `Reservas obtenidas con éxito para el usuario ${dto.userId}`,
         statusCode: HttpStatus.OK,
         data: result,
       };
@@ -33,7 +33,7 @@ export class FindAllByUser {
       const message = err instanceof Error ? err.message : 'Error desconocido';
       console.error(message);
       throw new HttpException(
-        'Algo salió mal al obtener las reservas, inténtelo de nuevo más tarde.',
+        'Algo salió mal al obtener las reservas del usuario, inténtelo de nuevo más tarde.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

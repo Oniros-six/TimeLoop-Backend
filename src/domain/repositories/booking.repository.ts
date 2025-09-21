@@ -13,7 +13,7 @@ export interface IBookingRepository {
 
   findOverlapping(data: {
     id?: number;
-    commerceId: number;
+    userId: number;
     timeStart: Date;
     timeEnd: Date;
   }): Promise<Booking | null>;
@@ -25,7 +25,7 @@ export interface IBookingRepository {
 
   //* findBusySlots repository methods
   findBusySlots(data: {
-    commerceId: number;
+    userId: number;
     timeStart: Date;
   }): Promise<Booking[] | null>;
 

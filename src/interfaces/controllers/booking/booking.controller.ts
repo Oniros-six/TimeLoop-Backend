@@ -28,6 +28,7 @@ import { CancelBookingDto } from './dto/cancel-booking.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { FindByCommerceDto } from './dto/find-by-commerce.dto';
 import { FindByDateAndCommerceDto } from './dto/find-by-date-commerce.dto';
+import { FindByDateAndUserDto } from './dto/find-by-date-user.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { FindByUserDto } from './dto/find-by-user.dto';
 import { FindAllByUser } from '@/application/use-cases/booking/find-all-by-user.use-case';
@@ -89,16 +90,16 @@ export class BookingController {
     return this.findAllByCommerceAndDateUseCase.execute(dto);
   }
 
-  // Get all bookings by date and commerceId, that are busy in the future
+  // Get all bookings by date and userId, that are busy in the future
   @ApiOperation({
     summary:
-      'Obtener todas las reservas ocupadas de un comercio, con base en su ID',
+      'Obtener todas las reservas ocupadas de un usuario/empleado, con base en su ID',
   })
   @ApiQuery({ name: 'date', required: true, type: String })
-  @ApiQuery({ name: 'commerceId', required: true, type: Number })
+  @ApiQuery({ name: 'userId', required: true, type: Number })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get('busy-slots')
-  findBusySlots(@Query() dto: FindByDateAndCommerceDto) {
+  findBusySlots(@Query() dto: FindByDateAndUserDto) {
     return this.findBusySlotsUseCase.execute(dto);
   }
 
