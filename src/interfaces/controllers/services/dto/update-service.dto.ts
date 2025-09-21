@@ -8,6 +8,14 @@ export class UpdateServiceDto {
   @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
   commerceId: number;
 
+  @ApiProperty({
+    example: 1,
+    description: 'ID del usuario/empleado',
+  })
+  @Type(() => Number)
+  @IsNumber({}, { message: 'El ID del usuario debe ser un número' })
+  userId: number;
+
   @ApiProperty({ example: 'Corte de pelo', description: 'Nombre del servicio' })
   @IsString({ message: 'El nombre tiene que contener solo letras' })
   @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })

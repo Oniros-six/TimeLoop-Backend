@@ -26,13 +26,11 @@ export class PrismaServicesRepository implements IServiceRepository {
 
   async findServices(data: {
     serviceIds: number[];
-    userId: number;
   }): Promise<DomainClient[]> {
-    const { serviceIds, userId } = data;
+    const { serviceIds } = data;
     const result = await this.prisma.service.findMany({
       where: {
         id: { in: serviceIds },
-        userId: userId,
       },
     });
     if (!result || result.length == 0) return [];
@@ -41,13 +39,11 @@ export class PrismaServicesRepository implements IServiceRepository {
 
   async findOne(data: {
     serviceId: number;
-    userId: number;
   }): Promise<DomainClient | null> {
-    const { serviceId, userId } = data;
+    const { serviceId } = data;
     const result = await this.prisma.service.findFirst({
       where: {
         id: serviceId,
-        userId: userId,
       },
     });
 
@@ -81,11 +77,10 @@ export class PrismaServicesRepository implements IServiceRepository {
 
   async updateService(data: {
     serviceId: number;
-    userId: number;
     data: ServiceUpdateData;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.service.update({
-      where: { id: data.serviceId, userId: data.userId },
+      where: { id: data.serviceId },
       data: data.data,
     });
 
@@ -95,10 +90,9 @@ export class PrismaServicesRepository implements IServiceRepository {
   }
   async deleteService(data: {
     serviceId: number;
-    userId: number;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.service.delete({
-      where: { id: data.serviceId, userId: data.userId },
+      where: { id: data.serviceId },
     });
 
     if (!result) return null;

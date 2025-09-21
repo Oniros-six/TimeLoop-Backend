@@ -3,12 +3,12 @@ import { IServiceRepository } from '@/domain/repositories/services.repository';
 import { CreateServiceDto } from '@/interfaces/controllers/services/dto/create-service.dto';
 import { Service as ServiceDomain } from '@/domain/entities/service.entity';
 import {
-  COMMERCE_REPOSITORY,
   SERVICE_REPOSITORY,
+  USER_REPOSITORY,
 } from '@/application/providers';
 import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
 import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
-import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
+import { IUserRepository } from '@/domain/repositories/user.repository';
 
 @Injectable()
 export class CreateService {
@@ -16,23 +16,29 @@ export class CreateService {
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
 
-    @Inject(COMMERCE_REPOSITORY)
-    private readonly commerceRepository: ICommerceRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
 
     private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(data: CreateServiceDto) {
-    const commerce = await this.commerceRepository.findCommerce({
+    // Validar que el usuario existe
+    const user = await this.userRepository.findUserByCommerce({
+      userId: data.userId,
       commerceId: data.commerceId,
     });
 
-    if (!commerce) {
-      throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
+    if (!user) {
+      throw new HttpException(
+        'El usuario no existe o no pertenece al comercio especificado',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
+    // Validar que no existe un servicio con el mismo nombre para este usuario
     const services = await this.serviceRepository.findAllServices({
-      commerceId: data.commerceId,
+      userId: data.userId,
     });
 
     if (services && services.length > 0) {
@@ -41,7 +47,7 @@ export class CreateService {
       );
       if (serviceExists) {
         throw new HttpException(
-          'Ya existe un servicio con este nombre.',
+          'Ya existe un servicio con este nombre para este usuario.',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -49,7 +55,7 @@ export class CreateService {
 
     try {
       const service = ServiceDomain.create({
-        commerceId: data.commerceId,
+        userId: data.userId,
         name: data.name,
         price: data.price,
         durationMinutes: data.durationMinutes,
@@ -67,10 +73,10 @@ export class CreateService {
       await this.activityLogService.created({
         entityType: EntityType.SERVICE,
         entityId: result.id,
-        userId: null,
-        commerceId: result.commerceId,
+        userId: result.userId,
+        commerceId: data.commerceId,
         customerId: null,
-        detail: `El servicio ${result.name} fue creado.`,
+        detail: `El servicio ${result.name} fue creado para el usuario ${user.name}.`,
       });
 
       return {

@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
 import {
-  COMMERCE_REPOSITORY,
   SERVICE_REPOSITORY,
+  USER_REPOSITORY,
 } from '@/application/providers';
-import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
+import { IUserRepository } from '@/domain/repositories/user.repository';
 
 @Injectable()
 export class FindAllServices {
@@ -12,26 +12,26 @@ export class FindAllServices {
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
 
-    @Inject(COMMERCE_REPOSITORY)
-    private readonly commerceRepository: ICommerceRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(commerceId: number) {
-    const commerce = await this.commerceRepository.findCommerce({
-      commerceId: commerceId,
+  async execute(userId: number) {
+    const user = await this.userRepository.findUser({
+      userId: userId,
     });
 
-    if (!commerce) {
-      throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
+    if (!user) {
+      throw new HttpException('El usuario no existe.', HttpStatus.NOT_FOUND);
     }
 
     const services = await this.serviceRepository.findAllServices({
-      commerceId: commerceId,
+      userId: userId,
     });
 
     if (!services || services.length == 0) {
       return {
-        message: 'No hay servicios asociados a este comercio.',
+        message: 'No hay servicios asociados a este empleado.',
         statusCode: HttpStatus.OK,
         data: services,
       };

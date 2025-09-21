@@ -17,6 +17,15 @@ export class CreateServiceDto {
   @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
   @IsNotEmpty({ message: 'El ID del comercio es requerido' })
   commerceId: number;
+  
+  @ApiProperty({
+    example: 1,
+    description: 'ID del usuario/empleado',
+  })
+  @Type(() => Number)
+  @IsNumber({}, { message: 'El ID del usuario debe ser un número' })
+  @IsNotEmpty({ message: 'El ID del usuario es requerido' })
+  userId: number;
 
   @ApiProperty({ example: 'Corte de pelo', description: 'Nombre del servicio' })
   @IsString({ message: 'El nombre tiene que contener solo letras' })

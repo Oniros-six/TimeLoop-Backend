@@ -11,13 +11,13 @@ import { DeleteService } from '@/application/use-cases/services/delete.use-case'
 
 // Tokens
 import {
-  COMMERCE_REPOSITORY,
   SERVICE_REPOSITORY,
+  USER_REPOSITORY,
 } from '@/application/providers';
 
 // Repositories
-import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';
 import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/services.repository';
+import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';
 
 @Module({
   imports: [PrismaModule],
@@ -28,8 +28,8 @@ import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/s
       useClass: PrismaServicesRepository,
     },
     {
-      provide: COMMERCE_REPOSITORY,
-      useClass: PrismaCommerceRepository,
+      provide: USER_REPOSITORY,
+      useClass: PrismaUserRepository,
     },
 
     CreateService,

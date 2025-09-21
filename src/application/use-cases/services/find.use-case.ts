@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
 import {
-  COMMERCE_REPOSITORY,
   SERVICE_REPOSITORY,
+  USER_REPOSITORY,
 } from '@/application/providers';
-import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
+import { IUserRepository } from '@/domain/repositories/user.repository';
 
 @Injectable()
 export class FindService {
@@ -12,26 +12,25 @@ export class FindService {
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
 
-    @Inject(COMMERCE_REPOSITORY)
-    private readonly commerceRepository: ICommerceRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(id: number, commerceId: number) {
-    const commerce = await this.commerceRepository.findCommerce({
-      commerceId: commerceId,
+  async execute(id: number, userId: number) {
+    const user = await this.userRepository.findUser({
+      userId: userId,
     });
 
-    if (!commerce) {
-      throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
+    if (!user) {
+      throw new HttpException('El usuario no existe.', HttpStatus.NOT_FOUND);
     }
 
     const service = await this.serviceRepository.findOne({
       serviceId: id,
-      commerceId: commerceId,
     });
 
     if (!service) {
-      throw new HttpException('Servicio no encontrado', HttpStatus.NOT_FOUND);
+      throw new HttpException('Servicio no encontrado o no pertenece a este empleado', HttpStatus.NOT_FOUND);
     }
 
     return {

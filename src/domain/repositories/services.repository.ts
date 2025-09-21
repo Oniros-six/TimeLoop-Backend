@@ -4,12 +4,10 @@ import { Service } from '../entities/service.entity';
 export interface IServiceRepository {
   findServices(data: {
     serviceIds: number[];
-    userId: number;
   }): Promise<Service[]>;
 
   findOne(data: {
     serviceId: number;
-    userId: number;
   }): Promise<Service | null>;
 
   findAllServices(data: { userId: number }): Promise<Service[] | null>;
@@ -18,12 +16,10 @@ export interface IServiceRepository {
 
   updateService(data: {
     serviceId: number;
-    userId: number;
     data: ServiceUpdateData;
   }): Promise<Service | null>;
 
   deleteService(data: {
     serviceId: number;
-    userId: number;
   }): Promise<Service | null>;
 }

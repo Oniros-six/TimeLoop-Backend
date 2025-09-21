@@ -3,15 +3,7 @@ import { Type } from 'class-transformer';
 import { IsNumber } from 'class-validator';
 
 export class DeleteServiceDto {
-  @ApiProperty({
-    example: 1,
-    description: 'ID del comercio',
-  })
-  @Type(() => Number)
-  @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
-  commerceId: number;
-
-  @ApiProperty({
+@ApiProperty({
     example: 1,
     description: 'ID del servicio',
   })

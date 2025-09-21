@@ -1,63 +1,37 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
 import {
-  COMMERCE_REPOSITORY,
   SERVICE_REPOSITORY,
 } from '@/application/providers';
-import { ActivityLogService } from '@/domain/services/activityLog/activity-log.service';
-import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
-import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 
 @Injectable()
 export class DeleteService {
   constructor(
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
-
-    @Inject(COMMERCE_REPOSITORY)
-    private readonly commerceRepository: ICommerceRepository,
-
-    private readonly activityLogService: ActivityLogService,
   ) {}
 
-  async execute(id: number, commerceId: number) {
-    const commerce = await this.commerceRepository.findCommerce({
-      commerceId: commerceId,
-    });
-
-    if (!commerce) {
-      throw new HttpException('El comercio no existe.', HttpStatus.NOT_FOUND);
-    }
+  async execute(serviceId: number) {
 
     const service = await this.serviceRepository.findOne({
-      serviceId: id,
-      commerceId: commerceId,
+      serviceId: serviceId,
     });
 
     if (!service) {
-      throw new HttpException('El servicio no existe.', HttpStatus.NOT_FOUND);
+      throw new HttpException('Servicio no encontrado', HttpStatus.NOT_FOUND);
     }
 
     try {
       const result = await this.serviceRepository.deleteService({
-        serviceId: id,
-        commerceId: commerceId,
+        serviceId: serviceId,
       });
-      if (result === null) {
+
+      if (!result) {
         throw new HttpException(
           'Error al eliminar el servicio, intente de nuevo en unos minutos.',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-
-      await this.activityLogService.canceled({
-        entityType: EntityType.SERVICE,
-        entityId: result.id,
-        userId: null,
-        commerceId: result.commerceId,
-        customerId: null,
-        detail: `Se eliminó el servicio '${service.name}'.`,
-      });
 
       return {
         message: 'Servicio eliminado con éxito',

@@ -41,7 +41,7 @@ export class ServicesController {
     private readonly updateServiceUseCase: UpdateService,
     private readonly deleteServiceUseCase: DeleteService,
     private readonly findAllServicesUseCase: FindAllServices,
-  ) {}
+  ) { }
 
   // Create a Service
   @ApiOperation({ summary: 'Crear un nuevo servicio' })
@@ -86,17 +86,17 @@ export class ServicesController {
   }
 
   // Get all Services
-  @ApiOperation({ summary: 'Obtener todos los servicios de un comercio' })
+  @ApiOperation({ summary: 'Obtener todos los servicios de un usuario' })
   @ApiQuery({
-    name: 'commerceId',
+    name: 'userId',
     type: Number,
     required: true,
-    description: 'ID del comercio',
+    description: 'ID del usuario',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get()
-  async findAll(@Query('commerceId', ParseIntPipe) commerceId: number) {
-    const res = await this.findAllServicesUseCase.execute(commerceId);
+  async findAll(@Query('userId', ParseIntPipe) userId: number) {
+    const res = await this.findAllServicesUseCase.execute(userId);
     return {
       message: res.message,
       statusCode: res.statusCode,
@@ -127,15 +127,9 @@ export class ServicesController {
     required: true,
     description: 'ID del Service',
   })
-  @ApiQuery({
-    name: 'commerceId',
-    type: Number,
-    required: true,
-    description: 'ID del comercio',
-  })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Delete()
   delete(@Query() dto: DeleteServiceDto) {
-    return this.deleteServiceUseCase.execute(dto.id, dto.commerceId);
+    return this.deleteServiceUseCase.execute(dto.id);
   }
 }
