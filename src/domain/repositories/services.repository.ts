@@ -4,26 +4,26 @@ import { Service } from '../entities/service.entity';
 export interface IServiceRepository {
   findServices(data: {
     serviceIds: number[];
-    commerceId: number;
+    userId: number;
   }): Promise<Service[]>;
 
   findOne(data: {
     serviceId: number;
-    commerceId: number;
+    userId: number;
   }): Promise<Service | null>;
 
-  findAllServices(data: { commerceId: number }): Promise<Service[] | null>;
+  findAllServices(data: { userId: number }): Promise<Service[] | null>;
 
   createService(data: Service): Promise<Service | null>;
 
   updateService(data: {
     serviceId: number;
-    commerceId: number;
+    userId: number;
     data: ServiceUpdateData;
   }): Promise<Service | null>;
 
   deleteService(data: {
     serviceId: number;
-    commerceId: number;
+    userId: number;
   }): Promise<Service | null>;
 }

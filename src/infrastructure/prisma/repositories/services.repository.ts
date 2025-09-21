@@ -10,14 +10,14 @@ export class PrismaServicesRepository implements IServiceRepository {
 
   private toDomain(service: {
     id: number;
-    commerceId: number;
+    userId: number;
     name: string;
     price: number;
     durationMinutes: number;
   }): DomainClient {
     return new DomainClient(
       service.id,
-      service.commerceId,
+      service.userId,
       service.name,
       service.price,
       service.durationMinutes,
@@ -26,13 +26,13 @@ export class PrismaServicesRepository implements IServiceRepository {
 
   async findServices(data: {
     serviceIds: number[];
-    commerceId: number;
+    userId: number;
   }): Promise<DomainClient[]> {
-    const { serviceIds, commerceId } = data;
+    const { serviceIds, userId } = data;
     const result = await this.prisma.service.findMany({
       where: {
         id: { in: serviceIds },
-        commerceId: commerceId,
+        userId: userId,
       },
     });
     if (!result || result.length == 0) return [];
@@ -41,13 +41,13 @@ export class PrismaServicesRepository implements IServiceRepository {
 
   async findOne(data: {
     serviceId: number;
-    commerceId: number;
+    userId: number;
   }): Promise<DomainClient | null> {
-    const { serviceId, commerceId } = data;
+    const { serviceId, userId } = data;
     const result = await this.prisma.service.findFirst({
       where: {
         id: serviceId,
-        commerceId: commerceId,
+        userId: userId,
       },
     });
 
@@ -57,11 +57,11 @@ export class PrismaServicesRepository implements IServiceRepository {
   }
 
   async findAllServices(data: {
-    commerceId: number;
+    userId: number;
   }): Promise<DomainClient[] | null> {
     const result = await this.prisma.service.findMany({
       where: {
-        commerceId: data.commerceId,
+        userId: data.userId,
       },
     });
     if (!result) return null;
@@ -81,11 +81,11 @@ export class PrismaServicesRepository implements IServiceRepository {
 
   async updateService(data: {
     serviceId: number;
-    commerceId: number;
+    userId: number;
     data: ServiceUpdateData;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.service.update({
-      where: { id: data.serviceId, commerceId: data.commerceId },
+      where: { id: data.serviceId, userId: data.userId },
       data: data.data,
     });
 
@@ -95,10 +95,10 @@ export class PrismaServicesRepository implements IServiceRepository {
   }
   async deleteService(data: {
     serviceId: number;
-    commerceId: number;
+    userId: number;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.service.delete({
-      where: { id: data.serviceId, commerceId: data.commerceId },
+      where: { id: data.serviceId, userId: data.userId },
     });
 
     if (!result) return null;
