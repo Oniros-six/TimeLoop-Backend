@@ -17,6 +17,7 @@ import { PrismaBookingHistoryRepository } from './repositories/bookingHistory.re
 import { PrismaInvoiceRepository } from './repositories/invoice.repository';
 import { PrismaPaymentRepository } from './repositories/payment.repository';
 import { PrismaMercadoPagoRepository } from './repositories/mercadoPago.repository';
+import { PrismaDashboardRepository } from './repositories/dashboard.repository';
 import { TokenEncryptionService } from '../payments/TokenEncryptationService';
 
 @Global()
@@ -92,6 +93,10 @@ import { TokenEncryptionService } from '../payments/TokenEncryptationService';
       provide: 'IMercadoPagoRepository',
       useClass: PrismaMercadoPagoRepository,
     },
+    {
+      provide: 'IDashboardRepository',
+      useClass: PrismaDashboardRepository,
+    },
   ],
 
   exports: [
@@ -114,6 +119,7 @@ import { TokenEncryptionService } from '../payments/TokenEncryptationService';
     'IInvoiceRepository',
     'IPaymentRepository',
     'IMercadoPagoRepository',
+    'IDashboardRepository'
   ],
 })
-export class PrismaModule {}
+export class PrismaModule { }

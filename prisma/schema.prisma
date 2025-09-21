@@ -148,13 +148,14 @@ model Commerce {
 }
 
 model Customer {
-  id        Int           @id @default(autoincrement())
-  name      String
-  email     String        @unique
-  phone     String
-  logs      ActivityLog[] @relation("CustomerLogs")
-  bookings  Booking[]     @relation("CustomerBookings")
-  reminders Reminder[]    @relation("CustomerReminders")
+  id             Int              @id @default(autoincrement())
+  name           String
+  email          String           @unique
+  phone          String
+  logs           ActivityLog[]    @relation("CustomerLogs")
+  bookings       Booking[]        @relation("CustomerBookings")
+  reminders      Reminder[]       @relation("CustomerReminders")
+  BookingHistory BookingHistory[]
 
   @@map("customers")
 }
@@ -190,6 +191,7 @@ model Booking {
   timeStart  DateTime
 
   bookingServices BookingService[]
+  bookingHistory  BookingHistory?
   commerce        Commerce         @relation("CommerceBookings", fields: [commerceId], references: [id])
   customer        Customer         @relation("CustomerBookings", fields: [customerId], references: [id])
   user            User             @relation("UserBookings", fields: [userId], references: [id])
@@ -358,6 +360,8 @@ model BookingHistory {
   timeEnd           DateTime
   status            BookingStatus
   notes             String
+  booking           Booking       @relation(fields: [bookingId], references: [id])
+  customer          Customer      @relation(fields: [customerId], references: [id])
 }
 
 model Invoice {

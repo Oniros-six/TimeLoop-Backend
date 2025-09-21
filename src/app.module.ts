@@ -21,6 +21,7 @@ import { UserModule } from './interfaces/controllers/user/user.module';
 import { UserConfigModule } from './interfaces/controllers/userConfig/userConfig.module';
 import { UserWorkingOverrideModule } from './interfaces/controllers/userWorkingOverride/userWorkingOverride.module';
 import { UserWorkingPatternModule } from './interfaces/controllers/userWorkingPattern/userWorkingPattern.module';
+import { DashboardModule } from './interfaces/controllers/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { UserWorkingPatternModule } from './interfaces/controllers/userWorkingPa
     BookingHistoryModule,
     InvoiceModule,
     MercadoPagoModule,
+    DashboardModule
   ],
 })
-export class AppModule {}
+export class AppModule { }
