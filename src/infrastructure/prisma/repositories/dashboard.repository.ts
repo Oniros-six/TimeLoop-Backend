@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { IDashboardRepository } from '@/domain/repositories/dashboard.repository';
 import { Dashboard as DomainClient } from '@/domain/entities/dashboard.entity';
 import { BookingStatus } from '@prisma/client';
-import { DashboardData, HistoryItem } from '@/domain/common/dashboard.types';
+import { DashboardData, HistoryItem, RecentItem } from '@/domain/common/dashboard.types';
 
 
 @Injectable()
@@ -14,11 +14,13 @@ export class PrismaDashboardRepository implements IDashboardRepository {
         commerceId: number,
         commerceName: string,
         history: HistoryItem[],
+        recentActivity: RecentItem[]
     }): DomainClient {
         return new DomainClient(
             dashboard.commerceId,
             dashboard.commerceName,
-            dashboard.history
+            dashboard.history,
+            dashboard.recentActivity
         );
     }
 
@@ -30,6 +32,41 @@ export class PrismaDashboardRepository implements IDashboardRepository {
                 name: true
             },
             where: { id: commerceId },
+        });
+        const recent = await this.prisma.booking.findMany({
+            select: {
+                id: true,
+                customerId: true,
+                timeStart: true,
+                status: true,
+                bookingServices: {
+                    select: {
+                        service: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+                customer: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+            where: {
+                commerceId: commerceId,
+                status: {
+                    notIn: [BookingStatus.COMPLETED, BookingStatus.NO_SHOW]
+                },
+                timeStart: {
+                    gte: new Date()
+                }
+            },
+            orderBy: {
+                timeStart: 'desc',
+            },
+            take: 10,
         });
         const history = await this.prisma.bookingHistory.findMany({
             select: {
@@ -67,13 +104,13 @@ export class PrismaDashboardRepository implements IDashboardRepository {
             take: 10,
         });
 
-        console.log(history)
         if (!commerce) return null;
 
         const result: DashboardData = {
             commerceId: commerce.id,
             commerceName: commerce.name,
-            history: history
+            history: history,
+            recentActivity: recent
         }
         return this.toDomain(result);
     }

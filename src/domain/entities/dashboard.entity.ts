@@ -1,10 +1,11 @@
-import { HistoryItem } from "../common/dashboard.types";
+import { HistoryItem, RecentItem } from "../common/dashboard.types";
 
 export class Dashboard {
     constructor(
         public commerceId: number,
         public commerceName: string,
         public history: HistoryItem[],
+        public recentActivity: RecentItem[],
     ) { }
 
     //TODO aqui mismo se calcularan las metricas luego
@@ -14,11 +15,13 @@ export class Dashboard {
         commerceId: number,
         commerceName: string,
         history: HistoryItem[],
+        recentActivity: RecentItem[],
     }): Dashboard {
         return new Dashboard(
             props.commerceId,
             props.commerceName,
             props.history,
+            props.recentActivity
         );
     }
 }

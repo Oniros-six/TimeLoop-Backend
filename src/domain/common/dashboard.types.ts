@@ -1,22 +1,33 @@
+import { BookingStatus } from "@/domain/dbEnums/BookingStatus.enum";
+
 export interface DashboardData {
   commerceId: number;
   commerceName: string;
   history: HistoryItem[];
+  recentActivity: RecentItem[];
 }
-
+//TODO Agregar que usuario/s atendera/atendio el servicio
 export interface HistoryItem {
   id: number;
   bookingId: number;
   customerId: number;
   priceAtBooking: number;
   timeStart: Date;
-  booking: Booking;
+  booking: {
+    bookingServices: BookingService[];
+  };
   customer: Customer;
 }
 
-export interface Booking {
+export interface RecentItem {
+  id: number;
+  customerId: number;
+  timeStart: Date;
+  status: BookingStatus;
   bookingServices: BookingService[];
+  customer: Customer;
 }
+
 
 export interface BookingService {
   service: Service;
