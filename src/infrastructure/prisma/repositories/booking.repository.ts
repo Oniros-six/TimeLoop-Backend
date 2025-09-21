@@ -105,12 +105,12 @@ export class PrismaBookingRepository implements IBookingRepository {
 
   async findBusy(data: {
     timeStart: Date;
-    commerceId: number;
+    userId: number;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.booking.findFirst({
       where: {
         timeStart: data.timeStart,
-        commerceId: data.commerceId,
+        userId: data.userId,
         status: BookingStatus.CONFIRMED,
       },
       include: {
@@ -156,8 +156,8 @@ export class PrismaBookingRepository implements IBookingRepository {
     return result.map((booking) => this.toDomain(booking));
   }
 
-  async findAllByDateAndCommerce(data: {
-    commerceId: number;
+  async findAllByDateAndUser(data: {
+    userId: number;
     timeStart: Date;
   }): Promise<DomainClient[] | null> {
     const date = data.timeStart;
@@ -192,7 +192,7 @@ export class PrismaBookingRepository implements IBookingRepository {
           gte: start,
           lte: end,
         },
-        commerceId: data.commerceId,
+        userId: data.userId,
       },
       include: {
         bookingServices: true,

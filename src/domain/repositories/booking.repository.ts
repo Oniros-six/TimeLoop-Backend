@@ -6,7 +6,7 @@ export interface IBookingRepository {
   //* Create repository methods
   findBusy(data: {
     timeStart: Date;
-    commerceId: number;
+    userId: number;
   }): Promise<Booking | null>;
 
   createSchedule(data: Booking): Promise<Booking | null>;
@@ -29,9 +29,9 @@ export interface IBookingRepository {
     timeStart: Date;
   }): Promise<Booking[] | null>;
 
-  //* findAllByDateAndCommerce repository methods
-  findAllByDateAndCommerce(data: {
-    commerceId: number;
+  //* findAllByDateAndUser repository methods
+  findAllByDateAndUser(data: {
+    userId: number;
     timeStart: Date;
   }): Promise<Booking[] | null>;
 

@@ -139,7 +139,6 @@ model Commerce {
   overridePatterns CommerceWorkingOverride[] @relation("CommerceOverridePatterns")
   workingPatterns  CommerceWorkingPattern[]  @relation("CommerceWorkingPatterns")
   reminders        Reminder[]                @relation("CommerceReminders")
-  services         Service[]                 @relation("CommerceServices")
   users            User[]                    @relation("CommerceUsers")
   Invoice          Invoice[]
   Payment          Payment[]
@@ -170,6 +169,7 @@ model User {
   active           Boolean
   logs             ActivityLog[]         @relation("UserLogs")
   bookings         Booking[]             @relation("UserBookings")
+  services         Service[]             @relation("UserServices")
   config           UserConfig?           @relation("UserConfig")
   overridePatterns UserWorkingOverride[] @relation("UserOverridePatterns")
   workingPatterns  UserWorkingPattern[]  @relation("UserWorkingPatterns")
@@ -205,9 +205,9 @@ model Service {
   name            String
   price           Float
   durationMinutes Int
-  commerceId      Int
+  userId          Int
   bookingServices BookingService[]
-  commerce        Commerce         @relation("CommerceServices", fields: [commerceId], references: [id])
+  user            User             @relation("UserServices", fields: [userId], references: [id])
 
   @@map("services")
 }
