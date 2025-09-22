@@ -6,6 +6,11 @@ export interface IServiceRepository {
     serviceIds: number[];
   }): Promise<Service[]>;
 
+  findServicesByUser(data: {
+    serviceIds: number[];
+    userId: number;
+  }): Promise<Service[]>;
+
   findOne(data: {
     serviceId: number;
   }): Promise<Service | null>;

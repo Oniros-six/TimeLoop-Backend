@@ -20,14 +20,13 @@ import {
 } from '@nestjs/swagger';
 import { CreateBooking } from '@/application/use-cases/booking/create.use-case';
 import { UpdateBooking } from '@/application/use-cases/booking/update.use-case';
-import { FindAllByCommerceAndDate } from '@/application/use-cases/booking/find-all-by-date-commerce.use-case';
 import { FindBusySlots } from '@/application/use-cases/booking/find-busy-slots.use-case';
 import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-commerce.use-case';
+import { FindAllByUserAndDate } from '@/application/use-cases/booking/find-all-by-date-user.use-case';
 import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
 import { CancelBookingDto } from './dto/cancel-booking.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { FindByCommerceDto } from './dto/find-by-commerce.dto';
-import { FindByDateAndCommerceDto } from './dto/find-by-date-commerce.dto';
 import { FindByDateAndUserDto } from './dto/find-by-date-user.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { FindByUserDto } from './dto/find-by-user.dto';
@@ -39,7 +38,7 @@ export class BookingController {
   constructor(
     private readonly createBookingUseCase: CreateBooking,
     private readonly updateBookingUseCase: UpdateBooking,
-    private readonly findAllByCommerceAndDateUseCase: FindAllByCommerceAndDate,
+    private readonly findAllByUserAndDateUseCase: FindAllByUserAndDate,
     private readonly findBusySlotsUseCase: FindBusySlots,
     private readonly findAllByCommerceUseCase: FindAllByCommerce,
     private readonly findAllByUserUseCase: FindAllByUser,
@@ -86,8 +85,8 @@ export class BookingController {
   @ApiQuery({ name: 'commerceId', required: true, type: Number })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get('slots')
-  findAllByDateAndCommerce(@Query() dto: FindByDateAndCommerceDto) {
-    return this.findAllByCommerceAndDateUseCase.execute(dto);
+  findAllByDateAndCommerce(@Query() dto: FindByDateAndUserDto) {
+    return this.findAllByUserAndDateUseCase.execute(dto);
   }
 
   // Get all bookings by date and userId, that are busy in the future

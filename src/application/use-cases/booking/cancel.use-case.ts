@@ -71,7 +71,7 @@ export class CancelBooking {
     await this.activityLogService.canceled({
       entityType: EntityType.BOOKING,
       entityId: result.id,
-      userId: null,
+      userId: booking.userId,
       commerceId: result.commerceId,
       customerId: result.customerId,
       detail: `Se cancela la reserva`,

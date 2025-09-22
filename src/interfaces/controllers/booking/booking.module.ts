@@ -6,7 +6,7 @@ import { NotificationModule } from '@/domain/services/notifications/notification
 // Use cases
 import { CreateBooking } from '@/application/use-cases/booking/create.use-case';
 import { UpdateBooking } from '@/application/use-cases/booking/update.use-case';
-import { FindAllByCommerceAndDate } from '@/application/use-cases/booking/find-all-by-date-commerce.use-case';
+import { FindAllByUserAndDate } from '@/application/use-cases/booking/find-all-by-date-user.use-case';
 import { FindBusySlots } from '@/application/use-cases/booking/find-busy-slots.use-case';
 import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-commerce.use-case';
 import { FindAllByUser } from '@/application/use-cases/booking/find-all-by-user.use-case';
@@ -57,7 +57,7 @@ import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/reposito
     // usesCases
     CreateBooking,
     UpdateBooking,
-    FindAllByCommerceAndDate,
+    FindAllByUserAndDate,
     FindBusySlots,
     FindAllByCommerce,
     FindAllByUser,

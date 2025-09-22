@@ -1,25 +1,25 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
-import { FindByDateAndCommerceDto } from '@/interfaces/controllers/booking/dto/find-by-date-commerce.dto';
+import { FindByDateAndUserDto } from '@/interfaces/controllers/booking/dto/find-by-date-user.dto';
 import { BOOKING_REPOSITORY } from '@/application/providers';
 
 @Injectable()
-export class FindAllByCommerceAndDate {
+export class FindAllByUserAndDate {
   constructor(
     @Inject(BOOKING_REPOSITORY)
     private readonly bookingRepository: IBookingRepository,
   ) {}
 
-  async execute(data: FindByDateAndCommerceDto) {
+  async execute(data: FindByDateAndUserDto) {
     try {
-      const result = await this.bookingRepository.findAllByDateAndCommerce({
-        commerceId: data.commerceId,
+      const result = await this.bookingRepository.findAllByDateAndUser({
+        userId: data.userId,
         timeStart: data.date,
       });
 
       if (!result || result.length == 0) {
         return {
-          message: 'No hay reservas para esta fecha en este comercio.',
+          message: 'No hay reservas para esta fecha para este empleado.',
           statusCode: HttpStatus.OK,
           data: result,
         };

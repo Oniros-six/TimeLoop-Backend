@@ -51,15 +51,15 @@ export class CreateBooking {
     //* 1) Validación de fecha y hora
     const scheduledAt = ensureNotPast(data.timeStart);
 
-    //* 2) Validar existencia de los servicios, y que pertenezcan al comercio
-    const services = await this.serviceRepository.findServices({
+    //* 2) Validar existencia de los servicios, y que pertenezcan al empleado
+    const services = await this.serviceRepository.findServicesByUser({
       serviceIds: data.serviceIds,
-      commerceId: data.commerceId,
+      userId: data.userId,
     });
 
     if (!services || services.length !== data.serviceIds.length) {
       throw new HttpException(
-        'Al menos uno de los servicios no pertenece al comercio especificado',
+        'Al menos uno de los servicios no pertenece al empleado especificado',
         HttpStatus.NOT_FOUND,
       );
     }

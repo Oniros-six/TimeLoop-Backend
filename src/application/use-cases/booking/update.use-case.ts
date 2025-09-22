@@ -53,7 +53,7 @@ export class UpdateBooking {
     private readonly activityLogService: ActivityLogService,
     private readonly eventEmitter: EventEmitter2,
     private readonly remindersService: RemindersService,
-  ) {}
+  ) { }
 
   async execute(id: number, newData: UpdateBookingDto) {
     //* 1) Cargar booking y autorizar
@@ -82,19 +82,22 @@ export class UpdateBooking {
       );
     }
 
-    //* 2) Determinar que servicios se utilizaran
+    //* 2) Definir el nuevo usuario (o dejar el que ya estaba)
+    const userIdToCheck = newData.userId ?? booking.userId;
+
+    //* 3) Determinar que servicios se utilizaran
     let nextServices: Service[];
 
     if (newData.serviceIds !== undefined) {
       // Buscamos solo los nuevos IDs
-      const services = await this.serviceRepository.findServices({
+      const services = await this.serviceRepository.findServicesByUser({
         serviceIds: newData.serviceIds,
-        commerceId: newData.commerceId,
+        userId: userIdToCheck,
       });
 
       if (services.length !== newData.serviceIds.length) {
         throw new HttpException(
-          'Al menos uno de los servicios no pertenece al comercio especificado',
+          'Al menos uno de los servicios no pertenece al empleado especificado',
           HttpStatus.NOT_FOUND,
         );
       }
@@ -105,16 +108,15 @@ export class UpdateBooking {
       const currentServiceIds = booking.bookingServices.map(
         (bs) => bs.serviceId,
       );
-      const services = await this.serviceRepository.findServices({
+      const services = await this.serviceRepository.findServicesByUser({
         serviceIds: currentServiceIds,
-        commerceId: booking.commerceId,
+        userId: userIdToCheck,
       });
 
       nextServices = services;
     }
 
-    //* 3) Definir el nuevo usuario (o dejar el que ya estaba)
-    const userIdToCheck = newData.userId ?? booking.userId;
+    //* 4) Validar el usuario
     const nextUser = await this.userRepository.findUserByCommerce({
       userId: userIdToCheck,
       commerceId: newData.commerceId,
@@ -214,7 +216,7 @@ export class UpdateBooking {
       detail: `Se actualizaron los campos: ${updatedFields}.`,
     });
 
-    //* 11) Crear el reminder
+    //* 11) Actualizar el reminder
     const reminder = Reminder.update({
       bookingId: result.id,
       customerId: result.customerId,
