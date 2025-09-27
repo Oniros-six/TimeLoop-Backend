@@ -20,7 +20,7 @@ export class GetDashboardInfo {
             throw new HttpException('Cliente no encontrado', HttpStatus.NOT_FOUND);
         }
 
-        const dashboardInfo = await this.dashboardRepository.findDashboardInfo({ commerceId: id });
+        const dashboardInfo = await this.dashboardRepository.findDashboardInfo({ commerceId: user.commerceId });
 
         if (!dashboardInfo) {
             throw new HttpException('No hay información', HttpStatus.NOT_FOUND);

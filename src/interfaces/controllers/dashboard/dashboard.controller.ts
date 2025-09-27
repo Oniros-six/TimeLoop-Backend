@@ -15,7 +15,7 @@ export class DashboardController {
     constructor(
         private readonly getDashboardInfoUseCase: GetDashboardInfo,
     ) { }
-    // Get a client
+    // Get information for dashboard
     @ApiOperation({ summary: 'Obtener información del panel de control' })
     @ApiParam({
         name: 'id',
