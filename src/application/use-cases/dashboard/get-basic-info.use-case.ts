@@ -4,7 +4,7 @@ import { IUserRepository } from '@/domain/repositories/user.repository';
 import { IDashboardRepository } from '@/domain/repositories/dashboard.repository';
 
 @Injectable()
-export class GetDashboardInfo {
+export class GetBasicDashboardInfo {
     constructor(
         @Inject(USER_REPOSITORY)
         private readonly userRepository: IUserRepository,
@@ -17,7 +17,7 @@ export class GetDashboardInfo {
         const user = await this.userRepository.findUser({ userId: id });
 
         if (!user) {
-            throw new HttpException('Cliente no encontrado', HttpStatus.NOT_FOUND);
+            throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
         }
 
         const dashboardInfo = await this.dashboardRepository.findDashboardInfo({ commerceId: user.commerceId });

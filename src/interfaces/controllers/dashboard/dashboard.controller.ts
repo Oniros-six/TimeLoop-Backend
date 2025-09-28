@@ -7,13 +7,13 @@ import {
     ParseIntPipe,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { GetDashboardInfo } from '@/application/use-cases/dashboard/get-info.use-case';
+import { GetBasicDashboardInfo } from '@/application/use-cases/dashboard/get-basic-info.use-case';
 
 @ApiTags('Dashboard')
 @Controller('dashboard')
 export class DashboardController {
     constructor(
-        private readonly getDashboardInfoUseCase: GetDashboardInfo,
+        private readonly getBasicDashboardInfoUseCase: GetBasicDashboardInfo,
     ) { }
     // Get information for dashboard
     @ApiOperation({ summary: 'Obtener información del panel de control' })
@@ -26,6 +26,8 @@ export class DashboardController {
     @UsePipes(new ValidationPipe({ transform: true }))
     @Get(':id')
     find(@Param('id', ParseIntPipe) id: number) {
-        return this.getDashboardInfoUseCase.execute(id);
+        return this.getBasicDashboardInfoUseCase.execute(id);
+    }
+
     }
 }

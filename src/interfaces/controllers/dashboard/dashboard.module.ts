@@ -3,7 +3,7 @@ import { DashboardController } from './dashboard.controller';
 import { PrismaModule } from '@/infrastructure/prisma/prisma.module';
 
 // Use cases
-import { GetDashboardInfo } from '@/application/use-cases/dashboard/get-info.use-case';
+import { GetBasicDashboardInfo } from '@/application/use-cases/dashboard/get-basic-info.use-case';
 
 // Tokens
 import {
@@ -28,7 +28,7 @@ import { PrismaDashboardRepository } from '@/infrastructure/prisma/repositories/
             useClass: PrismaDashboardRepository,
         },
 
-        GetDashboardInfo
+        GetBasicDashboardInfo,
     ],
 })
 export class DashboardModule { }
