@@ -17,13 +17,13 @@ export interface IBookingHistoryRepository {
     commerceId: number;
     startDate: Date;
     endDate: Date;
-  }): Promise<BookingHistory[] | null>;
+  }): Promise<BookingHistory[]>;
 
   findByDatesAndUser(data: {
     userId: number;
     startDate: Date;
     endDate: Date;
-  }): Promise<BookingHistory[] | null>;
+  }): Promise<BookingHistory[]>;
 
   update(data: {
     id: number;

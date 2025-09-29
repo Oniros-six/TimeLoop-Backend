@@ -78,9 +78,9 @@ export class PrismaBookingHistoryRepository
 
   async findByDatesAndCommerce(data: {
     commerceId: number;
-    startDate: Date;
+    startDate: Date;  
     endDate: Date;
-  }): Promise<DomainClient[] | null> {
+  }): Promise<DomainClient[]> {
     const result = await this.prisma.bookingHistory.findMany({
       where: {
         commerceId: data.commerceId,
@@ -91,7 +91,6 @@ export class PrismaBookingHistoryRepository
       },
     });
 
-    if (!result || result.length === 0) return null;
     return result.map((bh) => this.toDomain(bh));
   }
 
@@ -99,7 +98,7 @@ export class PrismaBookingHistoryRepository
     userId: number;
     startDate: Date;
     endDate: Date;
-  }): Promise<DomainClient[] | null> {
+  }): Promise<DomainClient[]> {
     const result = await this.prisma.bookingHistory.findMany({
       where: {
         userId: data.userId,
@@ -109,7 +108,6 @@ export class PrismaBookingHistoryRepository
         ],
       },
     });
-    if (!result || result.length === 0) return null;
     return result.map((bh) => this.toDomain(bh));
   }
 
