@@ -12,6 +12,7 @@ export class PrismaServicesRepository implements IServiceRepository {
     id: number;
     userId: number;
     name: string;
+    description: string;
     price: number;
     durationMinutes: number;
   }): DomainClient {
@@ -19,6 +20,7 @@ export class PrismaServicesRepository implements IServiceRepository {
       service.id,
       service.userId,
       service.name,
+      service.description,
       service.price,
       service.durationMinutes,
     );
@@ -33,7 +35,6 @@ export class PrismaServicesRepository implements IServiceRepository {
         id: { in: serviceIds },
       },
     });
-    if (!result || result.length == 0) return [];
     return result.map((service) => this.toDomain(service));
   }
 
@@ -48,7 +49,6 @@ export class PrismaServicesRepository implements IServiceRepository {
         userId: userId
       },
     });
-    if (!result || result.length == 0) return [];
     return result.map((service) => this.toDomain(service));
   }
 
@@ -69,13 +69,12 @@ export class PrismaServicesRepository implements IServiceRepository {
 
   async findAllServices(data: {
     userId: number;
-  }): Promise<DomainClient[] | null> {
+  }): Promise<DomainClient[]> {
     const result = await this.prisma.service.findMany({
       where: {
         userId: data.userId,
       },
     });
-    if (!result) return null;
     return result.map((service) => this.toDomain(service));
   }
 

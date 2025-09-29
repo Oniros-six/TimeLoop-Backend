@@ -206,6 +206,7 @@ model Booking {
 model Service {
   id              Int              @id @default(autoincrement())
   name            String
+  description     String           @default("")
   price           Float
   durationMinutes Int
   userId          Int

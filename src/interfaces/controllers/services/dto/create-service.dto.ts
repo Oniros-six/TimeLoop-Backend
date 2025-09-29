@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
+  MaxLength,
   Min,
   MinLength,
 } from 'class-validator';
@@ -17,7 +18,7 @@ export class CreateServiceDto {
   @IsNumber({}, { message: 'El ID del comercio debe ser un número' })
   @IsNotEmpty({ message: 'El ID del comercio es requerido' })
   commerceId: number;
-  
+
   @ApiProperty({
     example: 1,
     description: 'ID del usuario/empleado',
@@ -32,6 +33,14 @@ export class CreateServiceDto {
   @IsNotEmpty({ message: 'El nombre es requerido' })
   @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
   name: string;
+
+  @ApiProperty({
+    example: 'Corte de cabello tradicional adaptado a tu estilo. Incluye lavado, corte con tijera y máquina, retoque de contornos y peinado con producto de terminación. Ideal para quienes buscan un look prolijo y fresco.',
+    description: 'Descripción del servicio'
+  })
+  @IsString({ message: 'La descripción tiene que contener solo letras' })
+  @MaxLength(500, { message: 'La descripción debe contenter maximo 500 caracteres' })
+  description: string;
 
   @ApiProperty({
     example: '200',

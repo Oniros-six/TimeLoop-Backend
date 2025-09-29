@@ -15,7 +15,7 @@ export interface IServiceRepository {
     serviceId: number;
   }): Promise<Service | null>;
 
-  findAllServices(data: { userId: number }): Promise<Service[] | null>;
+  findAllServices(data: { userId: number }): Promise<Service[]>;
 
   createService(data: Service): Promise<Service | null>;
 

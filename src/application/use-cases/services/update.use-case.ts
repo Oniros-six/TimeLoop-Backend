@@ -67,6 +67,9 @@ export class UpdateService {
       if (data.name && data.name != service.name) {
         newServiceData.name = data.name;
       }
+      if (data.description && data.description != service.description) {
+        newServiceData.description = data.description;
+      }
       if (
         data.durationMinutes &&
         data.durationMinutes != service.durationMinutes

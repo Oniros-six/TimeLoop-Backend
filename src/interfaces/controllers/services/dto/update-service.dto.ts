@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNumber, IsString, Min, MinLength } from 'class-validator';
+import { IsNumber, IsString, MaxLength, Min, MinLength } from 'class-validator';
 
 export class UpdateServiceDto {
   @ApiProperty({ example: 1, description: 'ID del comercio' })
@@ -20,6 +20,14 @@ export class UpdateServiceDto {
   @IsString({ message: 'El nombre tiene que contener solo letras' })
   @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
   name?: string;
+
+  @ApiProperty({
+    example: 'Corte de cabello tradicional adaptado a tu estilo. Incluye lavado, corte con tijera y máquina, retoque de contornos y peinado con producto de terminación. Ideal para quienes buscan un look prolijo y fresco.',
+    description: 'Descripción del servicio'
+  })
+  @IsString({ message: 'La descripción tiene que contener solo letras' })
+  @MaxLength(500, { message: 'La descripción debe contenter maximo 500 caracteres' })
+  description?: string;
 
   @ApiProperty({
     example: '200',

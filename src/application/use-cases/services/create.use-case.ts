@@ -20,7 +20,7 @@ export class CreateService {
     private readonly userRepository: IUserRepository,
 
     private readonly activityLogService: ActivityLogService,
-  ) {}
+  ) { }
 
   async execute(data: CreateServiceDto) {
     // Validar que el usuario existe
@@ -57,6 +57,7 @@ export class CreateService {
       const service = ServiceDomain.create({
         userId: data.userId,
         name: data.name,
+        description: data.description,
         price: data.price,
         durationMinutes: data.durationMinutes,
       });
