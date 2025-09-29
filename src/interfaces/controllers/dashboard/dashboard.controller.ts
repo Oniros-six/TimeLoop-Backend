@@ -8,13 +8,16 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetBasicDashboardInfo } from '@/application/use-cases/dashboard/get-basic-info.use-case';
+import { GetDashboardMetrics } from '@/application/use-cases/dashboard/get-metrics.use-case';
 
 @ApiTags('Dashboard')
 @Controller('dashboard')
 export class DashboardController {
     constructor(
         private readonly getBasicDashboardInfoUseCase: GetBasicDashboardInfo,
+        private readonly getDashboardMetricsUseCase: GetDashboardMetrics,
     ) { }
+    
     // Get information for dashboard
     @ApiOperation({ summary: 'Obtener información del panel de control' })
     @ApiParam({
@@ -29,5 +32,17 @@ export class DashboardController {
         return this.getBasicDashboardInfoUseCase.execute(id);
     }
 
+    // Get metrics for dashboard
+    @ApiOperation({ summary: 'Obtener metricas del panel de control' })
+    @ApiParam({
+        name: 'id',
+        type: Number,
+        required: true,
+        description: 'ID del user',
+    })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    @Get('metrics/:id')
+    getMetrics(@Param('id', ParseIntPipe) id: number) {
+        return this.getDashboardMetricsUseCase.execute(id);
     }
 }

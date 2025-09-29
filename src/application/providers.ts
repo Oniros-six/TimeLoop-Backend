@@ -21,3 +21,4 @@ export const MERCADO_PAGO_REPOSITORY = 'IMercadoPagoRepository';
 export const RESEND_PROVIDER = 'RESEND_PROVIDER';
 export const PAYMENT_PROVIDERS = 'PAYMENT_PROVIDERS';
 export const DASHBOARD_REPOSITORY = 'IDashboardRepository';
+export const METRICS_REPOSITORY = 'IMetricsRepository';

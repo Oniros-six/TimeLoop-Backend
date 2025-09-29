@@ -41,6 +41,24 @@ export class PrismaBookingRepository implements IBookingRepository {
 
   async createSchedule(data: DomainClient): Promise<DomainClient | null> {
     const result = await this.prisma.$transaction(async (prisma) => {
+      
+      await this.prisma.customerCommerce.upsert({
+        where: {
+          customerId_commerceId: {
+            customerId: data.customerId,
+            commerceId: data.commerceId,
+          },
+        },
+        update: {
+          // si ya existe, podrías actualizar "lastReservationAt" o "totalReservations"
+        },
+        create: {
+          customerId: data.customerId,
+          commerceId: data.commerceId,
+          firstReservationAt: new Date(),
+        },
+      });
+
       return await prisma.booking.create({
         data: {
           timeStart: data.timeStart,
@@ -67,6 +85,8 @@ export class PrismaBookingRepository implements IBookingRepository {
         },
       });
     });
+
+
 
     if (!result) return null;
 

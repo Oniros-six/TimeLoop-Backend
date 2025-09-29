@@ -7,9 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// =========================================
-// Enums
-// =========================================
+//* =========================================
+//* Enums
+//* =========================================
 
 enum BillingTypes {
   FLEXIBLE
@@ -103,6 +103,7 @@ enum InvoiceStatus {
 enum PaymentMethod {
   MERCADO_PAGO
   CASH
+  // CRYPTO
   // PAYPAL
   // STRIPE
   // BANK_TRANSFER
@@ -121,9 +122,9 @@ enum Currency {
   EUR
 }
 
-// =========================================
-// Core
-// =========================================
+//* =========================================
+//* Core
+//* =========================================
 model Commerce {
   id               Int              @id @default(autoincrement())
   name             String
@@ -142,19 +143,21 @@ model Commerce {
   users            User[]                    @relation("CommerceUsers")
   Invoice          Invoice[]
   Payment          Payment[]
+  CustomerCommerce CustomerCommerce[]
 
   @@map("commerces")
 }
 
 model Customer {
-  id             Int              @id @default(autoincrement())
-  name           String
-  email          String           @unique
-  phone          String
-  logs           ActivityLog[]    @relation("CustomerLogs")
-  bookings       Booking[]        @relation("CustomerBookings")
-  reminders      Reminder[]       @relation("CustomerReminders")
-  BookingHistory BookingHistory[]
+  id               Int                @id @default(autoincrement())
+  name             String
+  email            String             @unique
+  phone            String
+  logs             ActivityLog[]      @relation("CustomerLogs")
+  bookings         Booking[]          @relation("CustomerBookings")
+  reminders        Reminder[]         @relation("CustomerReminders")
+  BookingHistory   BookingHistory[]
+  CustomerCommerce CustomerCommerce[]
 
   @@map("customers")
 }
@@ -222,9 +225,9 @@ model BookingService {
   @@map("booking_services")
 }
 
-// =========================================
-// Configs
-// =========================================
+//* =========================================
+//* Configs
+//* =========================================
 
 model CommerceConfig {
   id                          Int             @id @default(autoincrement())
@@ -247,9 +250,9 @@ model UserConfig {
   @@map("user_configs")
 }
 
-// =========================================
-// Working Patterns
-// =========================================
+//* =========================================
+//* Working Patterns
+//* =========================================
 
 model UserWorkingPattern {
   id               Int              @id @default(autoincrement())
@@ -279,9 +282,9 @@ model CommerceWorkingPattern {
   @@map("commerce_working_patterns")
 }
 
-// =========================================
-// Working override
-// =========================================
+//* =========================================
+//* Working override
+//* =========================================
 
 model UserWorkingOverride {
   id             Int              @id @default(autoincrement())
@@ -313,9 +316,9 @@ model CommerceWorkingOverride {
   @@map("commerce_working_overrides")
 }
 
-// =========================================
-// logging, History, Invoices and Reminders
-// =========================================
+//* =========================================
+//* logging, History, Invoices and Reminders
+//* =========================================
 model ActivityLog {
   id         Int        @id @default(autoincrement())
   entityId   Int
@@ -388,9 +391,10 @@ model Invoice {
   @@index([commerceId, periodStart, periodEnd])
 }
 
-// =========================================
-// Payment
-// =========================================
+//* =========================================
+//* Payment
+//* =========================================
+
 model Payment {
   id          Int           @id @default(autoincrement())
   bookingId   Int
@@ -421,4 +425,20 @@ model MercadoPago {
   tokenExpires DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+//* =========================================
+//* Metrics
+//* =========================================
+
+model CustomerCommerce {
+  id                 Int      @id @default(autoincrement())
+  customerId         Int
+  commerceId         Int
+  firstReservationAt DateTime
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  commerce Commerce @relation(fields: [commerceId], references: [id])
+
+  @@unique([customerId, commerceId])
 }

@@ -8,8 +8,6 @@ export class Dashboard {
         public recentActivity: RecentItem[],
     ) { }
 
-    //TODO aqui mismo se calcularan las metricas luego
-
     // Factory method
     static create(props: {
         commerceId: number,

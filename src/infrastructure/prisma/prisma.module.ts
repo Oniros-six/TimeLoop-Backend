@@ -18,6 +18,7 @@ import { PrismaInvoiceRepository } from './repositories/invoice.repository';
 import { PrismaPaymentRepository } from './repositories/payment.repository';
 import { PrismaMercadoPagoRepository } from './repositories/mercadoPago.repository';
 import { PrismaDashboardRepository } from './repositories/dashboard.repository';
+import { PrismaMetricsRepository } from './repositories/metrics.repository';
 import { TokenEncryptionService } from '../payments/TokenEncryptationService';
 
 @Global()
@@ -97,6 +98,10 @@ import { TokenEncryptionService } from '../payments/TokenEncryptationService';
       provide: 'IDashboardRepository',
       useClass: PrismaDashboardRepository,
     },
+    {
+      provide: 'IMetricsRepository',
+      useClass: PrismaMetricsRepository,
+    },
   ],
 
   exports: [
@@ -119,7 +124,8 @@ import { TokenEncryptionService } from '../payments/TokenEncryptationService';
     'IInvoiceRepository',
     'IPaymentRepository',
     'IMercadoPagoRepository',
-    'IDashboardRepository'
+    'IDashboardRepository',
+    'IMetricsRepository'
   ],
 })
 export class PrismaModule { }
