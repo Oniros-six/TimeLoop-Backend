@@ -15,7 +15,9 @@ export interface ICommerceRepository {
   reinstateCommerce(data: { commerceId: number }): Promise<Commerce | null>;
 
   createCommerce(data: Commerce): Promise<Commerce | null>;
-
+  
+  updateLogo(commerceId: number, logoUrl: string): Promise<Commerce | null>;
+  
   findAllActive(): Promise<Commerce[] | null>;
 
   updateCommerce(data: {

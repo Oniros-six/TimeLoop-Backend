@@ -22,3 +22,5 @@ export const RESEND_PROVIDER = 'RESEND_PROVIDER';
 export const PAYMENT_PROVIDERS = 'PAYMENT_PROVIDERS';
 export const DASHBOARD_REPOSITORY = 'IDashboardRepository';
 export const METRICS_REPOSITORY = 'IMetricsRepository';
+export const CLOUDINARY_REPOSITORY = 'CLOUDINARY_REPOSITORY';
+

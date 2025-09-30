@@ -7,7 +7,7 @@ import { CommerceUpdateData } from '@/domain/common/CommerceUpdateData';
 
 @Injectable()
 export class PrismaCommerceRepository implements ICommerceRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private toDomain(commerce: {
     id: number;
@@ -17,6 +17,7 @@ export class PrismaCommerceRepository implements ICommerceRepository {
     address: string;
     businessCategory: BusinessCategory;
     active: boolean;
+    logo?: string;
   }): DomainClient {
     return new DomainClient(
       commerce.id,
@@ -26,6 +27,7 @@ export class PrismaCommerceRepository implements ICommerceRepository {
       commerce.address,
       commerce.businessCategory,
       commerce.active,
+      commerce.logo
     );
   }
 
@@ -154,5 +156,12 @@ export class PrismaCommerceRepository implements ICommerceRepository {
       console.error('Error eliminando comercio:', error);
       return false;
     }
+  }
+
+  async updateLogo(commerceId: number, logoUrl: string) {
+    return this.prisma.commerce.update({
+      where: { id: commerceId },
+      data: { logo: logoUrl },
+    });
   }
 }

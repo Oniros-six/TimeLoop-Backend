@@ -9,6 +9,10 @@ import {
   ValidationPipe,
   ParseIntPipe,
   Patch,
+  UploadedFile,
+  UseInterceptors,
+  Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
@@ -17,9 +21,11 @@ import { FindCommerce } from '@/application/use-cases/commerce/find.use-case';
 import { UpdateCommerce } from '@/application/use-cases/commerce/update.use-case';
 import { SuspendCommerce } from '@/application/use-cases/commerce/suspend.use-case';
 import { ReinstateCommerce } from '@/application/use-cases/commerce/reinstate.use-case';
+import { UploadCommerceLogo } from '@/application/use-cases/commerce/upload-logo.use-case';
 
 import { CreateCommerceDto } from './dto/create-commerce.dto';
 import { UpdateCommerceDto } from './dto/update-commerce.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Commerces')
 @Controller('commerce')
@@ -30,7 +36,8 @@ export class CommerceController {
     private readonly updateCommerceUseCase: UpdateCommerce,
     private readonly suspendCommerceUseCase: SuspendCommerce,
     private readonly reinstateCommerceUseCase: ReinstateCommerce,
-  ) {}
+    private readonly uploadCommerceLogoUseCase: UploadCommerceLogo
+  ) { }
 
   // Create a commerce
   @ApiOperation({ summary: 'Crear un nuevo comercio' })
@@ -99,5 +106,22 @@ export class CommerceController {
   @Patch('/reinstate/:id')
   reinstate(@Param('id', ParseIntPipe) id: number) {
     return this.reinstateCommerceUseCase.execute(id);
+  }
+
+  @Post('upload-logo')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 1 * 1024 * 1024 }, // 1MB máximo
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
+          return cb(new BadRequestException('Solo se permiten imágenes JPG, PNG o WEBP'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async uploadLogo(@Req() req, @UploadedFile() file: Express.Multer.File) {
+    const commerceId = req.user.commerceId;
+    return this.uploadCommerceLogoUseCase.execute(commerceId, file);
   }
 }

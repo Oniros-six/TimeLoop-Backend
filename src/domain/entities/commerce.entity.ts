@@ -9,6 +9,7 @@ export class Commerce {
     public address: string,
     public businessCategory: BusinessCategory,
     public active: boolean,
+    public readonly logo?: string,
   ) {}
 
   static createCommerce(props: {
@@ -18,6 +19,7 @@ export class Commerce {
     phone: string;
     address: string;
     businessCategory: BusinessCategory;
+    logo?: string;
   }): Commerce {
     return new Commerce(
       props.id ?? 0,
@@ -27,6 +29,7 @@ export class Commerce {
       props.address,
       props.businessCategory,
       true,
+      props.logo
     );
   }
 }
