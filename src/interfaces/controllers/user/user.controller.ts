@@ -79,7 +79,7 @@ export class UserController {
       return { message: 'Usuario no encontrado', statusCode: 404, data: null };
     }
 
-    const { password, role, active, ...data } = res.data;
+    const { password, ...data } = res.data;
 
     return {
       message: res.message,
@@ -104,7 +104,7 @@ export class UserController {
     const res = await this.findAllUsersUseCase.execute(commerceId);
 
     const safeData =
-      res.data?.map(({ password, role, active, ...rest }) => rest) ?? [];
+      res.data?.map(({ password, ...rest }) => rest) ?? [];
 
     return {
       message: res.message,
@@ -129,8 +129,7 @@ export class UserController {
     @Body() dto: UpdateUserDto,
   ) {
     const res = await this.updateUserUseCase.execute(userId, dto);
-    const { password, role, active, ...data } = res.data;
-
+    const { password, ...data } = res.data;
     return {
       message: res.message,
       statusCode: res.statusCode,
@@ -150,7 +149,7 @@ export class UserController {
   @Patch('suspend')
   async suspend(@Query() dto: StateUserDto) {
     const res = await this.suspendUserUseCase.execute(dto);
-    const { password, role, active, ...data } = res.data;
+    const { password, ...data } = res.data;
 
     return {
       message: res.message,
@@ -171,7 +170,7 @@ export class UserController {
   @Patch('reinstate')
   async reinstate(@Query() dto: StateUserDto) {
     const res = await this.reinstateUserUseCase.execute(dto);
-    const { password, role, active, ...data } = res.data;
+    const { password, ...data } = res.data;
 
     return {
       message: res.message,
