@@ -14,9 +14,11 @@ export class FindAllByCommerce {
     try {
       const result = await this.bookingRepository.findAllByCommerce({
         commerceId: data.commerceId,
+        limit: data.limit,
+        cursor: data.cursor
       });
 
-      if (!result || result.length == 0) {
+      if (!result || result.items.length == 0) {
         return {
           message: 'No hay reservas en este comercio.',
           statusCode: HttpStatus.OK,

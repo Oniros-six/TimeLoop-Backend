@@ -14,9 +14,11 @@ export class FindAllByUser {
     try {
       const result = await this.bookingRepository.findAllByUser({
         userId: dto.userId,
+        limit: dto.limit,
+        cursor: dto.cursor
       });
 
-      if (!result || result.length == 0) {
+      if (!result || result.items.length == 0) {
         return {
           message: 'No hay reservas para este usuario.',
           statusCode: HttpStatus.OK,

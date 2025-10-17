@@ -1,4 +1,5 @@
 import { BookingDetail } from '../common/BookingDetail.type';
+import { BookingMP } from '../common/BookingMP.type';
 import { BookingUpdateData } from '../common/BookingUpdateData';
 import { Booking } from '../entities/booking.entity';
 
@@ -19,9 +20,17 @@ export interface IBookingRepository {
   }): Promise<Booking | null>;
 
   //* FindAllByCommerce repository methods
-  findAllByCommerce(data: { commerceId: number }): Promise<Booking[] | null>;
+  findAllByCommerce(data: { commerceId: number, limit?: number, cursor?: number }): Promise<{
+    items: BookingDetail[];
+    nextCursor: number | null;
+    hasNextPage: boolean;
+  }>;
 
-  findAllByUser(data: { userId: number }): Promise<Booking[] | null>;
+  findAllByUser(data: { userId: number, limit?: number, cursor?: number }): Promise<{
+    items: BookingDetail[];
+    nextCursor: number | null;
+    hasNextPage: boolean;
+  }>;
 
   //* findBusySlots repository methods
   findBusySlots(data: {
@@ -47,5 +56,5 @@ export interface IBookingRepository {
   //* General use
   findOne(data: { id: number }): Promise<Booking | null>;
 
-  findBookingData(bookingId: number): Promise<BookingDetail>;
+  findBookingData(bookingId: number): Promise<BookingMP>;
 }

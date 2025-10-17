@@ -6,10 +6,14 @@ import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { BookingService } from '@/domain/entities/bookingService.entity';
 import { BookingDetail } from '@/domain/common/BookingDetail.type';
+import { BookingMP } from '@/domain/common/BookingMP.type';
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
 
 @Injectable()
 export class PrismaBookingRepository implements IBookingRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private toDomain(booking: {
     id: number;
@@ -41,7 +45,7 @@ export class PrismaBookingRepository implements IBookingRepository {
 
   async createSchedule(data: DomainClient): Promise<DomainClient | null> {
     const result = await this.prisma.$transaction(async (prisma) => {
-      
+
       await this.prisma.customerCommerce.upsert({
         where: {
           customerId_commerceId: {
@@ -142,40 +146,115 @@ export class PrismaBookingRepository implements IBookingRepository {
     return this.toDomain(result);
   }
 
-  async findAllByUser(data: {
-    userId: number;
-  }): Promise<DomainClient[] | null> {
+  async findAllByUser(data: { userId: number; limit?: number; cursor?: number }): Promise<{
+    items: BookingDetail[];
+    nextCursor: number | null;
+    hasNextPage: boolean;
+  }> {
+    const { userId, limit = 10, cursor } = data;
+
     const result = await this.prisma.booking.findMany({
+      take: limit + 1, // pedimos uno más para saber si hay siguiente página
+      skip: cursor ? 1 : 0,
+      ...(cursor && { cursor: { id: cursor } }),
       where: {
-        userId: data.userId,
+        userId,
+        status: {
+          notIn: [BookingStatus.COMPLETED, BookingStatus.NO_SHOW],
+        },
+        timeStart: {
+          gte: today,
+        },
       },
+      orderBy: { timeStart: 'asc' },
       include: {
-        bookingServices: true,
+        customer: { select: { name: true } },
+        user: { select: { name: true } },
+        bookingServices: {
+          include: {
+            service: { select: { id: true, name: true } },
+          },
+        },
       },
     });
 
-    if (!result || result.length === 0) return null;
+    // Si obtuvimos más del límite, hay otra página
+    const hasNextPage = result.length > limit;
+    const trimmed = hasNextPage ? result.slice(0, limit) : result;
 
-    return result.map((booking) => this.toDomain(booking));
+    const mapped = trimmed.map((b) => {
+      const booking = this.toDomain(b);
+      return {
+        ...booking,
+        customer: b.customer,
+        user: b.user,
+        services: b.bookingServices.map((bs) => bs.service),
+      } as BookingDetail;
+    });
+
+    const nextCursor = hasNextPage ? trimmed[trimmed.length - 1].id : null;
+
+    return {
+      items: mapped,
+      nextCursor,
+      hasNextPage,
+    };
   }
 
-  async findAllByCommerce(data: {
-    commerceId: number;
-  }): Promise<DomainClient[] | null> {
+  async findAllByCommerce(data: { commerceId: number; limit?: number; cursor?: number }): Promise<{
+    items: BookingDetail[];
+    nextCursor: number | null;
+    hasNextPage: boolean;
+  }> {
+    const { commerceId, limit = 10, cursor } = data;
+
     const result = await this.prisma.booking.findMany({
+      take: limit + 1, // pedimos uno más para saber si hay siguiente página
+      skip: cursor ? 1 : 0,
+      ...(cursor && { cursor: { id: cursor } }),
       where: {
-        commerceId: data.commerceId,
+        commerceId,
+        status: {
+          notIn: [BookingStatus.COMPLETED, BookingStatus.NO_SHOW],
+        },
+        timeStart: {
+          gte: today,
+        },
       },
+      orderBy: { timeStart: 'asc' },
       include: {
-        bookingServices: true,
+        customer: { select: { name: true } },
+        user: { select: { name: true } },
+        bookingServices: {
+          include: {
+            service: { select: { id: true, name: true } },
+          },
+        },
       },
     });
 
-    if (!result || result.length === 0) return null;
+    // Si obtuvimos más del límite, hay otra página
+    const hasNextPage = result.length > limit;
+    const trimmed = hasNextPage ? result.slice(0, limit) : result;
 
-    return result.map((booking) => this.toDomain(booking));
+    const mapped = trimmed.map((b) => {
+      const booking = this.toDomain(b);
+      return {
+        ...booking,
+        customer: b.customer,
+        user: b.user,
+        services: b.bookingServices.map((bs) => bs.service),
+      } as BookingDetail;
+    });
+
+    const nextCursor = hasNextPage ? trimmed[trimmed.length - 1].id : null;
+
+    return {
+      items: mapped,
+      nextCursor,
+      hasNextPage,
+    };
   }
-
   async findAllByDateAndUser(data: {
     userId: number;
     timeStart: Date;
@@ -291,7 +370,7 @@ export class PrismaBookingRepository implements IBookingRepository {
     return this.toDomain(result);
   }
 
-  async findBookingData(bookingId: number): Promise<BookingDetail> {
+  async findBookingData(bookingId: number): Promise<BookingMP> {
     const result = await this.prisma.booking.findFirstOrThrow({
       where: { id: bookingId },
       include: {

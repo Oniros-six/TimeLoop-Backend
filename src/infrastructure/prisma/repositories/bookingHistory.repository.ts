@@ -7,9 +7,8 @@ import { BookingHistoryUpdateData } from '@/domain/common/BookingHistoryUpdateDa
 
 @Injectable()
 export class PrismaBookingHistoryRepository
-  implements IBookingHistoryRepository
-{
-  constructor(private readonly prisma: PrismaService) {}
+  implements IBookingHistoryRepository {
+  constructor(private readonly prisma: PrismaService) { }
 
   private toDomain(bookingHistory: {
     id: number;
@@ -78,7 +77,7 @@ export class PrismaBookingHistoryRepository
 
   async findByDatesAndCommerce(data: {
     commerceId: number;
-    startDate: Date;  
+    startDate: Date;
     endDate: Date;
   }): Promise<DomainClient[]> {
     const result = await this.prisma.bookingHistory.findMany({
