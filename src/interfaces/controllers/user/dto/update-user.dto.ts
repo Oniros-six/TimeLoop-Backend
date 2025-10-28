@@ -14,7 +14,7 @@ export class UpdateUserDto {
   @ApiProperty({ example: 'Leandro', description: 'Nombre del usuario' })
   @IsString({ message: 'El nombre tiene que contener solo letras' })
   @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-  @MaxLength(15, { message: 'El nombre debe tener como máximo 15 caracteres' })
+  @MaxLength(50, { message: 'El nombre no debe superar los 50 caracteres' })
   @IsOptional({})
   name: string;
 

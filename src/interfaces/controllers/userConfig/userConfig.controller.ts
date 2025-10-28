@@ -24,7 +24,7 @@ export class UserConfigController {
     private readonly createUserConfigUseCase: CreateUserConfig,
     private readonly updateUserConfigUseCase: UpdateUserConfig,
     private readonly findUserConfigUseCase: FindUserConfig,
-  ) {}
+  ) { }
 
   // Create a user
   @ApiOperation({ summary: 'Crear la configuración de un usuario' })
@@ -51,10 +51,18 @@ export class UserConfigController {
 
   // Update a user
   @ApiOperation({ summary: 'Actualizar la información de un usuario' })
+  @ApiParam({
+    name: 'userId',
+    type: Number,
+    description: 'ID del usuario',
+  })
   @ApiBody({ type: UpdateUserConfigDto })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Put()
-  update(@Body() dto: UpdateUserConfigDto) {
-    return this.updateUserConfigUseCase.execute(dto.userId, dto);
+  @Put(':userId')
+  update(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() dto: UpdateUserConfigDto,
+  ) {
+    return this.updateUserConfigUseCase.execute(userId, dto);
   }
 }

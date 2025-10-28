@@ -115,17 +115,17 @@ export class UserController {
 
   // Update a user
   @ApiOperation({ summary: 'Actualizar la información de un usuario' })
-  @ApiQuery({
+  @ApiParam({
     name: 'userId',
-    type: Number,
     required: true,
+    type: Number,
     description: 'ID del usuario',
   })
   @ApiBody({ type: UpdateUserDto })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Put()
+  @Put('/:userId')
   async update(
-    @Query('userId', ParseIntPipe) userId: number,
+    @Param('userId', ParseIntPipe) userId: number,
     @Body() dto: UpdateUserDto,
   ) {
     const res = await this.updateUserUseCase.execute(userId, dto);
