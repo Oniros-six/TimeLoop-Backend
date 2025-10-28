@@ -136,7 +136,7 @@ export class Signup {
         const commerceWP = new CreateCommercePatternDto();
         commerceWP.commerceId = commerceData.id;
         commerceWP.weekday = weekday;
-        commerceWP.availabilityType = AvailabilityType.off;
+        commerceWP.availabilityType = availabilityType;
         commerceWP.morningStart = shift.morningOpen;
         commerceWP.morningEnd = shift.morningClose;
         commerceWP.afternoonStart = shift.afternoonOpen;
