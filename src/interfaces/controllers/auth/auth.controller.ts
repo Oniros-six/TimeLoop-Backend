@@ -21,6 +21,7 @@ import { Signup } from '@/application/use-cases/auth/signup.use-case';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly signupUseCase: Signup) {}
+  
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
@@ -67,6 +68,7 @@ export class AuthController {
               email: user.email,
               role: user.role,
               commerceId: user.commerceId,
+              phone: user.phone,
               active: user.active,
             },
           });

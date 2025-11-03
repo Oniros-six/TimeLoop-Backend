@@ -2,11 +2,13 @@ import {
   COMMERCE_CONFIG_REPOSITORY,
   COMMERCE_REPOSITORY,
   COMMERCE_WORKING_PATTERN_REPOSITORY,
+  USER_WORKING_PATTERN_REPOSITORY,
   USER_REPOSITORY,
 } from '@/application/providers';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { ICommerceConfigRepository } from '@/domain/repositories/commerceConfig.repository';
 import { ICommerceWorkingPatternRepository } from '@/domain/repositories/commerceWorkingPattern.repository';
+import { IUserWorkingPatternRepository } from '@/domain/repositories/userWorkingPattern.repository';
 import { IUserRepository } from '@/domain/repositories/user.repository';
 import { CreateBusinessDto } from '@/interfaces/controllers/auth/dto/signup.dto';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
@@ -23,6 +25,7 @@ import { CreateCommerce } from '../commerce/create.use-case';
 import { CreateUser } from '../user/create.use-case';
 import { CreateCommerceConfig } from '../commerceConfig/create.use-case';
 import { CreateCommerceWorkingPattern } from '../commerceWorkingPattern/create.use-case';
+import { UserWorkingPattern as UserWorkingPatternDomain } from '@/domain/entities/userWorkingPattern.entity';
 
 @Injectable()
 export class Signup {
@@ -43,6 +46,9 @@ export class Signup {
 
     @Inject(COMMERCE_WORKING_PATTERN_REPOSITORY)
     private readonly commerceWorkingPatternRepository: ICommerceWorkingPatternRepository,
+
+    @Inject(USER_WORKING_PATTERN_REPOSITORY)
+    private readonly userWorkingPatternRepository: IUserWorkingPatternRepository,
   ) { }
 
   async execute(data: CreateBusinessDto) {
@@ -76,6 +82,7 @@ export class Signup {
         email: data.email,
         password: data.password,
         role: Roles.ADMIN,
+        phone: null,
         commerceId: commerceData.id,
       });
 
@@ -83,6 +90,24 @@ export class Signup {
       const userData = userResult.data
 
       createdIds.userId = userData.id;
+
+      // Crear patrón de trabajo OFF por cada día de la semana
+      for (const weekday of Object.values(WeekDays)) {
+        const userPattern = UserWorkingPatternDomain.create({
+          userId: userData.id,
+          weekday,
+          availabilityType: AvailabilityType.off,
+          morningStart: null,
+          morningEnd: null,
+          afternoonStart: null,
+          afternoonEnd: null,
+        });
+
+        await this.userWorkingPatternRepository.createUserWorkingPattern(
+          userPattern,
+        );
+      }
+
 
       //* 3. Crear configuración del comercio con valores por defecto
       const commerceConfig = CommerceConfig.create({

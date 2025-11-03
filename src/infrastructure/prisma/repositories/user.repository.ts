@@ -14,6 +14,7 @@ export class PrismaUserRepository implements IUserRepository {
     email: string;
     password: string;
     role: Roles;
+    phone: string | null;
     commerceId: number;
     active: boolean;
   }): DomainClient {
@@ -23,6 +24,7 @@ export class PrismaUserRepository implements IUserRepository {
       user.email,
       user.password,
       user.role,
+      user.phone ?? null,
       user.commerceId,
       user.active,
     );
@@ -94,6 +96,7 @@ export class PrismaUserRepository implements IUserRepository {
         email: data.email,
         password: data.password,
         role: data.role,
+        phone: data.phone ?? null,
         commerceId: data.commerceId,
         active: data.active,
       },

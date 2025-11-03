@@ -7,6 +7,7 @@ export class User {
     public email: string,
     public password: string,
     public role: Roles,
+    public phone: string | null,
     public readonly commerceId: number,
     public active: boolean,
   ) {}
@@ -18,6 +19,7 @@ export class User {
     email: string;
     password: string;
     role: Roles;
+    phone: string | null;
     commerceId: number;
     active?: boolean;
   }): User {
@@ -27,16 +29,16 @@ export class User {
       props.email,
       props.password,
       props.role,
+      props.phone,
       props.commerceId,
       true,
     );
   }
 
   update(
-    props: Partial<Pick<User, 'name' | 'email' | 'password' | 'role'>>,
+    props: Partial<Pick<User, 'name' | 'email' | 'password' | 'role' | 'phone'>>,
   ): boolean {
     let hasChanges = false;
-
     if (props.name !== undefined && props.name !== this.name) {
       this.name = props.name;
       hasChanges = true;
@@ -54,6 +56,11 @@ export class User {
 
     if (props.role !== undefined && props.role !== this.role) {
       this.role = props.role;
+      hasChanges = true;
+    }
+
+    if (props.phone !== undefined && props.phone !== this.phone) {
+      this.phone = props.phone;
       hasChanges = true;
     }
 

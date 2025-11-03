@@ -6,6 +6,7 @@ export interface User {
   commerceId: number;
   email: string;
   name: string;
+  phone: string | null;
   role: Roles;
   active: boolean;
 }
@@ -15,6 +16,7 @@ export interface SafeUser {
   commerceId: number;
   email: string;
   name: string;
+  phone: string | null;
   role: Roles;
   active: boolean;
 }
