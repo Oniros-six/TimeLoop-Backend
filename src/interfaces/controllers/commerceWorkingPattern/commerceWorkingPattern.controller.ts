@@ -50,20 +50,21 @@ export class CommerceWorkingPatternController {
     return this.findAllCommerceWorkingPatternUseCase.execute(commerceId);
   }
 
-  @ApiOperation({ summary: 'Actualizar un patrón de trabajo de un comercio' })
+  @ApiOperation({ summary: 'Actualizar patrones de trabajo de un comercio (lote)' })
   @ApiParam({
-    name: 'id',
+    name: 'commerceId',
     type: Number,
     required: true,
-    description: 'ID del patrón de trabajo',
+    description: 'ID del comercio',
   })
-  @ApiBody({ type: UpdateCommercePatternDto })
+  @ApiBody({ type: [UpdateCommercePatternDto] })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Put(':id')
+  @Put(':commerceId')
   update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateCommercePatternDto,
+    @Param('commerceId', ParseIntPipe) commerceId: number,
+    @Body() dto: UpdateCommercePatternDto[],
   ) {
-    return this.updateCommerceWorkingPatternUseCase.execute(id, dto);
+    console.log('dto', dto, 'commerceId', commerceId);
+    return this.updateCommerceWorkingPatternUseCase.execute(commerceId, dto);
   }
 }
