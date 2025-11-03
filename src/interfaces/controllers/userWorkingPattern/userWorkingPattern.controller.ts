@@ -50,20 +50,20 @@ export class UserWorkingPatternController {
     return this.findAllUserWorkingPatternUseCase.execute(userId);
   }
 
-  @ApiOperation({ summary: 'Actualizar un patrón de trabajo de un usuario' })
+  @ApiOperation({ summary: 'Actualizar patrones de trabajo de un usuario (lote)' })
   @ApiParam({
-    name: 'id',
+    name: 'userId',
     type: Number,
     required: true,
-    description: 'ID del patrón de trabajo',
+    description: 'ID del usuario',
   })
-  @ApiBody({ type: UpdateUserPatternDto })
+  @ApiBody({ type: [UpdateUserPatternDto] })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Put(':id')
+  @Put(':userId')
   update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateUserPatternDto,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() dto: UpdateUserPatternDto[],
   ) {
-    return this.updateUserWorkingPatternUseCase.execute(id, dto);
+    return this.updateUserWorkingPatternUseCase.execute(userId, dto);
   }
 }

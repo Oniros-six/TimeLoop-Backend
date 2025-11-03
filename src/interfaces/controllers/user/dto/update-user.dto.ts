@@ -42,6 +42,17 @@ export class UpdateUserDto {
   email: string;
 
   @ApiProperty({
+    example: '099123456',
+    description: 'Teléfono de contacto del usuario',
+    required: false,
+  })
+  @Matches(/^09\d{7}$/, {
+    message: 'El número debe comenzar con 09 y tener 9 dígitos',
+  })
+  @IsOptional()
+  phone?: string;
+
+  @ApiProperty({
     example: 'securePass123',
     description: 'Duración del servicio en minutos',
   })

@@ -16,79 +16,86 @@ export class UpdateUserWorkingPattern {
     private readonly activityLogService: ActivityLogService,
   ) {}
 
-  async execute(id: number, data: UpdateUserPatternDto) {
-    const existingPattern =
-      await this.userWorkingPatternRepository.findUserWorkingPatternById({
-        id,
-      });
-
-    if (!existingPattern) {
-      throw new HttpException(
-        'El patrón de trabajo no existe.',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    validateAvailabilityTimes({
-      availabilityType: data.availabilityType,
-      morningStart: data.morningStart,
-      morningEnd: data.morningEnd,
-      afternoonStart: data.afternoonStart,
-      afternoonEnd: data.afternoonEnd,
-    });
-
-    const userWorkingPattern = UserWorkingPatternDomain.create({
-      userId: existingPattern.userId,
-      weekday: existingPattern.weekday,
-      availabilityType:
-        data.availabilityType ?? existingPattern.availabilityType,
-      morningStart: data.morningStart
-        ? data.morningStart
-        : existingPattern.morningStart,
-      morningEnd: data.morningEnd
-        ? data.morningEnd
-        : existingPattern.morningEnd,
-      afternoonStart: data.afternoonStart
-        ? data.afternoonStart
-        : existingPattern.afternoonStart,
-      afternoonEnd: data.afternoonEnd
-        ? data.afternoonEnd
-        : existingPattern.afternoonEnd,
-    });
-
+  async execute(userId: number, data: UpdateUserPatternDto[]) {
+    // En lote: validar y actualizar cada patrón de trabajo
     try {
-      const result =
-        await this.userWorkingPatternRepository.updateUserWorkingPattern({
-          id,
-          newUserWorkingPatternData: userWorkingPattern,
+      const updates = [] as UserWorkingPatternDomain[];
+
+      for (const item of data) {
+        const existingPattern =
+          await this.userWorkingPatternRepository.findUserWorkingPatternById({
+            id: item.id,
+          });
+
+        if (!existingPattern) {
+          throw new HttpException(
+            `El patrón de trabajo con id ${item.id} no existe.`,
+            HttpStatus.NOT_FOUND,
+          );
+        }
+
+        if (existingPattern.userId !== userId) {
+          throw new HttpException(
+            `El patrón de trabajo con id ${item.id} no pertenece al usuario ${userId}.`,
+            HttpStatus.NOT_FOUND,
+          );
+        }
+
+        validateAvailabilityTimes({
+          availabilityType: item.availabilityType,
+          morningStart: item.morningStart,
+          morningEnd: item.morningEnd,
+          afternoonStart: item.afternoonStart,
+          afternoonEnd: item.afternoonEnd,
         });
 
-      if (result === null) {
-        throw new HttpException(
-          'Error al actualizar el patrón de trabajo del usuario.',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
+        const userWorkingPattern = UserWorkingPatternDomain.create({
+          userId: existingPattern.userId,
+          weekday: existingPattern.weekday,
+          availabilityType:
+            item.availabilityType ?? existingPattern.availabilityType,
+          morningStart: item.morningStart ?? existingPattern.morningStart,
+          morningEnd: item.morningEnd ?? existingPattern.morningEnd,
+          afternoonStart:
+            item.afternoonStart ?? existingPattern.afternoonStart,
+          afternoonEnd: item.afternoonEnd ?? existingPattern.afternoonEnd,
+        });
+
+        const result =
+          await this.userWorkingPatternRepository.updateUserWorkingPattern({
+            id: item.id,
+            newUserWorkingPatternData: userWorkingPattern,
+          });
+
+        if (result === null) {
+          throw new HttpException(
+            'Error al actualizar el patrón de trabajo del usuario.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+
+        await this.activityLogService.updated({
+          entityType: EntityType.USER_WORKING_PATTERN,
+          entityId: result.id,
+          userId: userId,
+          commerceId: null,
+          customerId: null,
+          detail: `El patrón de trabajo del usuario fue actualizado para el día ${result.weekday}.`,
+        });
+
+        updates.push(result);
       }
 
-      await this.activityLogService.updated({
-        entityType: EntityType.USER_WORKING_PATTERN,
-        entityId: result.id,
-        userId: result.userId,
-        commerceId: null,
-        customerId: null,
-        detail: `El patrón de trabajo del usuario fue actualizado para el día ${result.weekday}.`,
-      });
-
       return {
-        message: 'Patrón de trabajo del usuario actualizado con éxito',
+        message: 'Patrones de trabajo del usuario actualizados con éxito',
         statusCode: HttpStatus.OK,
-        data: result,
+        data: updates,
       };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error desconocido';
       console.error(message);
       throw new HttpException(
-        'Algo salió mal al actualizar el patrón de trabajo.',
+        'Algo salió mal al actualizar los patrones de trabajo.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

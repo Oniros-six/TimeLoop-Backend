@@ -11,11 +11,12 @@ import { SuspendUser } from '@/application/use-cases/user/suspend.use-case';
 import { ReinstateUser } from '@/application/use-cases/user/reinstate.use-case';
 
 // Tokens
-import { COMMERCE_REPOSITORY, USER_REPOSITORY } from '@/application/providers';
+import { COMMERCE_REPOSITORY, USER_REPOSITORY, USER_WORKING_PATTERN_REPOSITORY } from '@/application/providers';
 
 // Repositories
 import { PrismaCommerceRepository } from '@/infrastructure/prisma/repositories/commerce.repository';
 import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';
+import { PrismaUserWorkingPatternRepository } from '@/infrastructure/prisma/repositories/userWorkingPattern.repository';
 
 // Auth components
 import { AuthService } from '@/domain/services/auth/auth.service';
@@ -32,6 +33,10 @@ import { BcryptPasswordHasher } from '@/infrastructure/auth/bcrypt-password-hash
     {
       provide: COMMERCE_REPOSITORY,
       useClass: PrismaCommerceRepository,
+    },
+    {
+      provide: USER_WORKING_PATTERN_REPOSITORY,
+      useClass: PrismaUserWorkingPatternRepository,
     },
     {
       provide: 'IPasswordHasher',
