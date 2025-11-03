@@ -43,8 +43,8 @@ export class CommerceWorkingPattern {
     }
 
     if (props.availabilityType === AvailabilityType.full) {
-      const hasMorning = props.morningStart && props.morningEnd;
-      const hasAfternoon = props.afternoonStart && props.afternoonEnd;
+      const hasMorning = Boolean(props.morningStart && props.morningEnd);
+      const hasAfternoon = Boolean(props.afternoonStart && props.afternoonEnd);
 
       if (!hasMorning || !hasAfternoon) {
         throw new Error(
@@ -54,9 +54,9 @@ export class CommerceWorkingPattern {
     }
 
     if (props.availabilityType === AvailabilityType.half) {
-      const hasMorning = props.morningStart && props.morningEnd;
-      const hasAfternoon = props.afternoonStart && props.afternoonEnd;
-
+      const hasMorning = Boolean(props.morningStart || props.morningEnd);
+      const hasAfternoon = Boolean(props.afternoonStart || props.afternoonEnd);
+      
       if (!hasMorning && !hasAfternoon) {
         throw new Error(
           'Debes enviar horarios de mañana o de tarde para tipo half.',

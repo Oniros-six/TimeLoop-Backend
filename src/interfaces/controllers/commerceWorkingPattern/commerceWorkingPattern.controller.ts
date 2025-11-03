@@ -64,7 +64,6 @@ export class CommerceWorkingPatternController {
     @Param('commerceId', ParseIntPipe) commerceId: number,
     @Body() dto: UpdateCommercePatternDto[],
   ) {
-    console.log('dto', dto, 'commerceId', commerceId);
     return this.updateCommerceWorkingPatternUseCase.execute(commerceId, dto);
   }
 }

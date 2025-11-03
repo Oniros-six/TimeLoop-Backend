@@ -52,13 +52,11 @@ export class UpdateUserWorkingPattern {
         const userWorkingPattern = UserWorkingPatternDomain.create({
           userId: existingPattern.userId,
           weekday: existingPattern.weekday,
-          availabilityType:
-            item.availabilityType ?? existingPattern.availabilityType,
-          morningStart: item.morningStart ?? existingPattern.morningStart,
-          morningEnd: item.morningEnd ?? existingPattern.morningEnd,
-          afternoonStart:
-            item.afternoonStart ?? existingPattern.afternoonStart,
-          afternoonEnd: item.afternoonEnd ?? existingPattern.afternoonEnd,
+          availabilityType: item.availabilityType,
+          morningStart: item.morningStart,
+          morningEnd: item.morningEnd,
+          afternoonStart: item.afternoonStart,
+          afternoonEnd: item.afternoonEnd,
         });
 
         const result =
