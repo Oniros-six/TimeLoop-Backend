@@ -3,6 +3,7 @@ import { BookingStatus } from "@/domain/dbEnums/BookingStatus.enum";
 export interface DashboardData {
   commerceId: number;
   commerceName: string;
+  logoUrl: string;
   history: HistoryItem[];
   recentActivity: RecentItem[];
 }

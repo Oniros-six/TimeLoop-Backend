@@ -13,12 +13,14 @@ export class PrismaDashboardRepository implements IDashboardRepository {
     private toDomain(dashboard: {
         commerceId: number,
         commerceName: string,
+        logoUrl: string,
         history: HistoryItem[],
         recentActivity: RecentItem[]
     }): DomainClient {
         return new DomainClient(
             dashboard.commerceId,
             dashboard.commerceName,
+            dashboard.logoUrl,
             dashboard.history,
             dashboard.recentActivity
         );
@@ -29,7 +31,8 @@ export class PrismaDashboardRepository implements IDashboardRepository {
         const commerce = await this.prisma.commerce.findUnique({
             select: {
                 id: true,
-                name: true
+                name: true,
+                logo: true,
             },
             where: { id: commerceId },
         });
@@ -119,6 +122,7 @@ export class PrismaDashboardRepository implements IDashboardRepository {
         const result: DashboardData = {
             commerceId: commerce.id,
             commerceName: commerce.name,
+            logoUrl: commerce.logo,
             history: history,
             recentActivity: recent
         }
