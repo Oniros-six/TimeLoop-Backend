@@ -53,6 +53,11 @@ export class PrismaDashboardRepository implements IDashboardRepository {
                         name: true,
                     },
                 },
+                user: {
+                    select: {
+                        name: true,
+                    },
+                },
             },
             where: {
                 commerceId: commerceId,
@@ -89,6 +94,11 @@ export class PrismaDashboardRepository implements IDashboardRepository {
                     },
                 },
                 customer: {
+                    select: {
+                        name: true,
+                    },
+                },
+                user: {
                     select: {
                         name: true,
                     },

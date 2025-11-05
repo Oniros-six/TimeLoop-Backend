@@ -179,6 +179,7 @@ model User {
   overridePatterns UserWorkingOverride[] @relation("UserOverridePatterns")
   workingPatterns  UserWorkingPattern[]  @relation("UserWorkingPatterns")
   commerce         Commerce              @relation("CommerceUsers", fields: [commerceId], references: [id])
+  BookingHistory   BookingHistory[]
 
   @@map("users")
 }
@@ -368,6 +369,9 @@ model BookingHistory {
   notes             String
   booking           Booking       @relation(fields: [bookingId], references: [id])
   customer          Customer      @relation(fields: [customerId], references: [id])
+  user              User          @relation(fields: [userId], references: [id])
+
+  @@map("booking_histories")
 }
 
 model Invoice {
