@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   ParseIntPipe,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
@@ -16,8 +17,10 @@ import { UpdateUserConfig } from '@/application/use-cases/userConfig/update.use-
 import { FindUserConfig } from '@/application/use-cases/userConfig/find.use-case';
 import { CreateUserConfigDto } from './dto/create-userConfig.dto';
 import { UpdateUserConfigDto } from './dto/update-userConfig.dto';
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
 
 @ApiTags('User Config')
+@UseGuards(AuthGuard)
 @Controller('user-config')
 export class UserConfigController {
   constructor(
@@ -25,6 +28,7 @@ export class UserConfigController {
     private readonly updateUserConfigUseCase: UpdateUserConfig,
     private readonly findUserConfigUseCase: FindUserConfig,
   ) { }
+  //TODO Cada usuario deberia solo poder modificar y eliminar sus propias configuraciones (mas alla de la logica de frontend que impide que un usuario pueda modificar o eliminar una configuración que no le pertenece)
 
   //*==================================== CREATE USER CONFIG ====================================
   @ApiOperation({ summary: 'Crear la configuración de un usuario' })

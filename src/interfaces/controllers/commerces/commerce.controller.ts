@@ -13,6 +13,7 @@ import {
   UseInterceptors,
   Req,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
@@ -27,6 +28,10 @@ import { CreateCommerceDto } from './dto/create-commerce.dto';
 import { UpdateCommerceDto } from './dto/update-commerce.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+import { Roles } from '@/infrastructure/auth/roles.decorator';
+import { RolesGuard } from '@/infrastructure/auth/roles.guard';
+
 @ApiTags('Commerces')
 @Controller('commerce')
 export class CommerceController {
@@ -38,6 +43,7 @@ export class CommerceController {
     private readonly reinstateCommerceUseCase: ReinstateCommerce,
     private readonly uploadCommerceLogoUseCase: UploadCommerceLogo
   ) { }
+  //TODO Cada usuario deberia solo poder modificar y eliminar su propio comercio (mas alla de la logica de frontend que impide que un usuario pueda modificar o eliminar un comercio que no le pertenece)
 
   //*==================================== CREATE COMMERCE ====================================
   @ApiOperation({ summary: 'Crear un nuevo comercio' })
@@ -63,6 +69,9 @@ export class CommerceController {
   }
 
   //*==================================== UPDATE ====================================
+  @UseGuards(AuthGuard)
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Actualizar la información de un commerce' })
   @ApiParam({
     name: 'id',
@@ -81,6 +90,9 @@ export class CommerceController {
   }
 
   //*==================================== SUSPEND ====================================
+  @UseGuards(AuthGuard)
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Suspender la actividad de un comercio' })
   @ApiParam({
     name: 'id',
@@ -95,6 +107,9 @@ export class CommerceController {
   }
 
   //*==================================== REINSTATE ====================================
+  @UseGuards(AuthGuard)
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Reanudar la actividad de un comercio' })
   @ApiParam({
     name: 'id',
@@ -109,6 +124,9 @@ export class CommerceController {
   }
 
   //*==================================== UPLOAD LOGO ====================================
+  @UseGuards(AuthGuard)
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @Post('upload-logo')
   @UseInterceptors(
     FileInterceptor('file', {

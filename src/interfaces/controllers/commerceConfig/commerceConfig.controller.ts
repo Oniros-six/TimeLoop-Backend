@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   ParseIntPipe,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
@@ -17,7 +18,12 @@ import { FindCommerceConfig } from '@/application/use-cases/commerceConfig/find.
 import { CreateCommerceConfigDto } from './dto/create-commerceConfig.dto';
 import { UpdateCommerceConfigDto } from './dto/update-commerceConfig.dto';
 
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+import { RolesGuard } from '@/infrastructure/auth/roles.guard';
+import { Roles } from '@/infrastructure/auth/roles.decorator';
+
 @ApiTags('Commerce Config')
+@UseGuards(AuthGuard)
 @Controller('commerce-config')
 export class CommerceConfigController {
   constructor(
@@ -27,6 +33,8 @@ export class CommerceConfigController {
   ) { }
 
   //*==================================== CREATE COMMERCE CONFIG ====================================
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Crear la configuración de un comercio' })
   @ApiBody({ type: CreateCommerceConfigDto })
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -50,6 +58,8 @@ export class CommerceConfigController {
   }
 
   //*==================================== UPDATE ====================================
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Actualizar la configuración de un comercio' })
   @ApiParam({
     name: 'commerceId',

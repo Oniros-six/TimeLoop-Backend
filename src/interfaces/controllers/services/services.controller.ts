@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Query,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 
 import {
@@ -32,7 +33,10 @@ import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { DeleteServiceDto } from './dto/delete-service.dto';
 
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+
 @ApiTags('Services')
+@UseGuards(AuthGuard)
 @Controller('service')
 export class ServicesController {
   constructor(
@@ -42,6 +46,7 @@ export class ServicesController {
     private readonly deleteServiceUseCase: DeleteService,
     private readonly findAllServicesUseCase: FindAllServices,
   ) { }
+  //TODO Cada usuario deberia solo poder modificar y eliminar sus propios servicios (mas alla de la logica de frontend que impide que un usuario pueda modificar o eliminar un servicio que no le pertenece)
 
   //*==================================== CREATE ====================================
   @ApiOperation({ summary: 'Crear un nuevo servicio' })

@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   ParseIntPipe,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
@@ -18,14 +19,19 @@ import { FindAllUserWorkingPattern } from '@/application/use-cases/userWorkingPa
 import { CreateUserPatternDto } from './dto/create-userPattern.dto';
 import { UpdateUserPatternDto } from './dto/update-userPattern.dto';
 
+import { Roles } from '@/infrastructure/auth/roles.decorator';
+import { RolesGuard } from '@/infrastructure/auth/roles.guard';
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+
 @ApiTags('User Working Pattern')
+@UseGuards(AuthGuard)
 @Controller('user-working-pattern')
 export class UserWorkingPatternController {
   constructor(
     private readonly createUserWorkingPatternUseCase: CreateUserWorkingPattern,
     private readonly updateUserWorkingPatternUseCase: UpdateUserWorkingPattern,
     private readonly findAllUserWorkingPatternUseCase: FindAllUserWorkingPattern,
-  ) {}
+  ) { }
 
   //*==================================== CREATE ====================================
 
@@ -38,6 +44,8 @@ export class UserWorkingPatternController {
   }
 
   //*==================================== FIND ALL ====================================
+
+  @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Obtener todos los patrones de trabajo de un usuario',
   })
@@ -54,6 +62,9 @@ export class UserWorkingPatternController {
   }
 
   //*==================================== UPDATE ====================================
+
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Actualizar patrones de trabajo de un usuario (lote)' })
   @ApiParam({
     name: 'userId',

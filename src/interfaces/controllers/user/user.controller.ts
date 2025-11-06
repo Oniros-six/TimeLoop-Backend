@@ -10,6 +10,7 @@ import {
   Patch,
   Query,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -30,11 +31,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { StateUserDto } from './dto/state-user.dto';
 
-// // Auth guards and decorators
-// import { AuthGuard } from '@/infrastructure/auth/auth.guard';
-// import { RolesGuard } from '@/infrastructure/auth/roles.guard';
+// Auth guards and decorators
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+import { RolesGuard } from '@/infrastructure/auth/roles.guard';
+import { Roles } from '@/infrastructure/auth/roles.decorator';
 
 @ApiTags('Users')
+@UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
   constructor(
@@ -45,8 +48,11 @@ export class UserController {
     private readonly suspendUserUseCase: SuspendUser,
     private readonly reinstateUserUseCase: ReinstateUser,
   ) { }
+  //TODO Cada usuario deberia solo poder modificar y eliminar sus propios datos (mas alla de la logica de frontend que impide que un usuario pueda modificar o eliminar datos que no le pertenecen)
 
   //*==================================== CREATE USER ====================================
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
   @ApiBody({ type: CreateUserDto })
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -138,6 +144,8 @@ export class UserController {
   }
 
   //*==================================== SUSPEND ====================================
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Suspender la actividad de un usuario' })
   @ApiQuery({
     name: 'userId',
@@ -159,6 +167,8 @@ export class UserController {
   }
 
   //*==================================== REINSTATE ====================================
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Reanudar la actividad de un usuario' })
   @ApiQuery({
     name: 'userId',

@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Param,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
@@ -18,7 +19,10 @@ import { FindByDateUserDto } from './dto/find-by-date-user.dto';
 import { FindByDateCommerceDto } from './dto/find-by-date-commerce.dto';
 import { FindByDateDto } from './dto/find-by-date.dto';
 
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+
 @ApiTags('Booking History')
+@UseGuards(AuthGuard)
 @Controller('booking-history')
 export class BookingHistoryController {
   constructor(

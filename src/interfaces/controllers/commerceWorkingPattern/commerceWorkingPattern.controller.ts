@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   ParseIntPipe,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
@@ -18,7 +19,12 @@ import { FindAllCommerceWorkingPattern } from '@/application/use-cases/commerceW
 import { CreateCommercePatternDto } from './dto/create-commercePattern.dto';
 import { UpdateCommercePatternDto } from './dto/update-commercePattern.dto';
 
+import { Roles } from '@/infrastructure/auth/roles.decorator';
+import { RolesGuard } from '@/infrastructure/auth/roles.guard';
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+
 @ApiTags('Commerce Working Pattern')
+@UseGuards(AuthGuard)
 @Controller('commerce-working-pattern')
 export class CommerceWorkingPatternController {
   constructor(
@@ -38,6 +44,8 @@ export class CommerceWorkingPatternController {
   }
 
   //*==================================== FIND ALL ====================================
+
+  @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Obtener todos los patrones de trabajo de un comercio',
   })
@@ -54,6 +62,9 @@ export class CommerceWorkingPatternController {
   }
 
   //*==================================== UPDATE ====================================
+
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Actualizar patrones de trabajo de un comercio (lote)' })
   @ApiParam({
     name: 'commerceId',

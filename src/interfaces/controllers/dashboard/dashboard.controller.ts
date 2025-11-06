@@ -5,19 +5,23 @@ import {
     UsePipes,
     ValidationPipe,
     ParseIntPipe,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetBasicDashboardInfo } from '@/application/use-cases/dashboard/get-basic-info.use-case';
 import { GetDashboardMetrics } from '@/application/use-cases/dashboard/get-metrics.use-case';
 
+import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+
 @ApiTags('Dashboard')
+@UseGuards(AuthGuard)
 @Controller('dashboard')
 export class DashboardController {
     constructor(
         private readonly getBasicDashboardInfoUseCase: GetBasicDashboardInfo,
         private readonly getDashboardMetricsUseCase: GetDashboardMetrics,
     ) { }
-
+    
     //*==================================== GET BASIC INFO ====================================
     @ApiOperation({ summary: 'Obtener información del panel de control' })
     @ApiParam({
