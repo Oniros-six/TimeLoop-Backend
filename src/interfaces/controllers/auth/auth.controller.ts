@@ -20,8 +20,9 @@ import { Signup } from '@/application/use-cases/auth/signup.use-case';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly signupUseCase: Signup) {}
-  
+  constructor(private readonly signupUseCase: Signup) { }
+
+  //*==================================== LOGIN ====================================
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
@@ -77,6 +78,7 @@ export class AuthController {
     });
   }
 
+  //*==================================== VERIFY AUTHENTICATION ====================================
   @ApiOperation({ summary: 'Verificar estado de autenticación' })
   @ApiResponse({ status: 200, description: 'Usuario autenticado' })
   @ApiResponse({ status: 401, description: 'No autenticado' })
@@ -89,6 +91,7 @@ export class AuthController {
     };
   }
 
+  //*==================================== LOGOUT ====================================
   @ApiOperation({ summary: 'Cerrar sesión' })
   @ApiResponse({ status: 200, description: 'Logout exitoso' })
   @Post('logout')
@@ -115,6 +118,7 @@ export class AuthController {
     });
   }
 
+  //*==================================== SIGNUP ====================================
   @ApiOperation({
     summary: 'Registro completo de comercio',
     description:

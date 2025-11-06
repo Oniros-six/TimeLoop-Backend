@@ -27,9 +27,9 @@ export class BookingHistoryController {
     private readonly findByDatesUseCase: FindByDates,
     private readonly findByCommerceDateUseCase: FindByCommerceDate,
     private readonly findByUserDateUseCase: FindByUserDate,
-  ) {}
+  ) { }
 
-  // Get by commerce
+  //*==================================== FIND BY COMMERCE ====================================
   @ApiOperation({ summary: 'Obtener el historial de un comercio' })
   @ApiParam({
     name: 'commerceId',
@@ -43,7 +43,7 @@ export class BookingHistoryController {
     return this.findByCommerceUseCase.execute(commerceId);
   }
 
-  // Get by user
+  //*==================================== FIND BY USER ========================================
   @ApiOperation({ summary: 'Obtener el historial de un usuario' })
   @ApiParam({
     name: 'userId',
@@ -57,7 +57,7 @@ export class BookingHistoryController {
     return this.findByUserUseCase.execute(userId);
   }
 
-  // Get by user date
+  //*==================================== FIND BY USER DATE ======================================
   @ApiOperation({
     summary: 'Obtener el historial de un usuario filtrado por fechas',
   })
@@ -70,7 +70,7 @@ export class BookingHistoryController {
     return this.findByUserDateUseCase.execute(dto);
   }
 
-  // Get by commerce date
+  //*==================================== FIND BY COMMERCE DATE ===================================
   @ApiOperation({
     summary: 'Obtener el historial de un comercio filtrado por fechas',
   })
@@ -83,7 +83,7 @@ export class BookingHistoryController {
     return this.findByCommerceDateUseCase.execute(dto);
   }
 
-  // Get by date
+  //*==================================== FIND BY DATE =============================================
   @ApiOperation({ summary: 'Obtener el historial general filtrado por fechas' })
   @ApiQuery({ name: 'startDate', required: true, type: String })
   @ApiQuery({ name: 'endDate', required: true, type: String })

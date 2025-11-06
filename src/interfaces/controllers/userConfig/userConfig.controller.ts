@@ -26,7 +26,7 @@ export class UserConfigController {
     private readonly findUserConfigUseCase: FindUserConfig,
   ) { }
 
-  // Create a user
+  //*==================================== CREATE USER CONFIG ====================================
   @ApiOperation({ summary: 'Crear la configuración de un usuario' })
   @ApiBody({ type: CreateUserConfigDto })
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -35,7 +35,7 @@ export class UserConfigController {
     return this.createUserConfigUseCase.execute(dto.userId, dto);
   }
 
-  // Get a user
+  //*==================================== FIND ====================================
   @ApiOperation({ summary: 'Obtener la configuración de un usuario' })
   @ApiParam({
     name: 'userId',
@@ -49,8 +49,8 @@ export class UserConfigController {
     return this.findUserConfigUseCase.execute(userId);
   }
 
-  // Update a user
-  @ApiOperation({ summary: 'Actualizar la información de un usuario' })
+  //*==================================== UPDATE ====================================
+  @ApiOperation({ summary: 'Actualizar la configuración de un usuario' })
   @ApiParam({
     name: 'userId',
     type: Number,

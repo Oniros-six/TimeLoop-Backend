@@ -43,7 +43,7 @@ export class ServicesController {
     private readonly findAllServicesUseCase: FindAllServices,
   ) { }
 
-  // Create a Service
+  //*==================================== CREATE ====================================
   @ApiOperation({ summary: 'Crear un nuevo servicio' })
   @ApiBody({ type: CreateServiceDto })
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -52,7 +52,7 @@ export class ServicesController {
     return this.createServiceUseCase.execute(dto);
   }
 
-  // Get a Service
+  //*==================================== FIND ====================================
   @ApiOperation({ summary: 'Obtener un servicio por su ID' })
   @ApiParam({
     name: 'id',
@@ -85,7 +85,7 @@ export class ServicesController {
     };
   }
 
-  // Get all Services
+  //*==================================== FIND ALL ====================================
   @ApiOperation({ summary: 'Obtener todos los servicios de un usuario' })
   @ApiQuery({
     name: 'userId',
@@ -104,7 +104,7 @@ export class ServicesController {
     };
   }
 
-  // Update a Service
+  //*==================================== UPDATE ====================================
   @ApiOperation({ summary: 'Actualizar la información de un Service' })
   @ApiParam({
     name: 'id',
@@ -119,7 +119,7 @@ export class ServicesController {
     return this.updateServiceUseCase.execute(id, dto);
   }
 
-  // Suspend a Service
+  //*==================================== DELETE ====================================
   @ApiOperation({ summary: 'Eliminar un servicio' })
   @ApiQuery({
     name: 'id',

@@ -43,9 +43,9 @@ export class BookingController {
     private readonly findAllByCommerceUseCase: FindAllByCommerce,
     private readonly findAllByUserUseCase: FindAllByUser,
     private readonly cancelBookingUseCase: CancelBooking,
-  ) {}
+  ) { }
 
-  // Save a booking
+  //*==================================== CREATE ====================================
   @ApiOperation({ summary: 'Guardar una reserva' })
   @ApiBody({ type: CreateBookingDto })
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -54,7 +54,7 @@ export class BookingController {
     return this.createBookingUseCase.execute(dto);
   }
 
-  // Get all bookings by commerceId
+  //*==================================== FIND ALL BY COMMERCE ====================================
   @ApiOperation({
     summary: 'Obtener todas las reservas de un comercio, con base en su ID',
   })
@@ -65,7 +65,7 @@ export class BookingController {
     return this.findAllByCommerceUseCase.execute(dto);
   }
 
-  // Get all bookings by userId
+  //*==================================== FIND BY USER ====================================
   @ApiOperation({
     summary: 'Obtener todas las reservas de un usuario, con base en su ID',
   })
@@ -76,7 +76,7 @@ export class BookingController {
     return this.findAllByUserUseCase.execute(dto);
   }
 
-  // Get all bookings by date and commerceId on any state
+  //*==================================== FIND ALL BY DATE AND COMMERCE ON ANY STATE ====================================
   @ApiOperation({
     summary:
       'Obtener todas las reservas de un comercio, sin importar su estado, con base en el ID del comercio',
@@ -89,7 +89,7 @@ export class BookingController {
     return this.findAllByUserAndDateUseCase.execute(dto);
   }
 
-  // Get all bookings by date and userId, that are busy in the future
+  //*==================================== FIND ALL BUSY SLOTS ====================================
   @ApiOperation({
     summary:
       'Obtener todas las reservas ocupadas de un usuario/empleado, con base en su ID',
@@ -102,7 +102,7 @@ export class BookingController {
     return this.findBusySlotsUseCase.execute(dto);
   }
 
-  // Cancel a book
+  //*==================================== CANCEL ====================================
   @ApiOperation({ summary: 'Actualizar el estado de una reserva a cancelado' })
   @ApiParam({
     name: 'id',
@@ -120,7 +120,7 @@ export class BookingController {
     return this.cancelBookingUseCase.execute(id, dto);
   }
 
-  // update a book
+  //*==================================== UPDATE ====================================
   @ApiBody({ type: UpdateBookingDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   @Put(':id')

@@ -19,8 +19,9 @@ export class MercadoPagoController {
   constructor(
     private readonly createOrRefreshUseCase: CreateOrRefresh,
     private readonly verifyWebhookUseCase: VerifyWebhook,
-  ) {}
+  ) { }
 
+  //*==================================== MERCADO PAGO OAUTH CALLBACK ====================================
   @ApiOperation({ summary: 'Callback de OAuth de MercadoPago' })
   @Get('/oauth/callback')
   async mercadopagoCallback(
@@ -47,6 +48,7 @@ export class MercadoPagoController {
     }
   }
 
+  //*==================================== WEBHOOK ====================================
   @ApiOperation({ summary: 'Webhook de MercadoPago (validado)' })
   @Post()
   async mercadopagoWebhook(@Body() body: any, @Headers() headers: any) {

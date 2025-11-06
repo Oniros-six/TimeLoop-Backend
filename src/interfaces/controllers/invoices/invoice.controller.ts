@@ -10,8 +10,9 @@ export class InvoiceController {
   constructor(
     private readonly findAllByCommerce: FindAllByCommerce,
     private readonly findAllByCommerceDate: FindAllByCommerceDate,
-  ) {}
+  ) { }
 
+  //*==================================== FIND ALL BY COMMERCE ====================================
   @ApiOperation({ summary: 'Obtener todas las facturas de un comercio' })
   @ApiParam({
     name: 'commerceId',
@@ -24,6 +25,7 @@ export class InvoiceController {
     return this.findAllByCommerce.execute(commerceId);
   }
 
+  //*==================================== FIND ALL BY DATE ====================================
   @ApiOperation({
     summary: 'Obtener facturas de un comercio por rango de fechas',
   })

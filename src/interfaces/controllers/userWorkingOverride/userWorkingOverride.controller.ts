@@ -25,8 +25,9 @@ export class UserWorkingOverrideController {
     private readonly createUserWorkingOverrideUseCase: CreateUserWorkingOverride,
     private readonly updateUserWorkingOverrideUseCase: UpdateUserWorkingOverride,
     private readonly findAllUserWorkingOverrideUseCase: FindAllUserWorkingOverride,
-  ) {}
+  ) { }
 
+  //*==================================== CREATE USER WORKING OVERRIDE ====================================
   @ApiOperation({
     summary:
       'Crear un patrón de trabajo especifico en una fecha para un usuario',
@@ -38,6 +39,7 @@ export class UserWorkingOverrideController {
     return this.createUserWorkingOverrideUseCase.execute(dto);
   }
 
+  //*==================================== FIND ALL ====================================
   @ApiOperation({
     summary:
       'Obtener todos los patrones de trabajo especificos en una fecha de un usuario',
@@ -54,6 +56,7 @@ export class UserWorkingOverrideController {
     return this.findAllUserWorkingOverrideUseCase.execute(userId);
   }
 
+  //*==================================== UPDATE ====================================
   @ApiOperation({ summary: 'Actualizar un override de un usuario' })
   @ApiParam({
     name: 'id',

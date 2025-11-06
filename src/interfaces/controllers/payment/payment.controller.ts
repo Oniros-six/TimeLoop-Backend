@@ -22,8 +22,9 @@ export class PaymentsController {
     private readonly createPaymentUseCase: CreatePayment,
     private readonly getPaymentsByBookingUseCase: GetPaymentsByBooking,
     private readonly processRefundsUseCase: ProcessRefunds,
-  ) {}
+  ) { }
 
+  //*==================================== CREATE PAYMENT ====================================
   @ApiOperation({ summary: 'Crear un pago' })
   @ApiBody({ type: CreatePaymentDto })
   @Post()
@@ -31,6 +32,7 @@ export class PaymentsController {
     return this.createPaymentUseCase.execute(dto);
   }
 
+  //*==================================== FIND BY BOOKING ====================================
   @ApiOperation({ summary: 'Obtener los pagos realizados en una reserva' })
   @ApiParam({
     name: 'bookingId',
@@ -43,6 +45,7 @@ export class PaymentsController {
     return this.getPaymentsByBookingUseCase.execute(bookingId);
   }
 
+  //*==================================== REFUND ====================================
   @ApiOperation({ summary: 'Procesar reembolso de un pago' })
   @ApiBody({ type: ProcessRefundDto })
   @Post('refund')

@@ -25,8 +25,9 @@ export class CommerceWorkingOverrideController {
     private readonly createCommerceWorkingOverrideUseCase: CreateCommerceWorkingOverride,
     private readonly updateCommerceWorkingOverrideUseCase: UpdateCommerceWorkingOverride,
     private readonly findAllCommerceWorkingOverrideUseCase: FindAllCommerceWorkingOverride,
-  ) {}
+  ) { }
 
+  //*==================================== CREATE COMMERCE WORKING OVERRIDE ====================================
   @ApiOperation({
     summary:
       'Crear un patrón de trabajo especifico en una fecha para un comercio',
@@ -38,6 +39,7 @@ export class CommerceWorkingOverrideController {
     return this.createCommerceWorkingOverrideUseCase.execute(dto);
   }
 
+  //*==================================== FIND ALL ====================================
   @ApiOperation({
     summary:
       'Obtener todos los patrones de trabajo especificos en una fecha para un comercio',
@@ -54,6 +56,7 @@ export class CommerceWorkingOverrideController {
     return this.findAllCommerceWorkingOverrideUseCase.execute(commerceId);
   }
 
+  //*==================================== UPDATE ====================================
   @ApiOperation({ summary: 'Actualizar un override de un comercio' })
   @ApiParam({
     name: 'id',

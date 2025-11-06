@@ -44,9 +44,9 @@ export class UserController {
     private readonly updateUserUseCase: UpdateUser,
     private readonly suspendUserUseCase: SuspendUser,
     private readonly reinstateUserUseCase: ReinstateUser,
-  ) {}
+  ) { }
 
-  // Create a user
+  //*==================================== CREATE USER ====================================
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
   @ApiBody({ type: CreateUserDto })
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -62,7 +62,7 @@ export class UserController {
     };
   }
 
-  // Get a user
+  //*==================================== FIND ====================================
   @ApiOperation({ summary: 'Obtener un usuario por su ID' })
   @ApiParam({
     name: 'id',
@@ -88,7 +88,7 @@ export class UserController {
     };
   }
 
-  // Get a all users
+  //*==================================== FIND ALL ====================================
   @ApiOperation({
     summary: 'Obtener todos los usuarios de un comercio en base a su ID',
   })
@@ -113,7 +113,7 @@ export class UserController {
     };
   }
 
-  // Update a user
+  //*==================================== UPDATE ====================================
   @ApiOperation({ summary: 'Actualizar la información de un usuario' })
   @ApiParam({
     name: 'userId',
@@ -137,7 +137,7 @@ export class UserController {
     };
   }
 
-  // Suspend a user
+  //*==================================== SUSPEND ====================================
   @ApiOperation({ summary: 'Suspender la actividad de un usuario' })
   @ApiQuery({
     name: 'userId',
@@ -158,7 +158,7 @@ export class UserController {
     };
   }
 
-  // Reinstate a user
+  //*==================================== REINSTATE ====================================
   @ApiOperation({ summary: 'Reanudar la actividad de un usuario' })
   @ApiQuery({
     name: 'userId',

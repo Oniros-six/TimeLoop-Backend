@@ -25,7 +25,9 @@ export class CommerceWorkingPatternController {
     private readonly createCommerceWorkingPatternUseCase: CreateCommerceWorkingPattern,
     private readonly updateCommerceWorkingPatternUseCase: UpdateCommerceWorkingPattern,
     private readonly findAllCommerceWorkingPatternUseCase: FindAllCommerceWorkingPattern,
-  ) {}
+  ) { }
+
+  //*==================================== CREATE ====================================
 
   @ApiOperation({ summary: 'Crear un patrón de trabajo para un comercio' })
   @ApiBody({ type: CreateCommercePatternDto })
@@ -35,6 +37,7 @@ export class CommerceWorkingPatternController {
     return this.createCommerceWorkingPatternUseCase.execute(dto);
   }
 
+  //*==================================== FIND ALL ====================================
   @ApiOperation({
     summary: 'Obtener todos los patrones de trabajo de un comercio',
   })
@@ -50,6 +53,7 @@ export class CommerceWorkingPatternController {
     return this.findAllCommerceWorkingPatternUseCase.execute(commerceId);
   }
 
+  //*==================================== UPDATE ====================================
   @ApiOperation({ summary: 'Actualizar patrones de trabajo de un comercio (lote)' })
   @ApiParam({
     name: 'commerceId',

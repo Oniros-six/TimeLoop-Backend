@@ -26,9 +26,9 @@ export class CustomerController {
     private readonly findCustomerUseCase: FindCustomer,
     private readonly findAllCustomersUseCase: FindAllCustomers,
     private readonly updateCustomerUseCase: UpdateCustomer,
-  ) {}
+  ) { }
 
-  // Create a client
+  //*==================================== CREATE CUSTOMER ====================================
   @ApiOperation({ summary: 'Crear un nuevo cliente' })
   @ApiBody({ type: CreateCustomerDto })
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -37,7 +37,7 @@ export class CustomerController {
     return this.createCustomerUseCase.execute(dto);
   }
 
-  // Get all clients
+  //*==================================== FIND ALL ====================================
   @ApiOperation({
     summary: 'Obtener todos los clientes',
   })
@@ -46,7 +46,7 @@ export class CustomerController {
     return this.findAllCustomersUseCase.execute();
   }
 
-  // Get a client
+  //*==================================== FIND ====================================
   @ApiOperation({ summary: 'Obtener un cliente por su ID' })
   @ApiParam({
     name: 'id',
@@ -60,7 +60,7 @@ export class CustomerController {
     return this.findCustomerUseCase.execute(id);
   }
 
-  // Update a client
+  //*==================================== UPDATE ====================================
   @ApiOperation({ summary: 'Actualizar la información de un cliente' })
   @ApiParam({
     name: 'customerId',

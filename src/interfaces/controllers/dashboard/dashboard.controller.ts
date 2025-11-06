@@ -17,8 +17,8 @@ export class DashboardController {
         private readonly getBasicDashboardInfoUseCase: GetBasicDashboardInfo,
         private readonly getDashboardMetricsUseCase: GetDashboardMetrics,
     ) { }
-    
-    // Get information for dashboard
+
+    //*==================================== GET BASIC INFO ====================================
     @ApiOperation({ summary: 'Obtener información del panel de control' })
     @ApiParam({
         name: 'id',
@@ -32,7 +32,7 @@ export class DashboardController {
         return this.getBasicDashboardInfoUseCase.execute(id);
     }
 
-    // Get metrics for dashboard
+    //*==================================== GET METRICS ====================================
     @ApiOperation({ summary: 'Obtener metricas del panel de control' })
     @ApiParam({
         name: 'id',

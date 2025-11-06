@@ -39,7 +39,7 @@ export class CommerceController {
     private readonly uploadCommerceLogoUseCase: UploadCommerceLogo
   ) { }
 
-  // Create a commerce
+  //*==================================== CREATE COMMERCE ====================================
   @ApiOperation({ summary: 'Crear un nuevo comercio' })
   @ApiBody({ type: CreateCommerceDto })
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -48,7 +48,7 @@ export class CommerceController {
     return this.createCommerceUseCase.execute(dto);
   }
 
-  // Get a commerce
+  //*==================================== FIND ====================================
   @ApiOperation({ summary: 'Obtener un commerce por su ID' })
   @ApiParam({
     name: 'id',
@@ -62,7 +62,7 @@ export class CommerceController {
     return this.findCommerceUseCase.execute(id);
   }
 
-  // Update a commerce
+  //*==================================== UPDATE ====================================
   @ApiOperation({ summary: 'Actualizar la información de un commerce' })
   @ApiParam({
     name: 'id',
@@ -80,7 +80,7 @@ export class CommerceController {
     return this.updateCommerceUseCase.execute(id, dto);
   }
 
-  // Suspend a commerce
+  //*==================================== SUSPEND ====================================
   @ApiOperation({ summary: 'Suspender la actividad de un comercio' })
   @ApiParam({
     name: 'id',
@@ -94,7 +94,7 @@ export class CommerceController {
     return this.suspendCommerceUseCase.execute(id);
   }
 
-  // Reinstate a commerce
+  //*==================================== REINSTATE ====================================
   @ApiOperation({ summary: 'Reanudar la actividad de un comercio' })
   @ApiParam({
     name: 'id',
@@ -108,6 +108,7 @@ export class CommerceController {
     return this.reinstateCommerceUseCase.execute(id);
   }
 
+  //*==================================== UPLOAD LOGO ====================================
   @Post('upload-logo')
   @UseInterceptors(
     FileInterceptor('file', {

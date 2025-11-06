@@ -27,6 +27,8 @@ export class UserWorkingPatternController {
     private readonly findAllUserWorkingPatternUseCase: FindAllUserWorkingPattern,
   ) {}
 
+  //*==================================== CREATE ====================================
+
   @ApiOperation({ summary: 'Crear un patrón de trabajo para un usuario' })
   @ApiBody({ type: CreateUserPatternDto })
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -35,6 +37,7 @@ export class UserWorkingPatternController {
     return this.createUserWorkingPatternUseCase.execute(dto);
   }
 
+  //*==================================== FIND ALL ====================================
   @ApiOperation({
     summary: 'Obtener todos los patrones de trabajo de un usuario',
   })
@@ -50,6 +53,7 @@ export class UserWorkingPatternController {
     return this.findAllUserWorkingPatternUseCase.execute(userId);
   }
 
+  //*==================================== UPDATE ====================================
   @ApiOperation({ summary: 'Actualizar patrones de trabajo de un usuario (lote)' })
   @ApiParam({
     name: 'userId',
