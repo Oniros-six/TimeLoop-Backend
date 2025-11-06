@@ -12,6 +12,12 @@ export class Commerce {
     public readonly logo?: string,
   ) {}
 
+  private static capitalizeFirst(rawName: string): string {
+    const trimmed = rawName.trim();
+    if (trimmed.length === 0) return trimmed;
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  }
+
   static createCommerce(props: {
     id?: number;
     name: string;
@@ -21,9 +27,10 @@ export class Commerce {
     businessCategory: BusinessCategory;
     logo?: string;
   }): Commerce {
+    const normalizedName = Commerce.capitalizeFirst(props.name);
     return new Commerce(
       props.id ?? 0,
-      props.name,
+      normalizedName,
       props.email,
       props.phone,
       props.address,

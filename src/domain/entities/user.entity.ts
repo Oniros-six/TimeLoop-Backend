@@ -12,6 +12,17 @@ export class User {
     public active: boolean,
   ) {}
 
+  private static capitalizeName(rawName: string): string {
+    const trimmedName = rawName.trim();
+    if (trimmedName.length === 0) return trimmedName;
+    return trimmedName
+      .split(/\s+/)
+      .map((word) =>
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+      )
+      .join(' ');
+  }
+
   // Factory method
   static create(props: {
     id?: number;
@@ -23,9 +34,10 @@ export class User {
     commerceId: number;
     active?: boolean;
   }): User {
+    const normalizedName = User.capitalizeName(props.name);
     return new User(
       0,
-      props.name,
+      normalizedName,
       props.email,
       props.password,
       props.role,
@@ -40,7 +52,7 @@ export class User {
   ): boolean {
     let hasChanges = false;
     if (props.name !== undefined && props.name !== this.name) {
-      this.name = props.name;
+      this.name = User.capitalizeName(props.name);
       hasChanges = true;
     }
 
