@@ -82,7 +82,7 @@ export class Signup {
         email: data.email,
         password: data.password,
         role: Roles.ADMIN,
-        phone: null,
+        phone: data.ownerPhone,
         commerceId: commerceData.id,
       });
 

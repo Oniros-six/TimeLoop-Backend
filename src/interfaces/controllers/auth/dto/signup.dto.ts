@@ -110,6 +110,15 @@ export class CreateBusinessDto {
   phone: string;
 
   @ApiProperty({
+    example: '092601809',
+    description: 'Teléfono de contacto del dueño',
+  })
+  @Matches(/^09\d{7}$/, {
+    message: 'El número debe comenzar con 09 y tener 9 dígitos',
+  })
+  ownerPhone: string;
+
+  @ApiProperty({
     example: 'Magallanes esq Zufriategui',
     description: 'Dirección del comercio',
   })
