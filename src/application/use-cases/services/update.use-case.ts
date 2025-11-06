@@ -45,13 +45,20 @@ export class UpdateService {
     }
 
     try {
-      if (data.name && data.name !== service.name) {
+      const newServiceData: ServiceUpdateData = service.diffFrom({
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        durationMinutes: data.durationMinutes,
+      });
+
+      if (newServiceData.name) {
         const allServices = await this.serviceRepository.findAllServices({
           userId: data.userId,
         });
         if (allServices) {
           const serviceExists = allServices.some(
-            (s) => s.id !== id && s.name === data.name,
+            (s) => s.id !== id && s.name === newServiceData.name,
           );
           if (serviceExists) {
             throw new HttpException(
@@ -60,24 +67,6 @@ export class UpdateService {
             );
           }
         }
-      }
-
-      const newServiceData: ServiceUpdateData = {};
-
-      if (data.name && data.name != service.name) {
-        newServiceData.name = data.name;
-      }
-      if (data.description && data.description != service.description) {
-        newServiceData.description = data.description;
-      }
-      if (
-        data.durationMinutes &&
-        data.durationMinutes != service.durationMinutes
-      ) {
-        newServiceData.durationMinutes = data.durationMinutes;
-      }
-      if (data.price && data.price != service.price) {
-        newServiceData.price = data.price;
       }
 
       if (Object.keys(newServiceData).length === 0) {
