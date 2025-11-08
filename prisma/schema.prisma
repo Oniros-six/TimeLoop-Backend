@@ -193,8 +193,8 @@ model Booking {
   totalPrice Float
   notes      String
   status     BookingStatus
-  timeEnd    DateTime
-  timeStart  DateTime
+  timeEnd    DateTime      @db.Timestamptz
+  timeStart  DateTime      @db.Timestamptz
 
   bookingServices BookingService[]
   bookingHistory  BookingHistory?
@@ -293,7 +293,7 @@ model CommerceWorkingPattern {
 model UserWorkingOverride {
   id             Int              @id @default(autoincrement())
   userId         Int
-  date           DateTime
+  date           DateTime         @db.Timestamptz
   overrideType   AvailabilityType
   morningStart   String?
   morningEnd     String?
@@ -308,7 +308,7 @@ model UserWorkingOverride {
 model CommerceWorkingOverride {
   id             Int              @id @default(autoincrement())
   commerceId     Int
-  date           DateTime
+  date           DateTime         @db.Timestamptz
   overrideType   AvailabilityType
   morningStart   String?
   morningEnd     String?
@@ -332,7 +332,7 @@ model ActivityLog {
   entityType EntityType
   changeType ChangeType
   detail     String
-  timestamp  DateTime   @default(now())
+  timestamp  DateTime   @default(now()) @db.Timestamptz
   commerce   Commerce?  @relation("CommerceLogs", fields: [commerceId], references: [id])
   customer   Customer?  @relation("CustomerLogs", fields: [customerId], references: [id])
   user       User?      @relation("UserLogs", fields: [userId], references: [id])
@@ -347,8 +347,8 @@ model Reminder {
   commerceId  Int
   channel     ReminderChannel
   status      ReminderStatus
-  scheduledAt DateTime
-  sentAt      DateTime?
+  scheduledAt DateTime        @db.Timestamptz
+  sentAt      DateTime?       @db.Timestamptz
   commerce    Commerce        @relation("CommerceReminders", fields: [commerceId], references: [id])
   customer    Customer        @relation("CustomerReminders", fields: [customerId], references: [id])
 
@@ -363,8 +363,8 @@ model BookingHistory {
   customerId        Int
   priceAtBooking    Float
   durationAtBooking Int
-  timeStart         DateTime
-  timeEnd           DateTime
+  timeStart         DateTime      @db.Timestamptz
+  timeEnd           DateTime      @db.Timestamptz
   status            BookingStatus
   notes             String
   booking           Booking       @relation(fields: [bookingId], references: [id])
@@ -378,8 +378,8 @@ model Invoice {
   id         Int @id @default(autoincrement())
   commerceId Int
 
-  periodStart DateTime
-  periodEnd   DateTime
+  periodStart DateTime @db.Timestamptz
+  periodEnd   DateTime @db.Timestamptz
 
   totalBookings Int @default(0)
   totalCanceled Int @default(0)
@@ -391,7 +391,7 @@ model Invoice {
 
   status InvoiceStatus @default(PENDING)
 
-  generatedAt DateTime @default(now())
+  generatedAt DateTime @default(now()) @db.Timestamptz
 
   commerce Commerce @relation(fields: [commerceId], references: [id])
 
@@ -411,9 +411,9 @@ model Payment {
   status      PaymentStatus @default(pending)
   method      PaymentMethod
   providerRef String? // referencia de MercadoPago u otro proveedor
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime?     @updatedAt
-  refundedAt  DateTime?
+  createdAt   DateTime      @default(now()) @db.Timestamptz
+  updatedAt   DateTime?     @updatedAt @db.Timestamptz
+  refundedAt  DateTime?     @db.Timestamptz
 
   Commerce Commerce @relation(fields: [commerceId], references: [id])
   Booking  Booking  @relation(fields: [bookingId], references: [id])
@@ -429,9 +429,9 @@ model MercadoPago {
   refreshToken String
   publicKey    String?
   mpUserId     String
-  tokenExpires DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  tokenExpires DateTime @db.Timestamptz
+  createdAt    DateTime @default(now()) @db.Timestamptz
+  updatedAt    DateTime @updatedAt @db.Timestamptz
 }
 
 //* =========================================
@@ -442,7 +442,7 @@ model CustomerCommerce {
   id                 Int      @id @default(autoincrement())
   customerId         Int
   commerceId         Int
-  firstReservationAt DateTime
+  firstReservationAt DateTime @db.Timestamptz
 
   customer Customer @relation(fields: [customerId], references: [id])
   commerce Commerce @relation(fields: [commerceId], references: [id])

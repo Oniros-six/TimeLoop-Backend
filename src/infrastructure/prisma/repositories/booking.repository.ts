@@ -259,37 +259,19 @@ export class PrismaBookingRepository implements IBookingRepository {
     userId: number;
     timeStart: Date;
   }): Promise<DomainClient[] | null> {
-    const date = data.timeStart;
-
-    const start = new Date(
-      Date.UTC(
-        date.getUTCFullYear(),
-        date.getUTCMonth(),
-        date.getUTCDate(),
-        0,
-        0,
-        0,
-        0,
-      ),
-    );
-
-    const end = new Date(
-      Date.UTC(
-        date.getUTCFullYear(),
-        date.getUTCMonth(),
-        date.getUTCDate(),
-        23,
-        59,
-        59,
-        999,
-      ),
-    );
+    // PostgreSQL con TIMESTAMPTZ maneja UTC automáticamente
+    // Solo necesitamos definir el rango del día en UTC
+    const startOfDay = new Date(data.timeStart);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(data.timeStart);
+    endOfDay.setUTCHours(23, 59, 59, 999);
 
     const result = await this.prisma.booking.findMany({
       where: {
         timeStart: {
-          gte: start,
-          lte: end,
+          gte: startOfDay,
+          lte: endOfDay,
         },
         userId: data.userId,
       },
@@ -307,37 +289,18 @@ export class PrismaBookingRepository implements IBookingRepository {
     userId: number;
     timeStart: Date;
   }): Promise<DomainClient[] | null> {
-    const date = data.timeStart;
-
-    const start = new Date(
-      Date.UTC(
-        date.getUTCFullYear(),
-        date.getUTCMonth(),
-        date.getUTCDate(),
-        0,
-        0,
-        0,
-        0,
-      ),
-    );
-
-    const end = new Date(
-      Date.UTC(
-        date.getUTCFullYear(),
-        date.getUTCMonth(),
-        date.getUTCDate(),
-        23,
-        59,
-        59,
-        999,
-      ),
-    );
+    // PostgreSQL con TIMESTAMPTZ maneja UTC automáticamente
+    const startOfDay = new Date(data.timeStart);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(data.timeStart);
+    endOfDay.setUTCHours(23, 59, 59, 999);
 
     const result = await this.prisma.booking.findMany({
       where: {
         timeStart: {
-          gte: start,
-          lte: end,
+          gte: startOfDay,
+          lte: endOfDay,
         },
         userId: data.userId,
         status: {

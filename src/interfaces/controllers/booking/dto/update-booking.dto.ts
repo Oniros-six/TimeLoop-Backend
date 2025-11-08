@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { IsDate, IsNumber, IsOptional } from 'class-validator';
+import { toUTC } from '@/domain/value-objects/booking/validations';
 
 export class UpdateBookingDto {
   @ApiProperty({
@@ -31,10 +32,11 @@ export class UpdateBookingDto {
 
   @ApiProperty({
     example: '2025-07-08T15:00:00-03:00',
-    description: 'Fecha y hora de la reserva (ISO 8601 con zona horaria)',
+    description: 'Fecha y hora de la reserva (ISO 8601 con zona horaria). Se almacenará en UTC.',
   })
   @IsOptional()
   @Type(() => Date)
+  @Transform(({ value }) => value ? toUTC(new Date(value)) : undefined)
   @IsDate({ message: 'La fecha debe ser una fecha válida' })
   timeStart?: Date;
 
