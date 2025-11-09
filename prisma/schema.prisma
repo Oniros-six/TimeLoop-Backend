@@ -196,6 +196,7 @@ model Booking {
   status         BookingStatus
   timeEnd        DateTime      @db.Timestamptz
   timeStart      DateTime      @db.Timestamptz
+  timeRange      Unsupported("tstzrange")?
 
   bookingServices BookingService[]
   bookingHistory  BookingHistory?

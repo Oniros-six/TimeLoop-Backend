@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { Booking as DomainClient } from '@/domain/entities/booking.entity';
@@ -7,6 +7,7 @@ import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
 import { BookingService } from '@/domain/entities/bookingService.entity';
 import { BookingDetail } from '@/domain/common/BookingDetail.type';
 import { BookingMP } from '@/domain/common/BookingMP.type';
+import { Prisma } from '@prisma/client';
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -63,58 +64,95 @@ export class PrismaBookingRepository implements IBookingRepository {
     data: DomainClient,
     idempotencyKey?: string,
   ): Promise<DomainClient | null> {
-    const result = await this.prisma.$transaction(async (prisma) => {
+    try {
+      const result = await this.prisma.$transaction(async (prisma) => {
 
-      await this.prisma.customerCommerce.upsert({
-        where: {
-          customerId_commerceId: {
-            customerId: data.customerId,
-            commerceId: data.commerceId,
-          },
-        },
-        update: {
-          // si ya existe, podrías actualizar "lastReservationAt" o "totalReservations"
-        },
-        create: {
-          customerId: data.customerId,
-          commerceId: data.commerceId,
-          firstReservationAt: new Date(),
-        },
-      });
-
-      return await prisma.booking.create({
-        data: {
-          idempotencyKey: idempotencyKey,
-          timeStart: data.timeStart,
-          timeEnd: data.timeEnd,
-          duration: data.duration,
-          status: data.status,
-          customerId: data.customerId,
-          commerceId: data.commerceId,
-          userId: data.userId,
-          notes: data.notes,
-          totalPrice: data.totalPrice,
-          bookingServices: {
-            create: data.bookingServices.map((bs) => ({
-              serviceId: bs.serviceId,
-            })),
-          },
-        },
-        include: {
-          bookingServices: {
-            include: {
-              service: true,
+        await this.prisma.customerCommerce.upsert({
+          where: {
+            customerId_commerceId: {
+              customerId: data.customerId,
+              commerceId: data.commerceId,
             },
           },
-        },
+          update: {
+            // si ya existe, podrías actualizar "lastReservationAt" o "totalReservations"
+          },
+          create: {
+            customerId: data.customerId,
+            commerceId: data.commerceId,
+            firstReservationAt: new Date(),
+          },
+        });
+
+        return await prisma.booking.create({
+          data: {
+            idempotencyKey: idempotencyKey,
+            timeStart: data.timeStart,
+            timeEnd: data.timeEnd,
+            duration: data.duration,
+            status: data.status,
+            customerId: data.customerId,
+            commerceId: data.commerceId,
+            userId: data.userId,
+            notes: data.notes,
+            totalPrice: data.totalPrice,
+            bookingServices: {
+              create: data.bookingServices.map((bs) => ({
+                serviceId: bs.serviceId,
+              })),
+            },
+          },
+          include: {
+            bookingServices: {
+              include: {
+                service: true,
+              },
+            },
+          },
+        });
       });
-    });
 
+      if (!result) return null;
 
-
-    if (!result) return null;
-
-    return this.toDomain(result); // tu función para mapear a entidad de dominio
+      return this.toDomain(result);
+    } catch (error) {
+      // Handle exclusion constraint violation (overlapping bookings)
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        // P2002: Unique constraint violation (including idempotency key)
+        if (error.code === 'P2002') {
+          const target = error.meta?.target as string[] | undefined;
+          
+          if (target?.includes('idempotencyKey')) {
+            // Idempotency key conflict (shouldn't happen if use case checks first)
+            console.warn('Idempotency key conflict detected in repository', {
+              idempotencyKey,
+              userId: data.userId,
+              timeStart: data.timeStart,
+            });
+            throw new HttpException(
+              'Esta reserva ya fue procesada previamente',
+              HttpStatus.CONFLICT,
+            );
+          }
+        }
+        
+        // P2034: Exclusion constraint violation (time range overlap)
+        if (error.code === 'P2034' || error.message?.includes('unique_user_booking_range')) {
+          console.warn('Booking time range overlap detected by database constraint', {
+            userId: data.userId,
+            timeStart: data.timeStart,
+            timeEnd: data.timeEnd,
+          });
+          throw new HttpException(
+            'El horario está ocupado (conflicto de reserva simultánea)',
+            HttpStatus.CONFLICT,
+          );
+        }
+      }
+      
+      // Re-throw other errors
+      throw error;
+    }
   }
 
   async findOverlapping(data: {
