@@ -103,17 +103,7 @@ export class CreateBooking {
       services,
     );
 
-    //* 5) Validar solapamiento
-    const overlappingBookings = await this.bookingRepository.findOverlapping({
-      userId: data.userId,
-      timeStart: data.timeStart,
-      timeEnd: booking.timeEnd,
-    });
-
-    if (overlappingBookings) {
-      throw new HttpException('El horario está ocupado', HttpStatus.CONFLICT);
-    }
-
+    //* 5) Crear reserva (validación de solapamiento en BD via exclusion constraint)
     const result = await this.bookingRepository.createSchedule(
       booking,
       data.idempotencyKey,

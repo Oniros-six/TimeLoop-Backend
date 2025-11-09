@@ -14,13 +14,6 @@ export interface IBookingRepository {
 
   findByIdempotencyKey(key: string): Promise<Booking | null>;
 
-  findOverlapping(data: {
-    id?: number;
-    userId: number;
-    timeStart: Date;
-    timeEnd: Date;
-  }): Promise<Booking | null>;
-
   //* FindAllByCommerce repository methods
   findAllByCommerce(data: { commerceId: number, limit?: number, cursor?: number }): Promise<{
     items: BookingDetail[];

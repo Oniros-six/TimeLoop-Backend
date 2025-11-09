@@ -155,36 +155,6 @@ export class PrismaBookingRepository implements IBookingRepository {
     }
   }
 
-  async findOverlapping(data: {
-    id?: number;
-    timeEnd: Date;
-    timeStart: Date;
-    userId: number;
-  }): Promise<DomainClient | null> {
-    const result = await this.prisma.booking.findFirst({
-      where: {
-        id: { not: data.id },
-        userId: data.userId,
-        status: {
-          in: [
-            BookingStatus.CONFIRMED,
-            BookingStatus.PENDING,
-            BookingStatus.RESCHEDULED,
-          ],
-        },
-        AND: [
-          { timeStart: { lt: data.timeEnd } }, // startDB < endNew
-          { timeEnd: { gt: data.timeStart } }, // endDB > startNew
-        ],
-      },
-      include: {
-        bookingServices: true,
-      },
-    });
-    if (!result) return null;
-    return this.toDomain(result);
-  }
-
   async findBusy(data: {
     timeStart: Date;
     userId: number;
@@ -429,38 +399,60 @@ export class PrismaBookingRepository implements IBookingRepository {
     id: number;
     dataToUpdate: BookingUpdateData;
   }): Promise<DomainClient | null> {
-    const result = await this.prisma.$transaction(async (tx) => {
-      // Borrar los servicios antiguos
-      await tx.bookingService.deleteMany({
-        where: { bookingId: data.id },
+    try {
+      const result = await this.prisma.$transaction(async (tx) => {
+        // Borrar los servicios antiguos
+        await tx.bookingService.deleteMany({
+          where: { bookingId: data.id },
+        });
+
+        // Actualizar la reserva y crear los nuevos bookingServices
+        return await tx.booking.update({
+          where: { id: data.id },
+          data: {
+            timeStart: data.dataToUpdate.timeStart,
+            timeEnd: data.dataToUpdate.timeEnd,
+            duration: data.dataToUpdate.duration,
+            status: BookingStatus.RESCHEDULED,
+            userId: data.dataToUpdate.userId,
+            notes: data.dataToUpdate.notes,
+            totalPrice: data.dataToUpdate.totalPrice,
+            bookingServices: {
+              create: data.dataToUpdate.serviceIds.map((bs) => ({
+                serviceId: bs.serviceId,
+              })),
+            },
+          },
+          include: {
+            bookingServices: {
+              include: { service: true },
+            },
+          },
+        });
       });
 
-      // Actualizar la reserva y crear los nuevos bookingServices
-      return await tx.booking.update({
-        where: { id: data.id },
-        data: {
-          timeStart: data.dataToUpdate.timeStart,
-          timeEnd: data.dataToUpdate.timeEnd,
-          duration: data.dataToUpdate.duration,
-          status: BookingStatus.RESCHEDULED,
-          userId: data.dataToUpdate.userId,
-          notes: data.dataToUpdate.notes,
-          totalPrice: data.dataToUpdate.totalPrice,
-          bookingServices: {
-            create: data.dataToUpdate.serviceIds.map((bs) => ({
-              serviceId: bs.serviceId,
-            })),
-          },
-        },
-        include: {
-          bookingServices: {
-            include: { service: true },
-          },
-        },
-      });
-    });
-
-    if (!result) return null;
-    return this.toDomain(result);
+      if (!result) return null;
+      return this.toDomain(result);
+    } catch (error) {
+      // Handle exclusion constraint violation (overlapping bookings)
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        // P2034: Exclusion constraint violation (time range overlap)
+        if (error.code === 'P2034' || error.message?.includes('unique_user_booking_range')) {
+          console.warn('Booking time range overlap detected during update', {
+            bookingId: data.id,
+            userId: data.dataToUpdate.userId,
+            timeStart: data.dataToUpdate.timeStart,
+            timeEnd: data.dataToUpdate.timeEnd,
+          });
+          throw new HttpException(
+            'El horario está ocupado (conflicto de reserva simultánea)',
+            HttpStatus.CONFLICT,
+          );
+        }
+      }
+      
+      // Re-throw other errors
+      throw error;
+    }
   }
 }

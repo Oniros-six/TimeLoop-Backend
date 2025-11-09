@@ -161,24 +161,7 @@ export class UpdateBooking {
       };
     }
 
-    //* 7) Chequeo de solapamiento (si cambió fecha, hora o servicio)
-    if (
-      nextTimeStart.getTime() !== booking.timeStart.getTime() ||
-      nextTimeEnd.getTime() !== booking.timeEnd.getTime()
-    ) {
-      const overlapping = await this.bookingRepository.findOverlapping({
-        id, // id de la reserva actual para excluirla si es necesario
-        userId: nextUser.id,
-        timeStart: nextTimeStart,
-        timeEnd: nextTimeEnd,
-      });
-
-      if (overlapping) {
-        throw new HttpException('El horario está ocupado', HttpStatus.CONFLICT);
-      }
-    }
-
-    //* 8) Persistencia + efectos laterales
+    //* 7) Persistencia (validación de solapamiento en BD via exclusion constraint)
     const result = await this.bookingRepository.updateSchedule({
       id,
       dataToUpdate,
@@ -190,7 +173,7 @@ export class UpdateBooking {
       );
     }
 
-    //* 9) Generar historial
+    //* 8) Generar historial
     const history: BookingHistoryUpdateData = {
       timeStart: result.timeStart,
       timeEnd: result.timeEnd,
@@ -205,7 +188,7 @@ export class UpdateBooking {
       history: history,
     });
 
-    //* 10) Crear el activity log
+    //* 9) Crear el activity log
     const updatedFields = Object.keys(dataToUpdate).join(', ');
     await this.activityLogService.updated({
       entityType: EntityType.BOOKING,
@@ -216,7 +199,7 @@ export class UpdateBooking {
       detail: `Se actualizaron los campos: ${updatedFields}.`,
     });
 
-    //* 11) Actualizar el reminder
+    //* 10) Actualizar el reminder
     const reminder = Reminder.update({
       bookingId: result.id,
       customerId: result.customerId,
@@ -228,7 +211,7 @@ export class UpdateBooking {
     });
     await this.remindersService.updateReminder(reminder);
 
-    //* 12) Emitir evento si hubo cambio
+    //* 11) Emitir evento si hubo cambio
     if (Object.keys(dataToUpdate).length > 0) {
       this.eventEmitter.emit(
         BOOKING_EVENTS.RESCHEDULED,
