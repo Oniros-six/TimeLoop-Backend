@@ -48,6 +48,22 @@ export class CreateBooking {
   ) {}
 
   async execute(data: CreateBookingDto) {
+    //* 0) Verificar idempotencia
+    if (data.idempotencyKey) {
+      const existingBooking = await this.bookingRepository.findByIdempotencyKey(
+        data.idempotencyKey,
+      );
+
+      if (existingBooking) {
+        // Ya existe una reserva con esta key, retornar sin crear duplicado
+        return {
+          message: 'Su reserva ha sido agendada con éxito.',
+          statusCode: HttpStatus.OK,
+          data: existingBooking,
+        };
+      }
+    }
+
     //* 1) Validación de fecha y hora
     const scheduledAt = ensureNotPast(data.timeStart);
 
@@ -98,7 +114,10 @@ export class CreateBooking {
       throw new HttpException('El horario está ocupado', HttpStatus.CONFLICT);
     }
 
-    const result = await this.bookingRepository.createSchedule(booking);
+    const result = await this.bookingRepository.createSchedule(
+      booking,
+      data.idempotencyKey,
+    );
     if (!result) {
       throw new HttpException(
         'Error al registrar la reserva, intente de nuevo en unos minutos.',

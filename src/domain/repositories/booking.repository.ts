@@ -10,7 +10,9 @@ export interface IBookingRepository {
     userId: number;
   }): Promise<Booking | null>;
 
-  createSchedule(data: Booking): Promise<Booking | null>;
+  createSchedule(data: Booking, idempotencyKey?: string): Promise<Booking | null>;
+
+  findByIdempotencyKey(key: string): Promise<Booking | null>;
 
   findOverlapping(data: {
     id?: number;

@@ -12,6 +12,19 @@ import { toUTC } from '@/domain/value-objects/booking/validations';
 
 export class CreateBookingDto {
   @ApiProperty({
+    example: 'booking_550e8400-e29b-41d4-a716-446655440000',
+    description:
+      'Clave única de idempotencia. Si se envía la misma key en múltiples requests, solo se creará una reserva. ' +
+      'Útil para prevenir duplicados por doble-click o retry automático. ' +
+      'Formato recomendado: "booking_{UUID}"',
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'La clave de idempotencia debe ser texto' })
+  @MaxLength(255, { message: 'La clave no puede exceder 255 caracteres' })
+  idempotencyKey?: string;
+
+  @ApiProperty({
     example: 1,
     description: 'ID del comercio en el que se reserva',
   })

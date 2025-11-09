@@ -43,7 +43,26 @@ export class PrismaBookingRepository implements IBookingRepository {
     );
   }
 
-  async createSchedule(data: DomainClient): Promise<DomainClient | null> {
+  async findByIdempotencyKey(key: string): Promise<DomainClient | null> {
+    const result = await this.prisma.booking.findUnique({
+      where: { idempotencyKey: key },
+      include: {
+        bookingServices: {
+          include: {
+            service: true,
+          },
+        },
+      },
+    });
+
+    if (!result) return null;
+    return this.toDomain(result);
+  }
+
+  async createSchedule(
+    data: DomainClient,
+    idempotencyKey?: string,
+  ): Promise<DomainClient | null> {
     const result = await this.prisma.$transaction(async (prisma) => {
 
       await this.prisma.customerCommerce.upsert({
@@ -65,6 +84,7 @@ export class PrismaBookingRepository implements IBookingRepository {
 
       return await prisma.booking.create({
         data: {
+          idempotencyKey: idempotencyKey,
           timeStart: data.timeStart,
           timeEnd: data.timeEnd,
           duration: data.duration,
@@ -263,7 +283,7 @@ export class PrismaBookingRepository implements IBookingRepository {
     // Solo necesitamos definir el rango del día en UTC
     const startOfDay = new Date(data.timeStart);
     startOfDay.setUTCHours(0, 0, 0, 0);
-    
+
     const endOfDay = new Date(data.timeStart);
     endOfDay.setUTCHours(23, 59, 59, 999);
 
@@ -292,7 +312,7 @@ export class PrismaBookingRepository implements IBookingRepository {
     // PostgreSQL con TIMESTAMPTZ maneja UTC automáticamente
     const startOfDay = new Date(data.timeStart);
     startOfDay.setUTCHours(0, 0, 0, 0);
-    
+
     const endOfDay = new Date(data.timeStart);
     endOfDay.setUTCHours(23, 59, 59, 999);
 

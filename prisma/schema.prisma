@@ -185,16 +185,17 @@ model User {
 }
 
 model Booking {
-  id         Int           @id @default(autoincrement())
-  duration   Int
-  customerId Int
-  commerceId Int
-  userId     Int
-  totalPrice Float
-  notes      String
-  status     BookingStatus
-  timeEnd    DateTime      @db.Timestamptz
-  timeStart  DateTime      @db.Timestamptz
+  id             Int           @id @default(autoincrement())
+  idempotencyKey String?       @unique
+  duration       Int
+  customerId     Int
+  commerceId     Int
+  userId         Int
+  totalPrice     Float
+  notes          String
+  status         BookingStatus
+  timeEnd        DateTime      @db.Timestamptz
+  timeStart      DateTime      @db.Timestamptz
 
   bookingServices BookingService[]
   bookingHistory  BookingHistory?
@@ -203,6 +204,7 @@ model Booking {
   user            User             @relation("UserBookings", fields: [userId], references: [id])
   Payment         Payment[]
 
+  @@index([idempotencyKey])
   @@map("bookings")
 }
 
