@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BookingController } from './booking.controller';
+import { BookingHoldController } from './booking-hold.controller';
 import { PrismaModule } from '@/infrastructure/prisma/prisma.module';
 import { NotificationModule } from '@/domain/services/notifications/notifications.module';
 
@@ -12,6 +13,8 @@ import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-c
 import { FindAllByUser } from '@/application/use-cases/booking/find-all-by-user.use-case';
 import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
 import { FindCommerceConfig } from '@/application/use-cases/commerceConfig/find.use-case';
+import { CreateHold } from '@/application/use-cases/booking/create-hold.use-case';
+import { ConfirmHold } from '@/application/use-cases/booking/confirm-hold.use-case';
 
 // Tokens
 import {
@@ -31,7 +34,7 @@ import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/reposito
 
 @Module({
   imports: [PrismaModule, NotificationModule],
-  controllers: [BookingController],
+  controllers: [BookingController, BookingHoldController],
   providers: [
     {
       provide: BOOKING_REPOSITORY,
@@ -63,6 +66,8 @@ import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/reposito
     FindAllByUser,
     CancelBooking,
     FindCommerceConfig,
+    CreateHold,
+    ConfirmHold,
   ],
 })
 export class BookingModule {}

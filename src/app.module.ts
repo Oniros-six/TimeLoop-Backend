@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ActivityLogModule } from './domain/services/activityLog/activity-log.module';
 import { NotificationModule } from './domain/services/notifications/notifications.module';
 import { RemindersModule } from './domain/services/reminders/reminders.module';
+import { HoldCleanupModule } from './domain/services/hold-cleanup/hold-cleanup.module';
 import { PrismaModule } from './infrastructure/prisma/prisma.module';
 import { AuthModule } from './interfaces/controllers/auth/auth.module';
 import { BookingModule } from './interfaces/controllers/booking/booking.module';
@@ -46,6 +47,7 @@ import { DashboardModule } from './interfaces/controllers/dashboard/dashboard.mo
     CommerceWorkingOverrideModule,
     NotificationModule,
     RemindersModule,
+    HoldCleanupModule,
     AuthModule,
     BookingHistoryModule,
     InvoiceModule,
