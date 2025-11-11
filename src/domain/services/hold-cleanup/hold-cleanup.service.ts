@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 
@@ -74,32 +75,30 @@ export class HoldCleanupService {
         return;
       }
 
-      // Eliminar en batch
-      const holdIds = expiredHolds.map(h => h.id);
-      
-      const result = await this.prisma.booking.deleteMany({
-        where: {
-          id: { in: holdIds },
-          status: BookingStatus.HOLD, // Doble check por seguridad
-        },
-      });
+      const holdIds = expiredHolds.map((h) => h.id);
 
-      this.logger.log(
-        `Cleaned up ${result.count} expired holds`,
-        {
-          holdIds: holdIds,
-          expiredCount: expiredHolds.length,
-        },
-      );
+      const deletedCount = await this.deleteHoldsCascade(holdIds);
+
+      this.logger.log(`Cleaned up ${deletedCount} expired holds`, {
+        holdIds: holdIds,
+        expiredCount: expiredHolds.length,
+      });
 
       // TODO: Emitir evento de WebSocket aquí para actualizar disponibilidad
       // this.websocketGateway.emitSlotsAvailable({ userId, date })
 
     } catch (error) {
-      this.logger.error('Error cleaning up expired holds', {
+      const details: Record<string, unknown> = {
         error: error instanceof Error ? error.message : error,
         stack: error instanceof Error ? error.stack : undefined,
-      });
+      };
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        details.code = error.code;
+        details.meta = error.meta;
+      }
+
+      this.logger.error('Error cleaning up expired holds', details);
     } finally {
       this.isRunning = false;
     }
@@ -109,17 +108,26 @@ export class HoldCleanupService {
    * Método manual para limpiar holds (útil para testing o admin)
    */
   async manualCleanup(): Promise<number> {
-    const result = await this.prisma.booking.deleteMany({
+    const expiredHolds = await this.prisma.booking.findMany({
       where: {
         status: BookingStatus.HOLD,
         expiresAt: {
           lt: new Date(),
         },
       },
+      select: { id: true },
     });
 
-    this.logger.log(`Manual cleanup: removed ${result.count} expired holds`);
-    return result.count;
+    if (expiredHolds.length === 0) {
+      this.logger.debug('Manual cleanup: no expired holds to remove');
+      return 0;
+    }
+
+    const holdIds = expiredHolds.map((hold) => hold.id);
+    const deletedCount = await this.deleteHoldsCascade(holdIds);
+
+    this.logger.log(`Manual cleanup: removed ${deletedCount} expired holds`);
+    return deletedCount;
   }
 
   /**
@@ -149,6 +157,37 @@ export class HoldCleanupService {
       expired,
       active: total - expired,
     };
+  }
+
+  private async deleteHoldsCascade(holdIds: number[]): Promise<number> {
+    if (holdIds.length === 0) return 0;
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.bookingService.deleteMany({
+        where: { bookingId: { in: holdIds } },
+      });
+
+      await tx.bookingHistory.deleteMany({
+        where: { bookingId: { in: holdIds } },
+      });
+
+      await tx.reminder.deleteMany({
+        where: { bookingId: { in: holdIds } },
+      });
+
+      await tx.payment.deleteMany({
+        where: { bookingId: { in: holdIds } },
+      });
+
+      const result = await tx.booking.deleteMany({
+        where: {
+          id: { in: holdIds },
+          status: BookingStatus.HOLD,
+        },
+      });
+
+      return result.count;
+    });
   }
 }
 
