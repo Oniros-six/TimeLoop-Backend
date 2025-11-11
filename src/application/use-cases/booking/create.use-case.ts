@@ -148,28 +148,41 @@ export class CreateBooking {
         activityLogDetail: 'Se crea una nueva reserva',
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2034' || error.message?.includes('unique_user_booking_range')) {
-          this.logger.warn('Booking time range overlap detected', {
-            userId: data.userId,
-            timeStart: data.timeStart,
-            timeEnd: booking.timeEnd,
-          });
-          throw new HttpException(
-            'El horario está ocupado (conflicto de reserva simultánea)',
-            HttpStatus.CONFLICT,
-          );
-        }
+      const isOverlapError =
+        (error instanceof Prisma.PrismaClientKnownRequestError &&
+          (error.code === 'P2034' || error.message?.includes('unique_user_booking_range'))) ||
+        (error instanceof Prisma.PrismaClientUnknownRequestError &&
+          error.message?.includes('unique_user_booking_range')) ||
+        (typeof error === 'object' &&
+          error !== null &&
+          'message' in error &&
+          typeof error.message === 'string' &&
+          error.message.includes('unique_user_booking_range'));
 
-        if (error.code === 'P2002' && error.message?.includes('idempotencyKey')) {
-          this.logger.warn('Duplicate idempotency key detected', {
-            idempotencyKey: data.idempotencyKey,
-          });
-          throw new HttpException(
-            'Esta solicitud ya fue procesada',
-            HttpStatus.CONFLICT,
-          );
-        }
+      if (isOverlapError) {
+        this.logger.warn('Booking time range overlap detected', {
+          userId: data.userId,
+          timeStart: data.timeStart,
+          timeEnd: booking.timeEnd,
+        });
+        throw new HttpException(
+          'El horario está ocupado (conflicto de reserva simultánea)',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002' &&
+        error.message?.includes('idempotencyKey')
+      ) {
+        this.logger.warn('Duplicate idempotency key detected', {
+          idempotencyKey: data.idempotencyKey,
+        });
+        throw new HttpException(
+          'Esta solicitud ya fue procesada',
+          HttpStatus.CONFLICT,
+        );
       }
 
       this.logger.error('Error creating booking in transaction', error);
