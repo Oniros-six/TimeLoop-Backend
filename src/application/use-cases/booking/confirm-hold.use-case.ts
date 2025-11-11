@@ -1,14 +1,11 @@
-import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import { Booking } from '@/domain/entities/booking.entity';
-import { BookingHistory } from '@/domain/entities/bookingHistory.entity';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
-import { ActivityLog } from '@/domain/entities/activityLog.entity';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
-import { BookingService } from '@/domain/entities/bookingService.entity';
+import { BookingPersistenceService } from '@/application/services/booking/booking-persistence.service';
 
 /**
  * Use Case: Confirmar un hold y convertirlo en reserva PENDING
@@ -35,6 +32,7 @@ export class ConfirmHold {
   constructor(
     private readonly prisma: PrismaService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly bookingPersistenceService: BookingPersistenceService,
   ) {}
 
   async execute(holdId: number) {
@@ -89,93 +87,17 @@ export class ConfirmHold {
       );
     }
 
-    //* 4) TRANSACCIÓN ATÓMICA: Convertir HOLD a PENDING + history + activityLog
+    //* 4) Persistir cambios (transacción atómica)
     let result: Booking;
 
     try {
-      result = await this.prisma.$transaction(async (tx) => {
-        // 4.1) Actualizar booking: HOLD → PENDING
-        const confirmedBooking = await tx.booking.update({
-          where: { id: holdId },
-          data: {
-            status: BookingStatus.PENDING,
-            expiresAt: null, // Limpiar expiración, ya es permanente
-          },
-          include: {
-            bookingServices: {
-              include: { service: true },
-            },
-          },
-        });
-
-        // 4.2) Crear historial
-        const history = BookingHistory.create({
-          bookingId: confirmedBooking.id,
-          commerceId: confirmedBooking.commerceId,
-          customerId: confirmedBooking.customerId,
-          userId: confirmedBooking.userId,
-          priceAtBooking: confirmedBooking.totalPrice,
-          durationAtBooking: confirmedBooking.duration,
-          timeStart: confirmedBooking.timeStart,
-          timeEnd: confirmedBooking.timeEnd,
-          status: confirmedBooking.status,
-          notes: confirmedBooking.notes,
-        });
-
-        await tx.bookingHistory.create({
-          data: {
-            bookingId: history.bookingId,
-            commerceId: history.commerceId,
-            userId: history.userId,
-            customerId: history.customerId,
-            priceAtBooking: history.priceAtBooking,
-            durationAtBooking: history.durationAtBooking,
-            timeStart: history.timeStart,
-            timeEnd: history.timeEnd,
-            status: history.status,
-            notes: history.notes,
-          },
-        });
-
-        // 4.3) Crear activity log
-        const activityLog = ActivityLog.createLog({
-          entityType: EntityType.BOOKING,
-          entityId: confirmedBooking.id,
-          userId: confirmedBooking.userId,
-          commerceId: confirmedBooking.commerceId,
-          customerId: confirmedBooking.customerId,
-          detail: `Reserva confirmada (convertida desde hold)`,
-        });
-
-        await tx.activityLog.create({
-          data: {
-            entityType: activityLog.entityType,
-            entityId: activityLog.entityId,
-            changeType: activityLog.changeType,
-            detail: activityLog.detail,
-            userId: activityLog.userId,
-            commerceId: activityLog.commerceId,
-            customerId: activityLog.customerId,
-            timestamp: activityLog.timestamp,
-          },
-        });
-
-        // Convertir a entidad de dominio
-        return new Booking(
-          confirmedBooking.id,
-          confirmedBooking.customerId,
-          confirmedBooking.commerceId,
-          confirmedBooking.duration,
-          confirmedBooking.userId,
-          confirmedBooking.status as BookingStatus,
-          confirmedBooking.timeStart,
-          confirmedBooking.timeEnd,
-          confirmedBooking.notes,
-          confirmedBooking.totalPrice,
-          confirmedBooking.bookingServices.map((bs: any) => 
-            new BookingService(bs.bookingId || confirmedBooking.id, bs.serviceId)
-          ),
-        );
+      result = await this.bookingPersistenceService.updateBookingWithHistory({
+        bookingId: holdId,
+        bookingData: {
+          status: BookingStatus.PENDING,
+          expiresAt: null,
+        },
+        activityLogDetail: 'Reserva confirmada (convertida desde prereserva)',
       });
     } catch (error) {
       this.logger.error('Error confirming hold', error);

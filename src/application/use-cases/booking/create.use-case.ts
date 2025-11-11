@@ -1,4 +1,3 @@
-import { EntityType } from '@/domain/dbEnums/Activity-log.enum';
 import {
   BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
@@ -10,7 +9,6 @@ import {
   ReminderStatus,
 } from '@/domain/dbEnums/Reminder.enum';
 import { Booking } from '@/domain/entities/booking.entity';
-import { BookingService } from '@/domain/entities/bookingService.entity';
 import { Reminder } from '@/domain/entities/reminder.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
@@ -21,32 +19,27 @@ import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/c
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ensureNotPast } from '@/domain/value-objects/booking/validations';
 import { IUserRepository } from '@/domain/repositories/user.repository';
-import { BookingHistory } from '@/domain/entities/bookingHistory.entity';
-import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
-import { ActivityLog } from '@/domain/entities/activityLog.entity';
 import { Prisma } from '@prisma/client';
 import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
+import { BookingPersistenceService } from '@/application/services/booking/booking-persistence.service';
 
 /**
  * ARCHITECTURAL DECISION RECORD (ADR):
- * 
- * Este use case inyecta PrismaService directamente, lo cual técnicamente 
- * viola Clean Architecture (capa de aplicación dependiendo de infraestructura).
- * 
- * JUSTIFICACIÓN PRAGMÁTICA:
- * - Necesitamos atomicidad ACID entre booking, history y activityLog
- * - Prisma requiere acceso directo a $transaction para garantías ACID
- * - Los repositorios individuales no pueden compartir contexto transaccional
- * - La complejidad de implementar Unit of Work no se justifica en esta etapa
- * 
+ *
+ * Este use case delega la persistencia en BookingPersistenceService, el cual
+ * utiliza Prisma directamente para garantizar atomicidad ACID entre booking,
+ * historial y activity log. Técnicamente sigue violando Clean Architecture
+ * (capa de aplicación dependiendo de infraestructura), pero es una decisión
+ * pragmática documentada en el ADR 001.
+ *
  * TRADE-OFFS ACEPTADOS:
- * ✅ Ganamos: Atomicidad garantizada, código simple, performance óptimo
+ * ✅ Ganamos: Atomicidad garantizada, código centralizado y simple
  * ⚠️ Perdemos: Pureza arquitectónica, acoplamiento a Prisma
- * 
+ *
  * REFACTORING FUTURO (cuando escalar lo justifique):
  * Implementar Unit of Work pattern o Transaction Manager para abstraer Prisma.
- * 
+ *
  * PRIORIDAD: Baja (funciona correctamente, solo deuda técnica arquitectónica)
  */
 @Injectable()
@@ -63,13 +56,11 @@ export class CreateBooking {
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
 
-    // NOTA: Ver ADR arriba sobre inyección directa de PrismaService
-    private readonly prisma: PrismaService,
-
     private readonly remindersService: RemindersService,
 
     private readonly eventEmitter: EventEmitter2,
     private readonly workingPatternValidator: WorkingPatternValidator,
+    private readonly bookingPersistenceService: BookingPersistenceService,
   ) {}
 
   async execute(data: CreateBookingDto) {
@@ -135,114 +126,28 @@ export class CreateBooking {
       timeEnd: booking.timeEnd,
     });
 
-    //* 5) TRANSACCIÓN ATÓMICA: booking + history + activityLog
-    // NOTA: Ejecutamos directamente en Prisma para garantizar atomicidad ACID.
-    // Todos estos cambios DEBEN ser atómicos: si uno falla, se hace rollback de todo.
-    // Side effects opcionales (reminders, eventos) van FUERA de la transacción.
+    //* 5) Persistir booking + historial + activity log (transacción atómica)
     let result: Booking;
-    
+
     try {
-      result = await this.prisma.$transaction(async (tx) => {
-        // 5.1) Crear booking
-        const createdBooking = await tx.booking.create({
-          data: {
-            customerId: booking.customerId,
-            commerceId: booking.commerceId,
-            userId: booking.userId,
-            timeStart: booking.timeStart,
-            timeEnd: booking.timeEnd,
-            duration: booking.duration,
-            totalPrice: booking.totalPrice,
-            status: BookingStatus.PENDING,
-            notes: booking.notes,
-            idempotencyKey: data.idempotencyKey,
-            bookingServices: {
-              create: services.map((service) => ({
-                serviceId: service.id,
-              })),
-            },
-          },
-          include: {
-            bookingServices: {
-              include: { service: true },
-            },
-          },
-        });
-
-        // 5.2) Crear historial
-        const history = BookingHistory.create({
-          bookingId: createdBooking.id,
-          commerceId: createdBooking.commerceId,
-          customerId: createdBooking.customerId,
-          userId: createdBooking.userId,
-          priceAtBooking: createdBooking.totalPrice,
-          durationAtBooking: createdBooking.duration,
-          timeStart: createdBooking.timeStart,
-          timeEnd: createdBooking.timeEnd,
-          status: createdBooking.status,
-          notes: createdBooking.notes,
-        });
-
-        await tx.bookingHistory.create({
-          data: {
-            bookingId: history.bookingId,
-            commerceId: history.commerceId,
-            userId: history.userId,
-            customerId: history.customerId,
-            priceAtBooking: history.priceAtBooking,
-            durationAtBooking: history.durationAtBooking,
-            timeStart: history.timeStart,
-            timeEnd: history.timeEnd,
-            status: history.status,
-            notes: history.notes,
-          },
-        });
-
-        // 5.3) Crear activity log
-        const activityLog = ActivityLog.createLog({
-          entityType: EntityType.BOOKING,
-          entityId: createdBooking.id,
-          userId: createdBooking.userId,
-          commerceId: createdBooking.commerceId,
-          customerId: createdBooking.customerId,
-          detail: `Se crea una nueva reserva`,
-        });
-
-        await tx.activityLog.create({
-          data: {
-            entityType: activityLog.entityType,
-            entityId: activityLog.entityId,
-            changeType: activityLog.changeType,
-            detail: activityLog.detail,
-            userId: activityLog.userId,
-            commerceId: activityLog.commerceId,
-            customerId: activityLog.customerId,
-            timestamp: activityLog.timestamp,
-          },
-        });
-
-        // Convertir a entidad de dominio
-        return new Booking(
-          createdBooking.id,
-          createdBooking.customerId,
-          createdBooking.commerceId,
-          createdBooking.duration,
-          createdBooking.userId,
-          createdBooking.status as BookingStatus,
-          createdBooking.timeStart,
-          createdBooking.timeEnd,
-          createdBooking.notes,
-          createdBooking.totalPrice,
-          createdBooking.bookingServices.map((bs: any) => 
-            new BookingService(bs.bookingId || createdBooking.id, bs.serviceId)
-          ),
-        );
-      }, {
-        timeout: 10000, // 10 segundos max
-        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      result = await this.bookingPersistenceService.createBookingWithHistory({
+        bookingData: {
+          customerId: booking.customerId,
+          commerceId: booking.commerceId,
+          userId: booking.userId,
+          timeStart: booking.timeStart,
+          timeEnd: booking.timeEnd,
+          duration: booking.duration,
+          totalPrice: booking.totalPrice,
+          status: BookingStatus.PENDING,
+          notes: booking.notes,
+          idempotencyKey: data.idempotencyKey,
+          expiresAt: null,
+        },
+        serviceIds: services.map((service) => service.id),
+        activityLogDetail: 'Se crea una nueva reserva',
       });
     } catch (error) {
-      // Handle exclusion constraint violation
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2034' || error.message?.includes('unique_user_booking_range')) {
           this.logger.warn('Booking time range overlap detected', {
@@ -255,7 +160,7 @@ export class CreateBooking {
             HttpStatus.CONFLICT,
           );
         }
-        
+
         if (error.code === 'P2002' && error.message?.includes('idempotencyKey')) {
           this.logger.warn('Duplicate idempotency key detected', {
             idempotencyKey: data.idempotencyKey,

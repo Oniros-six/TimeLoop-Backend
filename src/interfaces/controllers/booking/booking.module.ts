@@ -16,6 +16,7 @@ import { FindCommerceConfig } from '@/application/use-cases/commerceConfig/find.
 import { CreateHold } from '@/application/use-cases/booking/create-hold.use-case';
 import { ConfirmHold } from '@/application/use-cases/booking/confirm-hold.use-case';
 import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
+import { BookingPersistenceService } from '@/application/services/booking/booking-persistence.service';
 
 // Tokens
 import {
@@ -69,6 +70,7 @@ import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/reposito
     FindCommerceConfig,
     CreateHold,
     ConfirmHold,
+    BookingPersistenceService,
     WorkingPatternValidator,
   ],
 })
