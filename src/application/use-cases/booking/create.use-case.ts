@@ -26,6 +26,7 @@ import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { ActivityLog } from '@/domain/entities/activityLog.entity';
 import { Prisma } from '@prisma/client';
+import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
 
 /**
  * ARCHITECTURAL DECISION RECORD (ADR):
@@ -68,6 +69,7 @@ export class CreateBooking {
     private readonly remindersService: RemindersService,
 
     private readonly eventEmitter: EventEmitter2,
+    private readonly workingPatternValidator: WorkingPatternValidator,
   ) {}
 
   async execute(data: CreateBookingDto) {
@@ -125,6 +127,13 @@ export class CreateBooking {
       data.notes,
       services,
     );
+
+    await this.workingPatternValidator.ensureAvailability({
+      commerceId: booking.commerceId,
+      userId: booking.userId,
+      timeStart: booking.timeStart,
+      timeEnd: booking.timeEnd,
+    });
 
     //* 5) TRANSACCIÓN ATÓMICA: booking + history + activityLog
     // NOTA: Ejecutamos directamente en Prisma para garantizar atomicidad ACID.

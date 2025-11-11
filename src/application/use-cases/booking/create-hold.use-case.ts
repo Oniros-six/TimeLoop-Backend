@@ -11,6 +11,7 @@ import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/c
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { Prisma } from '@prisma/client';
+import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
 
 /**
  * DTO para crear un hold temporal
@@ -54,6 +55,7 @@ export class CreateHold {
     private readonly userRepository: IUserRepository,
 
     private readonly prisma: PrismaService,
+    private readonly workingPatternValidator: WorkingPatternValidator,
   ) {}
 
   async execute(data: CreateHoldDto) {
@@ -95,6 +97,13 @@ export class CreateHold {
       data.notes || 'Prereserva temporal',
       services,
     );
+
+    await this.workingPatternValidator.ensureAvailability({
+      commerceId: booking.commerceId,
+      userId: booking.userId,
+      timeStart: booking.timeStart,
+      timeEnd: booking.timeEnd,
+    });
 
     //* 5) Calcular expiración (15 minutos desde ahora)
     const expiresAt = new Date();
@@ -186,4 +195,3 @@ export class CreateHold {
     };
   }
 }
-

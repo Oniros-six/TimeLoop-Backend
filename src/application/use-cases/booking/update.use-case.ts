@@ -32,6 +32,7 @@ import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { ActivityLog } from '@/domain/entities/activityLog.entity';
 import { Booking } from '@/domain/entities/booking.entity';
 import { Prisma } from '@prisma/client';
+import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
 
 /**
  * ARCHITECTURAL DECISION RECORD (ADR):
@@ -75,6 +76,7 @@ export class UpdateBooking {
     private readonly prisma: PrismaService,
     private readonly eventEmitter: EventEmitter2,
     private readonly remindersService: RemindersService,
+    private readonly workingPatternValidator: WorkingPatternValidator,
   ) { }
 
   async execute(id: number, newData: UpdateBookingDto) {
@@ -157,6 +159,13 @@ export class UpdateBooking {
     const totalDuration = booking.calcServicesDuration(nextServices);
     const totalPrice = booking.calcTotalPrice(nextServices);
     const nextTimeEnd = addMinutesToTime(nextTimeStart, totalDuration);
+
+    await this.workingPatternValidator.ensureAvailability({
+      commerceId: booking.commerceId,
+      userId: nextUser.id,
+      timeStart: nextTimeStart,
+      timeEnd: nextTimeEnd,
+    });
 
     //* 5) Construir diff (solo campos que realmente cambian)
     const dataToUpdate: BookingUpdateData = {
