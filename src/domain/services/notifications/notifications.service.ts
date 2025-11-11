@@ -9,12 +9,16 @@ import {
 import { Booking } from '@/domain/entities/booking.entity';
 import { INotificationProvider } from '@/domain/services/notifications/notification-provider.interface';
 import {
+  BOOKING_REPOSITORY,
   COMMERCE_REPOSITORY,
   REMINDER_REPOSITORY,
+  USER_REPOSITORY,
 } from '@/application/providers';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';
+import { IBookingRepository } from '@/domain/repositories/booking.repository';
+import { IUserRepository } from '@/domain/repositories/user.repository';
 
 export const BOOKING_EVENTS = {
   CREATED: 'booking.created',
@@ -44,6 +48,10 @@ export class NotificationService {
     private readonly commerceRepository: ICommerceRepository,
     @Inject(REMINDER_REPOSITORY)
     private readonly reminderRepository: IReminderRepository,
+    @Inject(BOOKING_REPOSITORY)
+    private readonly bookingRepository: IBookingRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
   ) {}
 
   @OnEvent(BOOKING_EVENTS.CREATED)
@@ -97,8 +105,21 @@ export class NotificationService {
     });
     if (!commerce) throw new Error('Commerce not found');
 
-    const message = `Se ha creado una reserva para el día ${booking.timeStart.toISOString()}`;
-    await this.provider.sendEmail(commerce.email, 'Nueva reserva', message);
+    const formattedStart = this.formatDateTime(booking.timeStart);
+
+    const message = [
+      '¡Tu agenda tiene una nueva reserva! ✨',
+      `• Fecha y hora: ${formattedStart}`,
+      '• Estado: confirmada',
+      '',
+      'Muy pronto podrás ajustar la cita desde el botón "Reprogramar" en tu panel.',
+    ].join('\n');
+
+    await this.provider.sendEmail({
+      to: commerce.email,
+      subject: 'Nueva reserva',
+      text: message,
+    });
   }
 
   async notifyBookingCanceled(booking: Booking): Promise<void> {
@@ -108,8 +129,20 @@ export class NotificationService {
     });
     if (!commerce) throw new Error('Commerce not found');
 
-    const message = `Se ha cancelado una reserva para el día ${booking.timeStart.toISOString()}`;
-    await this.provider.sendEmail(commerce.email, 'Reserva cancelada', message);
+    const formattedStart = this.formatDateTime(booking.timeStart);
+
+    const message = [
+      'Una reserva ha sido cancelada.',
+      `• Fecha y hora original: ${formattedStart}`,
+      '',
+      'Recuerda liberar el espacio para que otros clientes puedan reservarlo.',
+    ].join('\n');
+
+    await this.provider.sendEmail({
+      to: commerce.email,
+      subject: 'Reserva cancelada',
+      text: message,
+    });
   }
 
   async notifyBookingRescheduled(
@@ -124,39 +157,205 @@ export class NotificationService {
     });
     if (!commerce) throw new Error('Commerce not found');
 
-    const message = `Se ha reprogramado una reserva para el día ${newDate.toISOString()}`;
-    await this.provider.sendEmail(
-      commerce.email,
-      'Reserva reprogramada',
-      message,
-    );
+    const formattedStart = this.formatDateTime(newDate);
+
+    const message = [
+      'Una reserva ha sido reprogramada.',
+      `• Nueva fecha y hora: ${formattedStart}`,
+      '',
+      'Verifica que la agenda quede actualizada para evitar solapamientos.',
+    ].join('\n');
+
+    await this.provider.sendEmail({
+      to: commerce.email,
+      subject: 'Reserva reprogramada',
+      text: message,
+    });
   }
 
   async notifyBookingReminder(data: ReminderDTO) {
-    if (data.channel === 'email') {
-      this.logger.log(
-        `Sending reminder for booking ${data.scheduledAt.toISOString()} to ${data.customerEmail}`,
-      );
+    if (data.channel !== 'email') return;
 
-      const message = `Hola ${data.customerName}, te recordamos que tienes una reserva para el día ${data.scheduledAt.toISOString()} en ${data.commerceName} ubicado en ${data.commerceAddress}.
-      Porfavor asistir 5 minutos antes de la hora de la reserva, 
-      y en caso de que no puedas asistir, por favor cancelar la reserva o reprogramarla 
-      mediante el botón de cancelación o reprogramación que se encuentra en el correo de confirmación de la reserva.`;
+    this.logger.log(
+      `Sending reminder for booking ${data.scheduledAt.toISOString()} to ${data.customerEmail}`,
+    );
 
-      const result = await this.provider.sendEmail(
-        data.customerEmail,
-        'Recordatorio de reserva',
-        message,
-      );
+    const [commerce, booking] = await Promise.all([
+      this.commerceRepository.findCommerce({
+        commerceId: data.commerceId,
+      }),
+      this.bookingRepository.findOne({ id: data.bookingId }),
+    ]);
 
-      if (result) {
-        this.logger.log(`Email sent: ${data.customerEmail}`);
-        await this.reminderRepository.updateSent(data.id);
-      }
+    if (!commerce) throw new Error('Commerce not found');
+    if (!booking) throw new Error('Booking not found');
+
+    const user = await this.userRepository.findUser({
+      userId: booking.userId,
+    });
+
+    const formattedDate = this.formatDate(data.scheduledAt);
+    const formattedTime = this.formatTime(data.scheduledAt);
+
+    const html = this.buildReminderHtml({
+      commerceName: commerce.name,
+      commerceLogo: commerce.logo,
+      commerceAddress: data.commerceAddress,
+      customerName: data.customerName,
+      professionalName: user?.name,
+      date: formattedDate,
+      time: formattedTime,
+      cancelUrl: data.cancelUrl,
+    });
+
+    const text = this.buildReminderText({
+      commerceName: commerce.name,
+      commerceAddress: data.commerceAddress,
+      customerName: data.customerName,
+      professionalName: user?.name,
+      date: formattedDate,
+      time: formattedTime,
+      cancelUrl: data.cancelUrl,
+    });
+
+    const result = await this.provider.sendEmail({
+      to: data.customerEmail,
+      subject: 'Recordatorio de reserva',
+      text,
+      html,
+    });
+
+    if (result) {
+      this.logger.log(`Email sent: ${data.customerEmail}`);
+      await this.reminderRepository.updateSent(data.id);
     }
 
     // if (data.channel === 'whatsapp') {
     //   await this.provider.sendWhatsapp(data.customerPhone, 'Recordatorio de reserva', message);
     // }
+  }
+
+  private formatDateTime(date: Date): string {
+    return new Intl.DateTimeFormat('es-ES', {
+      dateStyle: 'long',
+      timeStyle: 'short',
+    }).format(date);
+  }
+
+  private formatDate(date: Date): string {
+    return new Intl.DateTimeFormat('es-ES', {
+      dateStyle: 'long',
+    }).format(date);
+  }
+
+  private formatTime(date: Date): string {
+    return new Intl.DateTimeFormat('es-ES', {
+      timeStyle: 'short',
+    }).format(date);
+  }
+
+  private buildReminderHtml({
+    commerceName,
+    commerceLogo,
+    commerceAddress,
+    customerName,
+    professionalName,
+    date,
+    time,
+    cancelUrl,
+  }: {
+    commerceName: string;
+    commerceLogo?: string;
+    commerceAddress: string;
+    customerName: string;
+    professionalName?: string;
+    date: string;
+    time: string;
+    cancelUrl?: string;
+  }): string {
+    const logoSection = commerceLogo
+      ? `<div style="text-align: center;">
+        <img src="${commerceLogo}" alt="Logo del comercio" style="width: 80px; height: auto; margin-bottom: 10px;" />
+      </div>`
+      : '';
+
+    const professional = professionalName ?? `Equipo ${commerceName}`;
+
+    const actionSection = cancelUrl
+      ? `<p style="margin-top: 20px; font-size: 14px;">
+        Si deseas cancelar o reprogramar tu turno, haz clic aquí:
+        <a href="${cancelUrl}" style="color: #007bff;">Cancelar turno</a>
+      </p>`
+      : `<p style="margin-top: 20px; font-size: 14px;">
+        Si deseas cancelar o reprogramar tu turno, ponte en contacto con nosotros para ayudarte.
+      </p>`;
+
+    return `<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recordatorio de turno</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
+    <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+      ${logoSection}
+
+      <h2 style="text-align: center; color: #333;">Recordatorio: ¡Tienes una reserva próximamente!</h2>
+
+      <p>¡Hola ${customerName}! Solo queríamos recordarte que tienes un turno próximamente. Aquí están los detalles:</p>
+
+      <ul style="list-style: none; padding-left: 0;">
+        <li><strong>Comercio:</strong> ${commerceName}</li>
+        <li><strong>Profesional:</strong> ${professional}</li>
+        <li><strong>Día:</strong> ${date}</li>
+        <li><strong>Hora:</strong> ${time}</li>
+        <li><strong>Dirección:</strong> ${commerceAddress}</li>
+      </ul>
+
+      <p style="margin-top: 20px;">Muchas gracias por elegirnos.<br />
+      Te estaremos esperando.</p>
+
+      <p style="font-weight: bold; margin-top: 10px;">Equipo ${commerceName}</p>
+
+      ${actionSection}
+    </div>
+  </body>
+</html>`;
+  }
+
+  private buildReminderText({
+    commerceName,
+    commerceAddress,
+    customerName,
+    professionalName,
+    date,
+    time,
+    cancelUrl,
+  }: {
+    commerceName: string;
+    commerceAddress: string;
+    customerName: string;
+    professionalName?: string;
+    date: string;
+    time: string;
+    cancelUrl?: string;
+  }): string {
+    const professional = professionalName ?? `Equipo ${commerceName}`;
+    const actionMessage = cancelUrl
+      ? `Si deseas cancelar o reprogramar tu turno, visita: ${cancelUrl}`
+      : `Si deseas cancelar o reprogramar tu turno, contáctanos directamente.`;
+
+    return [
+      `Hola ${customerName}, te recordamos que tienes una reserva próximamente.`,
+      '',
+      `Comercio: ${commerceName}`,
+      `Profesional: ${professional}`,
+      `Día: ${date}`,
+      `Hora: ${time}`,
+      `Dirección: ${commerceAddress}`,
+      '',
+      actionMessage,
+    ].join('\n');
   }
 }

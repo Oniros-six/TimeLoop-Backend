@@ -1,11 +1,13 @@
 import { CreateEmailResponse } from 'resend';
 
-//src\domain\services\notifications\notification-provider.interface.ts
+export type EmailPayload = {
+  to: string;
+  subject: string;
+  text?: string;
+  html?: string;
+};
+
 export interface INotificationProvider {
-  sendEmail(
-    to: string,
-    subject: string,
-    body: string,
-  ): Promise<CreateEmailResponse>;
+  sendEmail(payload: EmailPayload): Promise<CreateEmailResponse>;
   sendWhatsApp(to: string, message: string): Promise<void>;
 }

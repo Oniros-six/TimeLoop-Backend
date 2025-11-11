@@ -1,6 +1,8 @@
 export class ReminderDTO {
   constructor(
     public readonly id: number,
+    public readonly bookingId: number,
+    public readonly commerceId: number,
     public readonly scheduledAt: Date,
     public readonly channel: string,
     public readonly customerName: string,
@@ -8,5 +10,6 @@ export class ReminderDTO {
     public readonly customerPhone: string,
     public readonly commerceName: string,
     public readonly commerceAddress: string,
+    public readonly cancelUrl?: string,
   ) {}
 }

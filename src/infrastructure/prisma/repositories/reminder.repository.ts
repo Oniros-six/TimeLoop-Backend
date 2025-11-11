@@ -7,7 +7,7 @@ import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';
 
 type ReminderWithRelations = DomainClient & {
   customer: { name: string; email: string; phone: string };
-  commerce: { name: string; address: string };
+  commerce: { id: number; name: string; address: string };
 };
 
 @Injectable()
@@ -17,6 +17,8 @@ export class PrismaReminderRepository implements IReminderRepository {
   private toDTO(reminder: ReminderWithRelations): ReminderDTO {
     return new ReminderDTO(
       reminder.id,
+      reminder.bookingId,
+      reminder.commerceId,
       reminder.scheduledAt,
       reminder.channel,
       reminder.customer.name,

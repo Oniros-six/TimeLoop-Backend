@@ -1,42 +1,50 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
-import { Booking } from '@/domain/entities/booking.entity';
 import { NotificationService } from '../../../src/domain/services/notifications/notifications.service';
 import {
   BookingCreatedEvent,
   BookingCanceledEvent,
   BookingRescheduledEvent,
 } from '@/domain/common/booking.events';
-import { BookingDate } from '@/domain/value-objects/booking/booking-date.vo';
-import { BookingTime } from '@/domain/value-objects/booking/booking-time.vo';
-import { BookingStatus } from '@/domain/value-objects/booking/booking-status.vo';
 import { INotificationProvider } from '../../../src/domain/services/notifications/notification-provider.interface';
 import { ICommerceRepository } from '@/domain/repositories/commerce.repository';
 import { Commerce } from '@/domain/entities/commerce.entity';
 import {
+  BOOKING_REPOSITORY,
   COMMERCE_REPOSITORY,
   REMINDER_REPOSITORY,
+  USER_REPOSITORY,
 } from '@/application/providers';
-import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory.enum';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
+import { IBookingRepository } from '@/domain/repositories/booking.repository';
+import { IUserRepository } from '@/domain/repositories/user.repository';
+import { Booking } from '@/domain/entities/booking.entity';
+import { BusinessCategory } from '@/domain/dbEnums/BusinessCategory.enum';
+import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';
 
 describe('NotificationService', () => {
   let service: NotificationService;
   let mockNotificationProvider: jest.Mocked<INotificationProvider>;
   let mockCommerceRepository: jest.Mocked<ICommerceRepository>;
+  let mockBookingRepository: jest.Mocked<IBookingRepository>;
+  let mockUserRepository: jest.Mocked<IUserRepository>;
+  let mockReminderRepository: jest.Mocked<IReminderRepository>;
 
   // Mock de Booking
-  const mockBooking: Booking = new Booking(
-    1, // id
-    1, // customerId
-    1, // commerceId
-    60, // duration
-    new BookingStatus('pending'), // status
-    1, // serviceId
-    new BookingDate(new Date()), // date
-    new BookingTime(new Date('1970-01-01T10:00:00')), // timeStart
-    'Notas de la reserva', // notes
-  );
+  const now = new Date('2024-01-01T10:00:00.000Z');
+  const mockBooking = {
+    id: 1,
+    customerId: 10,
+    commerceId: 1,
+    duration: 60,
+    userId: 5,
+    status: 'pending',
+    timeStart: now,
+    timeEnd: new Date(now.getTime() + 60 * 60 * 1000),
+    notes: 'Notas de la reserva',
+    totalPrice: 100,
+    bookingServices: [],
+  } as unknown as Booking;
 
   // Mock de Commerce
   const mockCommerce = new Commerce(
@@ -52,18 +60,39 @@ describe('NotificationService', () => {
   beforeEach(async () => {
     // Crear mocks
     mockNotificationProvider = {
-      sendEmail: jest.fn(),
+      sendEmail: jest.fn().mockResolvedValue({} as any),
       sendWhatsApp: jest.fn(),
     };
 
     mockCommerceRepository = {
       findCommerce: jest.fn().mockResolvedValue(mockCommerce),
+      findCommerceByName: jest.fn(),
+      findCommerceByEmail: jest.fn(),
+      findCommerceByPhone: jest.fn(),
       suspendCommerce: jest.fn(),
       reinstateCommerce: jest.fn(),
       createCommerce: jest.fn(),
       updateCommerce: jest.fn(),
-      findCommerceByName: jest.fn(),
+      updateLogo: jest.fn(),
+      findAllActive: jest.fn(),
+      deleteCommerce: jest.fn(),
     } as jest.Mocked<ICommerceRepository>;
+
+    mockBookingRepository = {
+      findOne: jest.fn().mockResolvedValue(mockBooking),
+    } as unknown as jest.Mocked<IBookingRepository>;
+
+    mockUserRepository = {
+      findUser: jest.fn().mockResolvedValue({ id: 5, name: 'Profesional Test' }),
+    } as unknown as jest.Mocked<IUserRepository>;
+
+    mockReminderRepository = {
+      create: jest.fn(),
+      updateSent: jest.fn(),
+      updateReminder: jest.fn(),
+      findMany: jest.fn(),
+      cancelReminder: jest.fn(),
+    } as jest.Mocked<IReminderRepository>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -77,20 +106,31 @@ describe('NotificationService', () => {
           useValue: mockCommerceRepository,
         },
         {
+          provide: BOOKING_REPOSITORY,
+          useValue: mockBookingRepository,
+        },
+        {
+          provide: USER_REPOSITORY,
+          useValue: mockUserRepository,
+        },
+        {
           provide: REMINDER_REPOSITORY,
-          useValue: {
-            create: jest.fn(),
-            update: jest.fn(),
-            findMany: jest.fn(),
-          } as jest.Mocked<IReminderRepository>,
+          useValue: mockReminderRepository,
         },
       ],
     }).compile();
 
     service = module.get<NotificationService>(NotificationService);
 
-    // Limpiar todos los mocks antes de cada test
+    // Limpiar todos los mocks antes de cada test y restaurar implementaciones base
     jest.clearAllMocks();
+    mockNotificationProvider.sendEmail.mockResolvedValue({} as any);
+    mockCommerceRepository.findCommerce.mockResolvedValue(mockCommerce);
+    mockBookingRepository.findOne.mockResolvedValue(mockBooking);
+    mockUserRepository.findUser.mockResolvedValue({
+      id: 5,
+      name: 'Profesional Test',
+    } as any);
   });
 
   it('debería estar definido', () => {
@@ -147,9 +187,11 @@ describe('NotificationService', () => {
         commerceId: mockBooking.commerceId,
       });
       expect(mockNotificationProvider.sendEmail).toHaveBeenCalledWith(
-        mockCommerce.email,
-        'Nueva reserva',
-        expect.stringContaining('Se ha creado una reserva'),
+        expect.objectContaining({
+          to: mockCommerce.email,
+          subject: 'Nueva reserva',
+          text: expect.stringContaining('¡Tu agenda tiene una nueva reserva!'),
+        }),
       );
     });
 
@@ -167,9 +209,11 @@ describe('NotificationService', () => {
         commerceId: mockBooking.commerceId,
       });
       expect(mockNotificationProvider.sendEmail).toHaveBeenCalledWith(
-        mockCommerce.email,
-        'Reserva cancelada',
-        expect.stringContaining('Se ha cancelado una reserva'),
+        expect.objectContaining({
+          to: mockCommerce.email,
+          subject: 'Reserva cancelada',
+          text: expect.stringContaining('Una reserva ha sido cancelada.'),
+        }),
       );
     });
 
@@ -188,9 +232,11 @@ describe('NotificationService', () => {
         commerceId: mockBooking.commerceId,
       });
       expect(mockNotificationProvider.sendEmail).toHaveBeenCalledWith(
-        mockCommerce.email,
-        'Reserva reprogramada',
-        expect.stringContaining('Se ha reprogramado una reserva'),
+        expect.objectContaining({
+          to: mockCommerce.email,
+          subject: 'Reserva reprogramada',
+          text: expect.stringContaining('Una reserva ha sido reprogramada.'),
+        }),
       );
     });
 
@@ -200,6 +246,34 @@ describe('NotificationService', () => {
       await expect(service.notifyBookingCreated(mockBooking)).rejects.toThrow(
         'Commerce not found',
       );
+    });
+
+    it('debería enviar recordatorio con HTML y texto plano', async () => {
+      const reminder = new ReminderDTO(
+        10,
+        mockBooking.id,
+        mockCommerce.id,
+        new Date('2024-02-01T09:00:00.000Z'),
+        'email',
+        'Cliente Demo',
+        'cliente@example.com',
+        '123456789',
+        mockCommerce.name,
+        'Dirección Demo 123',
+        'https://example.com/cancel',
+      );
+
+      await service.notifyBookingReminder(reminder);
+
+      expect(mockNotificationProvider.sendEmail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: 'cliente@example.com',
+          subject: 'Recordatorio de reserva',
+          text: expect.stringContaining('Cliente Demo'),
+          html: expect.stringContaining('<!DOCTYPE html>'),
+        }),
+      );
+      expect(mockReminderRepository.updateSent).toHaveBeenCalledWith(reminder.id);
     });
   });
 

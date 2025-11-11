@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RemindersService } from '../reminders.service';
+import { RemindersService } from '@/domain/services/reminders/reminders.service';
 import { NotificationService } from '@/domain/services/notifications/notifications.service';
 import { IReminderRepository } from '@/domain/repositories/reminder.repository';
-import { ReminderDTO } from '../reminder.dto';
+import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';
 import { REMINDER_REPOSITORY } from '@/application/providers';
 
 describe('RemindersService', () => {
@@ -20,6 +20,8 @@ describe('RemindersService', () => {
 
   const mockReminderDTO = new ReminderDTO(
     1,
+    101,
+    201,
     new Date('2023-12-25T10:00:00.000Z'),
     'email',
     'Juan Pérez',
@@ -42,8 +44,10 @@ describe('RemindersService', () => {
 
     mockReminderRepository = {
       create: jest.fn(),
-      update: jest.fn(),
+      updateSent: jest.fn(),
+      updateReminder: jest.fn(),
       findMany: jest.fn(),
+      cancelReminder: jest.fn(),
     } as jest.Mocked<IReminderRepository>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -101,6 +105,8 @@ describe('RemindersService', () => {
         mockReminderDTO,
         new ReminderDTO(
           2,
+          102,
+          201,
           new Date('2023-12-25T11:00:00.000Z'),
           'email',
           'María García',

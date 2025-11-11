@@ -2,7 +2,10 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
 import { RESEND_PROVIDER } from '@/application/providers';
-import { INotificationProvider } from '@/domain/services/notifications/notification-provider.interface';
+import {
+  EmailPayload,
+  INotificationProvider,
+} from '@/domain/services/notifications/notification-provider.interface';
 
 @Injectable()
 export class ResendNotificationProvider implements INotificationProvider {
@@ -10,17 +13,29 @@ export class ResendNotificationProvider implements INotificationProvider {
 
   constructor(@Inject(RESEND_PROVIDER) private readonly resend: Resend) {}
 
-  async sendEmail(a: string, subject: string, body: string) {
-    const to = 'delivered@resend.dev';
+  async sendEmail({ to, subject, text, html }: EmailPayload) {
     const from = 'onboarding@resend.dev';
+
+    if (!html && !text) {
+      throw new Error('Email payload must include html or text content');
+    }
+
     try {
-      const result = await this.resend.emails.send({
+      const emailPayload: Record<string, unknown> = {
         from,
         to,
         subject,
-        html: `<p>${body}</p>`,
-        text: body,
-      });
+      };
+
+      if (html) emailPayload.html = html;
+      if (text) emailPayload.text = text;
+      if (!emailPayload.html && text) {
+        emailPayload.html = `<p>${text}</p>`;
+      }
+
+      const result = await this.resend.emails.send(
+        emailPayload as unknown as Parameters<Resend['emails']['send']>[0],
+      );
       this.logger.log(`Email sent: ${subject} → ${to}`);
       return result;
     } catch (error: unknown) {
