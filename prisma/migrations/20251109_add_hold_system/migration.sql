@@ -13,13 +13,11 @@ CREATE INDEX IF NOT EXISTS "bookings_expiresAt_idx" ON "bookings"("expiresAt");
 
 -- 4. Update exclusion constraint to include HOLD status
 -- This ensures that HOLD reservations also prevent overlapping bookings
-ALTER TABLE "bookings" DROP CONSTRAINT IF EXISTS "unique_user_booking_range";
-
-ALTER TABLE "bookings" ADD CONSTRAINT "unique_user_booking_range" 
-  EXCLUDE USING GIST ("userId" WITH =, time_range WITH &&) 
-  WHERE (status IN ('HOLD', 'PENDING', 'CONFIRMED', 'RESCHEDULED'));
+-- NOTA: el constraint se actualizará en una migración posterior para evitar
+-- el error de transacción al usar valores nuevos del enum en la misma transacción.
 
 -- Comments for documentation
 COMMENT ON COLUMN "bookings"."expiresAt" IS 'Expiration timestamp for HOLD status bookings. NULL for permanent bookings.';
 COMMENT ON INDEX "bookings_expiresAt_idx" IS 'Index for efficient cleanup of expired hold bookings by cron job.';
+
 
