@@ -54,8 +54,7 @@ export class WorkingPatternValidator {
       );
     }
 
-    const userPatterns =
-      await this.userWorkingPatternRepository.findUserWorkingPattern({
+    const userPatterns = await this.userWorkingPatternRepository.findUserWorkingPattern({
         userId,
       });
 

@@ -31,6 +31,7 @@ export class BookingHoldController {
     private readonly confirmHoldUseCase: ConfirmHold,
   ) {}
 
+  //*==================================== CREATE HOLD ====================================
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -73,6 +74,7 @@ export class BookingHoldController {
     return this.createHoldUseCase.execute(dto);
   }
 
+  //*==================================== CONFIRM HOLD ====================================
   @Post(':id/confirm')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
