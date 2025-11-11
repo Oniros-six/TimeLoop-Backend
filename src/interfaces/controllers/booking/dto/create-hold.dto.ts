@@ -69,5 +69,16 @@ export class CreateHoldDto {
   @IsString()
   @MaxLength(500)
   notes?: string;
+
+  @ApiProperty({
+    description: 'Clave de idempotencia opcional para evitar duplicados en prereservas',
+    required: false,
+    example: 'hold-1234-abc',
+    maxLength: 255,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  idempotencyKey?: string;
 }
 

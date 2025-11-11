@@ -1,9 +1,11 @@
 import {
+  BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
   USER_REPOSITORY,
 } from '@/application/providers';
 import { Booking } from '@/domain/entities/booking.entity';
 import { BookingService } from '@/domain/entities/bookingService.entity';
+import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
 import { IUserRepository } from '@/domain/repositories/user.repository';
 import { ensureNotPast } from '@/domain/value-objects/booking/validations';
@@ -12,18 +14,7 @@ import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { Prisma } from '@prisma/client';
 import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
-
-/**
- * DTO para crear un hold temporal
- */
-export class CreateHoldDto {
-  customerId: number;
-  commerceId: number;
-  userId: number;
-  serviceIds: number[];
-  timeStart: Date;
-  notes?: string;
-}
+import { CreateHoldDto } from '@/interfaces/controllers/booking/dto/create-hold.dto';
 
 /**
  * Use Case: Crear un "hold" temporal de 15 minutos
@@ -48,6 +39,9 @@ export class CreateHold {
   private readonly HOLD_EXPIRATION_MINUTES = 15;
 
   constructor(
+    @Inject(BOOKING_REPOSITORY)
+    private readonly bookingRepository: IBookingRepository,
+
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
 
@@ -59,6 +53,25 @@ export class CreateHold {
   ) {}
 
   async execute(data: CreateHoldDto) {
+    //* 0) Verificar idempotencia (si la prereserva ya existe, reutilizarla)
+    if (data.idempotencyKey) {
+      const existingBooking = await this.bookingRepository.findByIdempotencyKey(
+        data.idempotencyKey,
+      );
+
+      if (existingBooking) {
+        const message = existingBooking.status === BookingStatus.HOLD
+          ? 'La prereserva ya estaba registrada. Puedes continuar con el pago.'
+          : 'Esta solicitud ya fue procesada previamente.';
+
+        return {
+          message,
+          statusCode: HttpStatus.OK,
+          data: existingBooking,
+        };
+      }
+    }
+
     //* 1) Validación de fecha y hora
     const validatedTimeStart = ensureNotPast(data.timeStart);
 
@@ -123,9 +136,10 @@ export class CreateHold {
             timeEnd: booking.timeEnd,
             duration: booking.duration,
             totalPrice: booking.totalPrice,
-            status: BookingStatus.HOLD, // ← Status HOLD
+            status: BookingStatus.HOLD,
             notes: booking.notes,
-            expiresAt: expiresAt, // ← Expira en 15 min
+            expiresAt: expiresAt,
+            idempotencyKey: data.idempotencyKey ?? null,
             bookingServices: {
               create: services.map((service) => ({
                 serviceId: service.id,
