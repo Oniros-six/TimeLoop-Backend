@@ -11,6 +11,7 @@ import { INotificationProvider } from '@/domain/services/notifications/notificat
 import {
   BOOKING_REPOSITORY,
   COMMERCE_REPOSITORY,
+  CUSTOMER_REPOSITORY,
   REMINDER_REPOSITORY,
   USER_REPOSITORY,
 } from '@/application/providers';
@@ -19,6 +20,10 @@ import { IReminderRepository } from '@/domain/repositories/reminder.repository';
 import { ReminderDTO } from '@/domain/services/reminders/reminder.dto';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { IUserRepository } from '@/domain/repositories/user.repository';
+import { ICustomerRepository } from '@/domain/repositories/customer.repository';
+import { Customer } from '@/domain/entities/customer.entity';
+import { User } from '@/domain/entities/user.entity';
+import { Commerce } from '@/domain/entities/commerce.entity';
 
 export const BOOKING_EVENTS = {
   CREATED: 'booking.created',
@@ -46,18 +51,37 @@ export class NotificationService {
     private readonly provider: INotificationProvider,
     @Inject(COMMERCE_REPOSITORY)
     private readonly commerceRepository: ICommerceRepository,
+    @Inject(CUSTOMER_REPOSITORY)
+    private readonly customerRepository: ICustomerRepository,
     @Inject(REMINDER_REPOSITORY)
     private readonly reminderRepository: IReminderRepository,
     @Inject(BOOKING_REPOSITORY)
     private readonly bookingRepository: IBookingRepository,
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-  ) {}
+  ) { }
 
   @OnEvent(BOOKING_EVENTS.CREATED)
   async handleBookingCreated(event: BookingCreatedEvent) {
     try {
-      await this.notifyBookingCreated(event.booking);
+      const commerce = await this.commerceRepository.findCommerce({
+        commerceId: event.booking.commerceId,
+      });
+      if (!commerce) throw new Error('Commerce not found');
+
+      const user = await this.userRepository.findUser({
+        userId: event.booking.userId,
+      });
+      if (!user) throw new Error('User not found');
+
+      const customer = await this.customerRepository.findCustomer({
+        id: event.booking.customerId,
+      });
+      if (!customer) throw new Error('Customer not found');
+
+      await this.notifyBookingCreatedCommerce(customer, user, commerce, event.booking);
+      await this.notifyBookingCreatedUser(customer, user, commerce, event.booking);
+      await this.notifyBookingCreatedCustomer(customer, user, commerce, event.booking);
     } catch (err: unknown) {
       this.logError(err, event.booking.id, 'BookingCreatedEvent');
     }
@@ -98,30 +122,93 @@ export class NotificationService {
     );
   }
 
-  async notifyBookingCreated(booking: Booking): Promise<void> {
+  //*==================================== NOTIFY BOOKING CREATED COMMERCE ====================================
+  async notifyBookingCreatedCommerce(customer: Customer, user: User, commerce: Commerce, booking: Booking): Promise<void> {
     this.logger.log(`Notifying booking created: ${booking.id}`);
-    const commerce = await this.commerceRepository.findCommerce({
-      commerceId: booking.commerceId,
-    });
-    if (!commerce) throw new Error('Commerce not found');
 
     const formattedStart = this.formatDateTime(booking.timeStart);
 
-    const message = [
-      '¡Tu agenda tiene una nueva reserva! ✨',
-      `• Fecha y hora: ${formattedStart}`,
-      '• Estado: confirmada',
-      '',
-      'Muy pronto podrás ajustar la cita desde el botón "Reprogramar" en tu panel.',
-    ].join('\n');
+    const html = this.buildBookingEventHtml({
+      title: 'Nueva reserva confirmada',
+      intro: '¡Tu agenda tiene una nueva reserva! ✨',
+      items: [
+        { label: 'Fecha y hora', value: formattedStart },
+        { label: 'Estado', value: 'Confirmada' },
+        { label: 'Cliente', value: customer.name },
+        { label: 'Profesional', value: user.name },
+        { label: 'Tiempo de la cita', value: `${booking.duration} minutos` },
+        { label: 'Precio', value: `$${booking.totalPrice}` },
+        { label: 'Notas', value: booking.notes },
+      ],
+      footer: 'Puedes ver la reserva en tu panel de control.',
+    });
 
     await this.provider.sendEmail({
       to: commerce.email,
       subject: 'Nueva reserva',
-      text: message,
+      html,
+    });
+  }
+  //*==================================== NOTIFY BOOKING CREATED USER ====================================
+  async notifyBookingCreatedUser(customer: Customer, user: User, commerce: Commerce, booking: Booking): Promise<void> {
+    this.logger.log(`Notifying booking created: ${booking.id}`);
+
+    const formattedStart = this.formatDateTime(booking.timeStart);
+
+    const html = this.buildBookingEventHtml({
+      title: 'Nueva reserva confirmada',
+      intro: '¡Tu agenda tiene una nueva reserva! ✨',
+      items: [
+        { label: 'Fecha y hora', value: formattedStart },
+        { label: 'Estado', value: 'Confirmada' },
+        { label: 'Cliente', value: customer.name },
+        { label: 'Tiempo de la cita', value: `${booking.duration} minutos` },
+        { label: 'Precio', value: `$${booking.totalPrice}` },
+        { label: 'Notas', value: booking.notes },
+      ],
+      footer: 'Puedes ver la reserva en tu panel de control.',
+    });
+
+    await this.provider.sendEmail({
+      to: user.email,
+      subject: 'Nueva reserva',
+      html,
     });
   }
 
+  //*==================================== NOTIFY BOOKING CREATED CUSTOMER ====================================
+  async notifyBookingCreatedCustomer(customer: Customer, user: User, commerce: Commerce, booking: Booking): Promise<void> {
+    this.logger.log(`Notifying booking created: ${booking.id}`);
+
+    const formattedStart = this.formatDateTime(booking.timeStart);
+
+    const html = this.buildBookingEventHtml({
+      title: 'Detalles de tu reserva',
+      intro: '¡Tu reserva ha sido creada con éxito! ✨',
+      items: [
+        { label: 'Comercio', value: commerce.name },
+        { label: 'Profesional', value: user.name },
+        { label: 'Dirección', value: commerce.address },
+        { label: 'Fecha y hora', value: formattedStart },
+        { label: 'Tiempo de la cita', value: `${booking.duration} minutos` },
+        { label: 'Precio', value: `$${booking.totalPrice}` },
+        { label: 'Notas', value: booking.notes },
+      ],
+      footer: `
+        <p style="margin-top: 20px;">
+          <a href="${process.env.FRONTEND_URL}/booking/${booking.id}" style="color: #007bff;">Ver reserva</a>
+        </p>
+      `,
+    });
+
+    await this.provider.sendEmail({
+      to: customer.email,
+      subject: 'Detalles de tu reserva',
+      html,
+    });
+  }
+
+  //*==================================== NOTIFY BOOKING CANCELED ====================================
   async notifyBookingCanceled(booking: Booking): Promise<void> {
     this.logger.log(`Notifying booking canceled: ${booking.id}`);
     const commerce = await this.commerceRepository.findCommerce({
@@ -129,22 +216,41 @@ export class NotificationService {
     });
     if (!commerce) throw new Error('Commerce not found');
 
+    const user = await this.userRepository.findUser({
+      userId: booking.userId,
+    });
+    if (!user) throw new Error('User not found');
+
+    const customer = await this.customerRepository.findCustomer({
+      id: booking.customerId,
+    });
+    if (!customer) throw new Error('Customer not found');
+
     const formattedStart = this.formatDateTime(booking.timeStart);
 
-    const message = [
-      'Una reserva ha sido cancelada.',
-      `• Fecha y hora original: ${formattedStart}`,
-      '',
-      'Recuerda liberar el espacio para que otros clientes puedan reservarlo.',
-    ].join('\n');
+    const html = this.buildBookingEventHtml({
+      title: 'Reserva cancelada',
+      intro: 'Una reserva ha sido cancelada.',
+      items: [
+        { label: 'Fecha y hora', value: formattedStart },
+        { label: 'Estado', value: 'Cancelada' },
+        { label: 'Cliente', value: customer.name },
+        { label: 'Profesional', value: user.name },
+        { label: 'Tiempo de la cita', value: `${booking.duration} minutos` },
+        { label: 'Precio', value: `$${booking.totalPrice}` },
+        { label: 'Notas', value: booking.notes },
+      ],
+      footer: '',
+    });
 
     await this.provider.sendEmail({
       to: commerce.email,
       subject: 'Reserva cancelada',
-      text: message,
+      html,
     });
   }
 
+  //*==================================== NOTIFY BOOKING RESCHEDULED ====================================
   async notifyBookingRescheduled(
     booking: Booking,
     newDate: Date,
@@ -157,22 +263,42 @@ export class NotificationService {
     });
     if (!commerce) throw new Error('Commerce not found');
 
+    const user = await this.userRepository.findUser({
+      userId: booking.userId,
+    });
+    if (!user) throw new Error('User not found');
+
+    const customer = await this.customerRepository.findCustomer({
+      id: booking.customerId,
+    });
+    if (!customer) throw new Error('Customer not found');
+
     const formattedStart = this.formatDateTime(newDate);
 
-    const message = [
-      'Una reserva ha sido reprogramada.',
-      `• Nueva fecha y hora: ${formattedStart}`,
-      '',
-      'Verifica que la agenda quede actualizada para evitar solapamientos.',
-    ].join('\n');
+    const html = this.buildBookingEventHtml({
+      title: 'Reserva reprogramada',
+      intro: 'Una reserva ha sido reprogramada.',
+      items: [
+        { label: 'Nueva fecha y hora', value: formattedStart },
+        { label: 'Estado', value: 'Reprogramada' },
+        { label: 'Cliente', value: customer.name },
+        { label: 'Profesional', value: user.name },
+        { label: 'Tiempo de la cita', value: `${booking.duration} minutos` },
+        { label: 'Precio', value: `$${booking.totalPrice}` },
+        { label: 'Notas', value: booking.notes },
+      ],
+      footer:
+        'Tu agenda a sido actualizada con éxito.',
+    });
 
     await this.provider.sendEmail({
       to: commerce.email,
       subject: 'Reserva reprogramada',
-      text: message,
+      html,
     });
   }
 
+  //*==================================== NOTIFY BOOKING REMINDER ====================================
   async notifyBookingReminder(data: ReminderDTO) {
     if (data.channel !== 'email') return;
 
@@ -208,20 +334,9 @@ export class NotificationService {
       cancelUrl: data.cancelUrl,
     });
 
-    const text = this.buildReminderText({
-      commerceName: commerce.name,
-      commerceAddress: data.commerceAddress,
-      customerName: data.customerName,
-      professionalName: user?.name,
-      date: formattedDate,
-      time: formattedTime,
-      cancelUrl: data.cancelUrl,
-    });
-
     const result = await this.provider.sendEmail({
       to: data.customerEmail,
       subject: 'Recordatorio de reserva',
-      text,
       html,
     });
 
@@ -252,6 +367,48 @@ export class NotificationService {
     return new Intl.DateTimeFormat('es-ES', {
       timeStyle: 'short',
     }).format(date);
+  }
+
+  private buildBookingEventHtml({
+    title,
+    intro,
+    items,
+    footer,
+  }: {
+    title: string;
+    intro: string;
+    items: Array<{ label: string; value: string }>;
+    footer?: string;
+  }): string {
+    const itemsHtml = items
+      .map(
+        ({ label, value }) =>
+          `<li style="margin-bottom: 6px;"><strong>${label}:</strong> ${value}</li>`,
+      )
+      .join('');
+
+    const footerSection = footer
+      ? `<p style="margin-top: 20px;">${footer}</p>`
+      : '';
+
+    return `<!DOCTYPE html>
+              <html lang="es">
+                <head>
+                  <meta charset="UTF-8" />
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                  <title>${title}</title>
+                </head>
+                <body style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
+                  <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h2 style="text-align: center; color: #333;">${title}</h2>
+                    <p>${intro}</p>
+                    <ul style="list-style: none; padding-left: 0;">
+                      ${itemsHtml}
+                    </ul>
+                    ${footerSection}
+                  </div>
+                </body>
+              </html>`;
   }
 
   private buildReminderHtml({
@@ -291,71 +448,36 @@ export class NotificationService {
       </p>`;
 
     return `<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recordatorio de turno</title>
-  </head>
-  <body style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
-    <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-      ${logoSection}
+              <html lang="es">
+                <head>
+                  <meta charset="UTF-8" />
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                  <title>Recordatorio de turno</title>
+                </head>
+                <body style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
+                  <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    ${logoSection}
 
-      <h2 style="text-align: center; color: #333;">Recordatorio: ¡Tienes una reserva próximamente!</h2>
+                    <h2 style="text-align: center; color: #333;">Recordatorio: ¡Tienes una reserva próximamente!</h2>
 
-      <p>¡Hola ${customerName}! Solo queríamos recordarte que tienes un turno próximamente. Aquí están los detalles:</p>
+                    <p>¡Hola ${customerName}! Solo queríamos recordarte que tienes un turno próximamente. Aquí están los detalles:</p>
 
-      <ul style="list-style: none; padding-left: 0;">
-        <li><strong>Comercio:</strong> ${commerceName}</li>
-        <li><strong>Profesional:</strong> ${professional}</li>
-        <li><strong>Día:</strong> ${date}</li>
-        <li><strong>Hora:</strong> ${time}</li>
-        <li><strong>Dirección:</strong> ${commerceAddress}</li>
-      </ul>
+                    <ul style="list-style: none; padding-left: 0;">
+                      <li><strong>Comercio:</strong> ${commerceName}</li>
+                      <li><strong>Profesional:</strong> ${professional}</li>
+                      <li><strong>Día:</strong> ${date}</li>
+                      <li><strong>Hora:</strong> ${time}</li>
+                      <li><strong>Dirección:</strong> ${commerceAddress}</li>
+                    </ul>
 
-      <p style="margin-top: 20px;">Muchas gracias por elegirnos.<br />
-      Te estaremos esperando.</p>
+                    <p style="margin-top: 20px;">Muchas gracias por elegirnos.<br />
+                    Te estaremos esperando.</p>
 
-      <p style="font-weight: bold; margin-top: 10px;">Equipo ${commerceName}</p>
+                    <p style="font-weight: bold; margin-top: 10px;">Equipo ${commerceName}</p>
 
-      ${actionSection}
-    </div>
-  </body>
-</html>`;
-  }
-
-  private buildReminderText({
-    commerceName,
-    commerceAddress,
-    customerName,
-    professionalName,
-    date,
-    time,
-    cancelUrl,
-  }: {
-    commerceName: string;
-    commerceAddress: string;
-    customerName: string;
-    professionalName?: string;
-    date: string;
-    time: string;
-    cancelUrl?: string;
-  }): string {
-    const professional = professionalName ?? `Equipo ${commerceName}`;
-    const actionMessage = cancelUrl
-      ? `Si deseas cancelar o reprogramar tu turno, visita: ${cancelUrl}`
-      : `Si deseas cancelar o reprogramar tu turno, contáctanos directamente.`;
-
-    return [
-      `Hola ${customerName}, te recordamos que tienes una reserva próximamente.`,
-      '',
-      `Comercio: ${commerceName}`,
-      `Profesional: ${professional}`,
-      `Día: ${date}`,
-      `Hora: ${time}`,
-      `Dirección: ${commerceAddress}`,
-      '',
-      actionMessage,
-    ].join('\n');
+                    ${actionSection}
+                  </div>
+                </body>
+              </html>`;
   }
 }

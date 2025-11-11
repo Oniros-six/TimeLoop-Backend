@@ -13,11 +13,11 @@ export class ResendNotificationProvider implements INotificationProvider {
 
   constructor(@Inject(RESEND_PROVIDER) private readonly resend: Resend) {}
 
-  async sendEmail({ to, subject, text, html }: EmailPayload) {
+  async sendEmail({ to, subject, html }: EmailPayload) {
     const from = 'onboarding@resend.dev';
 
-    if (!html && !text) {
-      throw new Error('Email payload must include html or text content');
+    if (!html) {
+      throw new Error('Email payload must include html content');
     }
 
     try {
@@ -28,10 +28,6 @@ export class ResendNotificationProvider implements INotificationProvider {
       };
 
       if (html) emailPayload.html = html;
-      if (text) emailPayload.text = text;
-      if (!emailPayload.html && text) {
-        emailPayload.html = `<p>${text}</p>`;
-      }
 
       const result = await this.resend.emails.send(
         emailPayload as unknown as Parameters<Resend['emails']['send']>[0],
