@@ -174,19 +174,27 @@ export class CreateHold {
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
       });
     } catch (error) {
-      // Handle exclusion constraint violation (horario ocupado)
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2034' || error.message?.includes('unique_user_booking_range')) {
-          this.logger.warn('Horario no disponible (ocupado o en hold)', {
-            userId: data.userId,
-            timeStart: data.timeStart,
-            timeEnd: booking.timeEnd,
-          });
-          throw new HttpException(
-            'El horario ya no está disponible',
-            HttpStatus.CONFLICT,
-          );
-        }
+      const isOverlapError =
+        (error instanceof Prisma.PrismaClientKnownRequestError &&
+          (error.code === 'P2034' || error.message?.includes('unique_user_booking_range'))) ||
+        (error instanceof Prisma.PrismaClientUnknownRequestError &&
+          error.message?.includes('unique_user_booking_range')) ||
+        (typeof error === 'object' &&
+          error !== null &&
+          'message' in error &&
+          typeof error.message === 'string' &&
+          error.message.includes('unique_user_booking_range'));
+
+      if (isOverlapError) {
+        this.logger.warn('Horario no disponible (ocupado o en prereserva)', {
+          userId: data.userId,
+          timeStart: data.timeStart,
+          timeEnd: booking.timeEnd,
+        });
+        throw new HttpException(
+          'El horario ya no está disponible. Intenta con otro horario.',
+          HttpStatus.CONFLICT,
+        );
       }
 
       this.logger.error('Error creating hold', error);
