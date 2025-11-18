@@ -9,7 +9,7 @@ import { UpdateCommerce } from '@/application/use-cases/commerce/update.use-case
 import { SuspendCommerce } from '@/application/use-cases/commerce/suspend.use-case';
 import { ReinstateCommerce } from '@/application/use-cases/commerce/reinstate.use-case';
 import { UploadCommerceLogo } from '@/application/use-cases/commerce/upload-logo.use-case';
-
+import { FindCommerceByName } from '@/application/use-cases/commerce/findByName.use-case';
 // Tokens
 import { COMMERCE_REPOSITORY, CLOUDINARY_REPOSITORY } from '@/application/providers';
 
@@ -37,6 +37,7 @@ import { CloudinaryService } from '@/infrastructure/cloudinary/cloudinary.servic
     SuspendCommerce,
     ReinstateCommerce,
     UploadCommerceLogo,
+    FindCommerceByName,
   ],
 })
 export class CommerceModule {}

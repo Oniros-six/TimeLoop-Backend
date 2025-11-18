@@ -12,6 +12,7 @@ export class PrismaCommerceRepository implements ICommerceRepository {
   private toDomain(commerce: {
     id: number;
     name: string;
+    uniqueName: string;
     email: string;
     phone: string;
     address: string;
@@ -22,6 +23,7 @@ export class PrismaCommerceRepository implements ICommerceRepository {
     return new DomainClient(
       commerce.id,
       commerce.name,
+      commerce.uniqueName,
       commerce.email,
       commerce.phone,
       commerce.address,
@@ -57,7 +59,7 @@ export class PrismaCommerceRepository implements ICommerceRepository {
     name: string;
   }): Promise<DomainClient | null> {
     const result = await this.prisma.commerce.findFirst({
-      where: { name: data.name },
+      where: { uniqueName: data.name },
     });
 
     if (!result) return null;
@@ -117,6 +119,10 @@ export class PrismaCommerceRepository implements ICommerceRepository {
       return await tx.commerce.create({
         data: {
           name: data.name,
+          uniqueName: `${data.name
+            .toLowerCase()
+            .replace(/[´]/g, '')
+            .replace(/ /g, '-')}-${Math.floor(100 + Math.random() * 900)}`,
           email: data.email,
           phone: data.phone,
           address: data.address,

@@ -130,6 +130,7 @@ model Commerce {
   id               Int              @id @default(autoincrement())
   logo             String           @default("")
   name             String
+  uniqueName       String           @unique
   email            String           @unique
   phone            String           @unique
   address          String

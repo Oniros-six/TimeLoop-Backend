@@ -16,14 +16,6 @@ export class CreateCommerce {
   ) { }
 
   async execute(data: CreateCommerceDto) {
-    // Validacion de name existente
-    if (await this.commerceRepository.findCommerceByName({ name: data.name })) {
-      throw new HttpException(
-        'Ya existe un comercio con este nombre.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     // Validacion de email existente
     if (
       await this.commerceRepository.findCommerceByEmail({ email: data.email })

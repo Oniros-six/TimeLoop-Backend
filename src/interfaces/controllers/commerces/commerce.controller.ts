@@ -31,6 +31,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
 import { Roles } from '@/infrastructure/auth/roles.decorator';
 import { RolesGuard } from '@/infrastructure/auth/roles.guard';
+import { FindCommerceByName } from '@/application/use-cases/commerce/findByName.use-case';
 
 @ApiTags('Commerces')
 @Controller('commerce')
@@ -38,6 +39,7 @@ export class CommerceController {
   constructor(
     private readonly createCommerceUseCase: CreateCommerce,
     private readonly findCommerceUseCase: FindCommerce,
+    private readonly findByUniqueNameUseCase: FindCommerceByName,
     private readonly updateCommerceUseCase: UpdateCommerce,
     private readonly suspendCommerceUseCase: SuspendCommerce,
     private readonly reinstateCommerceUseCase: ReinstateCommerce,
@@ -66,6 +68,20 @@ export class CommerceController {
   @Get(':id')
   find(@Param('id', ParseIntPipe) id: number) {
     return this.findCommerceUseCase.execute(id);
+  }
+
+  //*==================================== FIND BY UNIQUE NAME ====================================
+  @ApiOperation({ summary: 'Obtener un commerce por su ID' })
+  @ApiParam({
+    name: 'uniqueName',
+    type: String,
+    required: true,
+    description: 'Nombre único del comercio',
+  })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Get('/find-by-name/:name')
+  findByName(@Param('uniqueName') uniqueName: string) {
+    return this.findByUniqueNameUseCase.execute(uniqueName);
   }
 
   //*==================================== UPDATE ====================================

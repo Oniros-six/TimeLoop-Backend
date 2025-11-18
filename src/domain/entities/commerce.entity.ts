@@ -4,6 +4,7 @@ export class Commerce {
   constructor(
     public readonly id: number,
     public name: string,
+    public uniqueName: string,
     public email: string,
     public phone: string,
     public address: string,
@@ -21,6 +22,7 @@ export class Commerce {
   static createCommerce(props: {
     id?: number;
     name: string;
+    uniqueName?: string;
     email: string;
     phone: string;
     address: string;
@@ -31,6 +33,7 @@ export class Commerce {
     return new Commerce(
       props.id ?? 0,
       normalizedName,
+      props.uniqueName ?? '',
       props.email,
       props.phone,
       props.address,
