@@ -35,6 +35,7 @@ import { StateUserDto } from './dto/state-user.dto';
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
 import { RolesGuard } from '@/infrastructure/auth/roles.guard';
 import { Roles } from '@/infrastructure/auth/roles.decorator';
+import { Public } from '@/infrastructure/auth/public.decorator';
 
 @ApiTags('Users')
 @UseGuards(AuthGuard)
@@ -95,6 +96,7 @@ export class UserController {
   }
 
   //*==================================== FIND ALL ====================================
+  @Public()
   @ApiOperation({
     summary: 'Obtener todos los usuarios de un comercio en base a su ID',
   })

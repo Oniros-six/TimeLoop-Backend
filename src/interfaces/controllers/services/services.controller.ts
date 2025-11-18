@@ -34,6 +34,7 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 import { DeleteServiceDto } from './dto/delete-service.dto';
 
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+import { Public } from '@/infrastructure/auth/public.decorator';
 
 @ApiTags('Services')
 @UseGuards(AuthGuard)
@@ -92,6 +93,7 @@ export class ServicesController {
 
   //*==================================== FIND ALL ====================================
   @ApiOperation({ summary: 'Obtener todos los servicios de un usuario' })
+  @Public()
   @ApiQuery({
     name: 'userId',
     type: Number,
