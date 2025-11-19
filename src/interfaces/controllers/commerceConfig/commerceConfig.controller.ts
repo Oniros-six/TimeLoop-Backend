@@ -21,6 +21,7 @@ import { UpdateCommerceConfigDto } from './dto/update-commerceConfig.dto';
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
 import { RolesGuard } from '@/infrastructure/auth/roles.guard';
 import { Roles } from '@/infrastructure/auth/roles.decorator';
+import { Public } from '@/infrastructure/auth/public.decorator';
 
 @ApiTags('Commerce Config')
 @UseGuards(AuthGuard)
@@ -51,6 +52,7 @@ export class CommerceConfigController {
     required: true,
     description: 'ID del comercio',
   })
+  @Public()
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get(':commerceId')
   find(@Param('commerceId', ParseIntPipe) commerceId: number) {
