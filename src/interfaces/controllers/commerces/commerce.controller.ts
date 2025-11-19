@@ -79,7 +79,7 @@ export class CommerceController {
     description: 'Nombre único del comercio',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Get('/find-by-name/:name')
+  @Get('/find-by-name/:uniqueName')
   findByName(@Param('uniqueName') uniqueName: string) {
     return this.findByUniqueNameUseCase.execute(uniqueName);
   }
