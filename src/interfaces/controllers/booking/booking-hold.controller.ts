@@ -19,10 +19,10 @@ import { ConfirmHold } from '@/application/use-cases/booking/confirm-hold.use-ca
  * Controlador para operaciones de Hold (prereservas temporales)
  * 
  * FLUJO TÍPICO:
- * 1. POST /booking/hold → Crea prereserva de 15 min
- * 2. Cliente completa proceso de pago
+ * 1. POST /booking/hold → Crea prereserva de 5 min
+ * 2. Cliente completa proceso de checkout
  * 3. POST /booking/hold/:id/confirm → Convierte a PENDING
- * 4. Si no confirma en 15 min → Cron elimina automáticamente
+ * 4. Si no confirma en 5 min → Cron elimina automáticamente
  * 
  * NOTA: Si necesitas autenticación, agrega @UseGuards() cuando implementes el guard.
  */
@@ -38,13 +38,13 @@ export class BookingHoldController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: 'Crear prereserva temporal (15 minutos)',
+    summary: 'Crear prereserva temporal (5 minutos)',
     description: `
-      Crea una prereserva temporal que bloquea el horario por 15 minutos.
+      Crea una prereserva temporal que bloquea el horario por 5 minutos.
       
-      Durante estos 15 minutos:
+      Durante estos 5 minutos:
       - El horario NO estará disponible para otros usuarios
-      - El cliente puede completar el proceso de pago
+      - El cliente puede completar el proceso de checkout
       - Si no se confirma, un worker automático eliminará la prereserva
       
       Después de crear la prereserva, usar el endpoint /confirm para convertirla en reserva.
@@ -52,15 +52,15 @@ export class BookingHoldController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Prereserva creada exitosamente. Expira en 15 minutos.',
+    description: 'Prereserva creada exitosamente. Expira en 5 minutos.',
     schema: {
       example: {
-        message: 'Horario prereservado. Complete el pago en 15 minutos.',
+        message: 'Horario prereservado. Complete el checkout en 5 minutos.',
         statusCode: 201,
         data: {
           holdId: 123,
           expiresAt: '2024-11-09T15:45:00.000Z',
-          expiresInSeconds: 900,
+          expiresInSeconds: 300,
         },
       },
     },

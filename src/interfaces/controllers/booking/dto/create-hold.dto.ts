@@ -13,7 +13,7 @@ import {
 import { toUTC } from '@/domain/value-objects/booking/validations';
 
 /**
- * DTO para crear un hold temporal (prereserva de 15 minutos)
+ * DTO para crear un hold temporal (prereserva de 5 minutos)
  */
 export class CreateHoldDto {
   @ApiProperty({

@@ -12,7 +12,7 @@ import { AvailabilityUpdateEventDto } from '@/application/dto/availability-updat
  * 
  * PROPÓSITO:
  * Eliminar automáticamente los holds (prereservas) que han expirado
- * después de 15 minutos sin ser confirmados.
+ * después de 5 minutos sin ser confirmados.
  * 
  * FUNCIONAMIENTO:
  * - Se ejecuta cada 1 minuto (configurable)

@@ -125,7 +125,7 @@ export class CreateHold {
       timeEnd: booking.timeEnd,
     });
 
-    //* 5) Calcular expiración (15 minutos desde ahora)
+    //* 5) Calcular expiración (5 minutos desde ahora)
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + this.HOLD_EXPIRATION_MINUTES);
 
@@ -234,7 +234,7 @@ export class CreateHold {
     }
 
     return {
-      message: 'Horario prereservado. Complete el pago en 15 minutos.',
+      message: 'Horario prereservado. Complete el checkout en 5 minutos.',
       statusCode: HttpStatus.CREATED,
       data: {
         holdId: result.id,
