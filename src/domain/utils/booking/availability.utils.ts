@@ -14,6 +14,11 @@ export type TimeSlot = {
 /**
  * Genera slots de tiempo disponibles basándose en los patrones de trabajo
  * del comercio y usuario, excluyendo los slots ocupados por reservas existentes.
+ * 
+ * Optimizado para alto rendimiento mediante:
+ * - Ordenamiento único de reservas por tiempo
+ * - Filtrado de reservas por ventana antes de verificar solapamientos
+ * - Early exit en verificaciones de ocupación
  */
 export function generateAvailableSlots(params: {
   date: Date;
@@ -28,6 +33,12 @@ export function generateAvailableSlots(params: {
   const slots: TimeSlot[] = [];
   const slotInterval = 15; // Intervalo de 15 minutos entre slots
 
+  // Optimización: Ordenar reservas una sola vez por timeStart
+  // Esto permite usar early exit y filtrado más eficiente
+  const sortedBookings = [...existingBookings].sort(
+    (a, b) => a.timeStart.getTime() - b.timeStart.getTime(),
+  );
+
   // Obtener ventanas disponibles (intersección entre comercio y usuario)
   const availableWindows = getAvailableWindows(commercePattern, userPattern);
 
@@ -35,6 +46,14 @@ export function generateAvailableSlots(params: {
   for (const window of availableWindows) {
     const windowStart = timeStringToDate(date, window.start);
     const windowEnd = timeStringToDate(date, window.end);
+
+    // Optimización: Filtrar solo reservas relevantes para esta ventana
+    // Las reservas están ordenadas, así que podemos usar early exit
+    const relevantBookings = getRelevantBookingsForWindow(
+      sortedBookings,
+      windowStart,
+      windowEnd,
+    );
 
     // Generar slots cada 15 minutos dentro de la ventana
     let currentSlotStart = new Date(windowStart);
@@ -44,8 +63,14 @@ export function generateAvailableSlots(params: {
 
       // Verificar que el slot completo quepa en la ventana
       if (slotEnd <= windowEnd) {
-        // Verificar que el slot no esté ocupado
-        if (!isSlotOccupied(currentSlotStart, slotEnd, existingBookings)) {
+        // Verificar que el slot no esté ocupado (usando reservas filtradas)
+        if (
+          !isSlotOccupied(
+            currentSlotStart,
+            slotEnd,
+            relevantBookings,
+          )
+        ) {
           slots.push({
             start: new Date(currentSlotStart),
             end: new Date(slotEnd),
@@ -155,18 +180,112 @@ export function timeStringToDate(baseDate: Date, timeString: string): Date {
 
 /**
  * Verifica si un slot de tiempo está ocupado por alguna reserva existente.
- * Utiliza una verificación optimizada de solapamiento de intervalos.
+ * Versión optimizada que asume que las reservas están ordenadas por timeStart
+ * y ya fueron filtradas para la ventana relevante.
+ * 
+ * Utiliza early exit: si una reserva comienza después del slot, 
+ * todas las siguientes también lo harán (reservas ordenadas).
+ * 
+ * Dos intervalos se solapan si: start1 < end2 && start2 < end1
  */
-export function isSlotOccupied(
+function isSlotOccupied(
   slotStart: Date,
   slotEnd: Date,
-  existingBookings: Booking[],
+  sortedBookings: Booking[],
 ): boolean {
-  // Optimización: verificar solapamiento de forma más eficiente
-  // Dos intervalos se solapan si: start1 < end2 && start2 < end1
-  return existingBookings.some((booking) => {
-    return slotStart < booking.timeEnd && booking.timeStart < slotEnd;
-  });
+  const slotStartTime = slotStart.getTime();
+  const slotEndTime = slotEnd.getTime();
+
+  // Early exit: si no hay reservas, el slot está disponible
+  if (sortedBookings.length === 0) {
+    return false;
+  }
+
+  // Early exit: si la primera reserva empieza después del slot, no hay solapamiento
+  if (sortedBookings[0].timeStart.getTime() >= slotEndTime) {
+    return false;
+  }
+
+  // Early exit: si la última reserva termina antes del slot, no hay solapamiento
+  const lastBooking = sortedBookings[sortedBookings.length - 1];
+  if (lastBooking.timeEnd.getTime() <= slotStartTime) {
+    return false;
+  }
+
+  // Verificar solapamiento con early exit
+  // Como están ordenadas, podemos detenernos cuando encontramos una que empieza después del slot
+  for (const booking of sortedBookings) {
+    const bookingStartTime = booking.timeStart.getTime();
+    const bookingEndTime = booking.timeEnd.getTime();
+
+    // Early exit: si esta reserva empieza después del slot, las siguientes también
+    if (bookingStartTime >= slotEndTime) {
+      break;
+    }
+
+    // Verificar solapamiento: start1 < end2 && start2 < end1
+    if (slotStartTime < bookingEndTime && bookingStartTime < slotEndTime) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Filtra y retorna solo las reservas que podrían solaparse con la ventana especificada.
+ * Aprovecha que las reservas están ordenadas por timeStart para un filtrado eficiente.
+ * 
+ * Una reserva es relevante si:
+ * - Su tiempo de inicio es antes del final de la ventana, Y
+ * - Su tiempo de fin es después del inicio de la ventana
+ */
+function getRelevantBookingsForWindow(
+  sortedBookings: Booking[],
+  windowStart: Date,
+  windowEnd: Date,
+): Booking[] {
+  const windowStartTime = windowStart.getTime();
+  const windowEndTime = windowEnd.getTime();
+
+  // Early exit: si no hay reservas
+  if (sortedBookings.length === 0) {
+    return [];
+  }
+
+  // Early exit: si todas las reservas están fuera de la ventana
+  const firstBooking = sortedBookings[0];
+  const lastBooking = sortedBookings[sortedBookings.length - 1];
+
+  if (firstBooking.timeStart.getTime() >= windowEndTime) {
+    return []; // Todas las reservas empiezan después de la ventana
+  }
+
+  if (lastBooking.timeEnd.getTime() <= windowStartTime) {
+    return []; // Todas las reservas terminan antes de la ventana
+  }
+
+  // Filtrar reservas relevantes
+  // Como están ordenadas, podemos optimizar el proceso
+  const relevantBookings: Booking[] = [];
+
+  for (const booking of sortedBookings) {
+    const bookingStartTime = booking.timeStart.getTime();
+    const bookingEndTime = booking.timeEnd.getTime();
+
+    // Early exit: si esta reserva empieza después de la ventana, las siguientes también
+    if (bookingStartTime >= windowEndTime) {
+      break;
+    }
+
+    // Una reserva es relevante si se solapa con la ventana
+    // Dos intervalos se solapan si: start1 < end2 && start2 < end1
+    if (bookingStartTime < windowEndTime && windowStartTime < bookingEndTime) {
+      relevantBookings.push(booking);
+    }
+  }
+
+  return relevantBookings;
 }
 
 /**
