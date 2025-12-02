@@ -2,6 +2,7 @@ import {
   BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
   USER_REPOSITORY,
+  BOOKING_REALTIME_NOTIFIER,
 } from '@/application/providers';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
 import {
@@ -23,6 +24,8 @@ import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { Prisma } from '@prisma/client';
 import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
 import { BookingPersistenceService } from '@/application/services/booking/booking-persistence.service';
+import { BookingRealtimeNotifier } from '@/application/services/booking/booking-realtime-notifier.service';
+import { AvailabilityUpdateEventDto } from '@/application/dto/availability-update-event.dto';
 
 /**
  * ARCHITECTURAL DECISION RECORD (ADR):
@@ -55,6 +58,9 @@ export class CreateBooking {
 
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+
+    @Inject(BOOKING_REALTIME_NOTIFIER)
+    private readonly bookingRealtimeNotifier: BookingRealtimeNotifier,
 
     private readonly remindersService: RemindersService,
 
@@ -227,6 +233,26 @@ export class CreateBooking {
       );
     } catch (error) {
       this.logger.error('Failed to emit booking created event (non-critical)', {
+        bookingId: result.id,
+        error: error instanceof Error ? error.message : error,
+      });
+      // No lanzamos error, booking ya fue creado exitosamente
+    }
+
+    // 6.3) Emitir actualización en tiempo real (NO crítico)
+    try {
+      await this.bookingRealtimeNotifier.emitAvailabilityUpdate(
+        new AvailabilityUpdateEventDto({
+          bookingId: result.id,
+          status: result.status,
+          timeStart: result.timeStart,
+          timeEnd: result.timeEnd,
+          employeeId: result.userId,
+          commerceId: result.commerceId,
+        })
+      );
+    } catch (error) {
+      this.logger.error('Failed to emit realtime update (non-critical)', {
         bookingId: result.id,
         error: error instanceof Error ? error.message : error,
       });

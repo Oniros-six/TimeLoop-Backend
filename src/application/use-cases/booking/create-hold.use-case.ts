@@ -2,6 +2,7 @@ import {
   BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
   USER_REPOSITORY,
+  BOOKING_REALTIME_NOTIFIER,
 } from '@/application/providers';
 import { Booking } from '@/domain/entities/booking.entity';
 import { BookingService } from '@/domain/entities/bookingService.entity';
@@ -15,6 +16,8 @@ import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { Prisma } from '@prisma/client';
 import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
 import { CreateHoldDto } from '@/interfaces/controllers/booking/dto/create-hold.dto';
+import { BookingRealtimeNotifier } from '@/application/services/booking/booking-realtime-notifier.service';
+import { AvailabilityUpdateEventDto } from '@/application/dto/availability-update-event.dto';
 
 /**
  * Use Case: Crear un "hold" temporal de 15 minutos
@@ -47,6 +50,9 @@ export class CreateHold {
 
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+
+    @Inject(BOOKING_REALTIME_NOTIFIER)
+    private readonly bookingRealtimeNotifier: BookingRealtimeNotifier,
 
     private readonly prisma: PrismaService,
     private readonly workingPatternValidator: WorkingPatternValidator,
@@ -205,6 +211,26 @@ export class CreateHold {
     }
 
     this.logger.log(`Hold created: ${result.id}, expires at ${expiresAt.toISOString()}`);
+
+    //* 7) Emitir actualización en tiempo real (NO crítico)
+    try {
+      await this.bookingRealtimeNotifier.emitAvailabilityUpdate(
+        new AvailabilityUpdateEventDto({
+          bookingId: result.id,
+          status: result.status,
+          timeStart: result.timeStart,
+          timeEnd: result.timeEnd,
+          employeeId: result.userId,
+          commerceId: result.commerceId,
+        })
+      );
+    } catch (error) {
+      this.logger.error('Failed to emit realtime update (non-critical)', {
+        bookingId: result.id,
+        error: error instanceof Error ? error.message : error,
+      });
+      // No lanzamos error, hold ya fue creado exitosamente
+    }
 
     return {
       message: 'Horario prereservado. Complete el pago en 15 minutos.',

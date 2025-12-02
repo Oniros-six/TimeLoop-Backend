@@ -1,8 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
+import { BOOKING_REALTIME_NOTIFIER } from '@/application/providers';
+import { BookingRealtimeNotifier } from '@/application/services/booking/booking-realtime-notifier.service';
+import { AvailabilityUpdateEventDto } from '@/application/dto/availability-update-event.dto';
 
 /**
  * Servicio de Limpieza de Holds Expirados
@@ -26,7 +29,12 @@ export class HoldCleanupService {
   private readonly logger = new Logger(HoldCleanupService.name);
   private isRunning = false; // Evitar ejecuciones concurrentes
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    
+    @Inject(BOOKING_REALTIME_NOTIFIER)
+    private readonly bookingRealtimeNotifier: BookingRealtimeNotifier,
+  ) {}
 
   /**
    * Ejecuta cada 1 minuto para limpiar holds expirados
@@ -66,6 +74,8 @@ export class HoldCleanupService {
           customerId: true,
           userId: true,
           timeStart: true,
+          timeEnd: true,
+          commerceId: true,
           expiresAt: true,
         },
       });
@@ -75,17 +85,36 @@ export class HoldCleanupService {
         return;
       }
 
-      const holdIds = expiredHolds.map((h) => h.id);
+      // Primero emitir las notificaciones antes de eliminar los holds
+      // para tener acceso a los datos completos
+      for (const hold of expiredHolds) {
+        try {
+          await this.bookingRealtimeNotifier.emitAvailabilityUpdate(
+            new AvailabilityUpdateEventDto({
+              bookingId: hold.id,
+              status: BookingStatus.CANCELED,
+              timeStart: hold.timeStart,
+              timeEnd: hold.timeEnd,
+              employeeId: hold.userId,
+              commerceId: hold.commerceId,
+            })
+          );
+        } catch (error) {
+          this.logger.error('Failed to emit realtime update for expired hold', {
+            holdId: hold.id,
+            error: error instanceof Error ? error.message : error,
+          });
+        }
+      }
 
+      // Ahora sí eliminar los holds de la base de datos
+      const holdIds = expiredHolds.map((h) => h.id);
       const deletedCount = await this.deleteHoldsCascade(holdIds);
 
       this.logger.log(`Cleaned up ${deletedCount} expired holds`, {
         holdIds: holdIds,
         expiredCount: expiredHolds.length,
       });
-
-      // TODO: Emitir evento de WebSocket aquí para actualizar disponibilidad
-      // this.websocketGateway.emitSlotsAvailable({ userId, date })
 
     } catch (error) {
       const details: Record<string, unknown> = {

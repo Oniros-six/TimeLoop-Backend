@@ -1,11 +1,14 @@
 import { Booking } from '@/domain/entities/booking.entity';
 import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.service';
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger, Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
 import { BookingPersistenceService } from '@/application/services/booking/booking-persistence.service';
+import { BOOKING_REALTIME_NOTIFIER } from '@/application/providers';
+import { BookingRealtimeNotifier } from '@/application/services/booking/booking-realtime-notifier.service';
+import { AvailabilityUpdateEventDto } from '@/application/dto/availability-update-event.dto';
 
 /**
  * Use Case: Confirmar un hold y convertirlo en reserva PENDING
@@ -33,6 +36,9 @@ export class ConfirmHold {
     private readonly prisma: PrismaService,
     private readonly eventEmitter: EventEmitter2,
     private readonly bookingPersistenceService: BookingPersistenceService,
+
+    @Inject(BOOKING_REALTIME_NOTIFIER)
+    private readonly bookingRealtimeNotifier: BookingRealtimeNotifier,
   ) {}
 
   async execute(holdId: number) {
@@ -117,6 +123,26 @@ export class ConfirmHold {
         bookingId: result.id,
         error: error instanceof Error ? error.message : error,
       });
+    }
+
+    //* 5) Emitir actualización en tiempo real (NO crítico)
+    try {
+      await this.bookingRealtimeNotifier.emitAvailabilityUpdate(
+        new AvailabilityUpdateEventDto({
+          bookingId: result.id,
+          status: result.status,
+          timeStart: result.timeStart,
+          timeEnd: result.timeEnd,
+          employeeId: result.userId,
+          commerceId: result.commerceId,
+        })
+      );
+    } catch (error) {
+      this.logger.error('Failed to emit realtime update (non-critical)', {
+        bookingId: result.id,
+        error: error instanceof Error ? error.message : error,
+      });
+      // No lanzamos error, hold ya fue confirmado exitosamente
     }
 
     this.logger.log(`Prereserva ${holdId} confirmada exitosamente`);

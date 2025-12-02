@@ -3,6 +3,7 @@ import {
   COMMERCE_CONFIG_REPOSITORY,
   SERVICE_REPOSITORY,
   USER_REPOSITORY,
+  BOOKING_REALTIME_NOTIFIER,
 } from '@/application/providers';
 import { BookingRescheduledEvent } from '@/domain/common/booking.events';
 import { BookingUpdateData } from '@/domain/common/BookingUpdateData';
@@ -33,6 +34,8 @@ import { ActivityLog } from '@/domain/entities/activityLog.entity';
 import { Booking } from '@/domain/entities/booking.entity';
 import { Prisma } from '@prisma/client';
 import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
+import { BookingRealtimeNotifier } from '@/application/services/booking/booking-realtime-notifier.service';
+import { AvailabilityUpdateEventDto } from '@/application/dto/availability-update-event.dto';
 
 /**
  * ARCHITECTURAL DECISION RECORD (ADR):
@@ -71,6 +74,9 @@ export class UpdateBooking {
 
     @Inject(COMMERCE_CONFIG_REPOSITORY)
     private readonly commerceConfigRepository: ICommerceConfigRepository,
+
+    @Inject(BOOKING_REALTIME_NOTIFIER)
+    private readonly bookingRealtimeNotifier: BookingRealtimeNotifier,
 
     // NOTA: Ver ADR arriba sobre inyección directa de PrismaService
     private readonly prisma: PrismaService,
@@ -346,6 +352,26 @@ export class UpdateBooking {
       }
     } catch (error) {
       this.logger.error('Failed to emit booking rescheduled event (non-critical)', {
+        bookingId: result.id,
+        error: error instanceof Error ? error.message : error,
+      });
+      // No lanzamos error, booking ya fue actualizado exitosamente
+    }
+
+    // 8.3) Emitir actualización en tiempo real (NO crítico)
+    try {
+      await this.bookingRealtimeNotifier.emitAvailabilityUpdate(
+        new AvailabilityUpdateEventDto({
+          bookingId: result.id,
+          status: result.status,
+          timeStart: result.timeStart,
+          timeEnd: result.timeEnd,
+          employeeId: result.userId,
+          commerceId: result.commerceId,
+        })
+      );
+    } catch (error) {
+      this.logger.error('Failed to emit realtime update (non-critical)', {
         bookingId: result.id,
         error: error instanceof Error ? error.message : error,
       });

@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { BookingController } from './booking.controller';
 import { BookingHoldController } from './booking-hold.controller';
 import { PrismaModule } from '@/infrastructure/prisma/prisma.module';
 import { NotificationModule } from '@/domain/services/notifications/notifications.module';
+import { BookingGatewayModule } from '@/interfaces/gateways/booking/booking-gateway.module';
 
 // Use cases
 import { CreateBooking } from '@/application/use-cases/booking/create.use-case';
@@ -17,6 +18,7 @@ import { CreateHold } from '@/application/use-cases/booking/create-hold.use-case
 import { ConfirmHold } from '@/application/use-cases/booking/confirm-hold.use-case';
 import { WorkingPatternValidator } from '@/application/services/working-pattern/working-pattern.validator';
 import { BookingPersistenceService } from '@/application/services/booking/booking-persistence.service';
+import { BookingRealtimeNotifier } from '@/application/services/booking/booking-realtime-notifier.service';
 
 // Tokens
 import {
@@ -25,6 +27,7 @@ import {
   COMMERCE_CONFIG_REPOSITORY,
   SERVICE_REPOSITORY,
   USER_REPOSITORY,
+  BOOKING_REALTIME_NOTIFIER,
 } from '@/application/providers';
 
 // Repositories
@@ -35,7 +38,7 @@ import { PrismaBookingHistoryRepository } from '@/infrastructure/prisma/reposito
 import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/repositories/commerceConfig.repository';
 
 @Module({
-  imports: [PrismaModule, NotificationModule],
+  imports: [PrismaModule, NotificationModule, forwardRef(() => BookingGatewayModule)],
   controllers: [BookingController, BookingHoldController],
   providers: [
     {
@@ -57,6 +60,10 @@ import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/reposito
     {
       provide: COMMERCE_CONFIG_REPOSITORY,
       useClass: PrismaCommerceConfigRepository,
+    },
+    {
+      provide: BOOKING_REALTIME_NOTIFIER,
+      useExisting: BookingRealtimeNotifier,
     },
 
     // usesCases
