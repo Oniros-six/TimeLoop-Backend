@@ -30,6 +30,8 @@ import { FindByDateAndUserDto } from './dto/find-by-date-user.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { FindByUserDto } from './dto/find-by-user.dto';
 import { FindAllByUser } from '@/application/use-cases/booking/find-all-by-user.use-case';
+import { GetAvailability } from '@/application/use-cases/booking/get-availability.use-case';
+import { AvailabilityDto } from './dto/availability.dto';
 
 @ApiTags('Bookings')
 @Controller('booking')
@@ -41,6 +43,7 @@ export class BookingController {
     private readonly findAllByCommerceUseCase: FindAllByCommerce,
     private readonly findAllByUserUseCase: FindAllByUser,
     private readonly cancelBookingUseCase: CancelBooking,
+    private readonly getAvailabilityUseCase: GetAvailability,
   ) { }
 
   //*==================================== CREATE ====================================
@@ -85,6 +88,20 @@ export class BookingController {
   @Get('slots')
   findAllByDateAndCommerce(@Query() dto: FindByDateAndUserDto) {
     return this.findAllByUserAndDateUseCase.execute(dto);
+  }
+
+  //*==================================== AVAILABILITY ====================================
+  @ApiOperation({
+    summary: 'Obtener horarios disponibles para una fecha, usuario y servicios específicos',
+  })
+  @ApiQuery({ name: 'commerceId', required: true, type: Number })
+  @ApiQuery({ name: 'userId', required: true, type: Number })
+  @ApiQuery({ name: 'date', required: true, type: String })
+  @ApiQuery({ name: 'services', required: true, type: [Number], isArray: true })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Get('availability')
+  getAvailability(@Query() dto: AvailabilityDto) {
+    return this.getAvailabilityUseCase.execute(dto);
   }
 
   //*==================================== CANCEL ====================================
