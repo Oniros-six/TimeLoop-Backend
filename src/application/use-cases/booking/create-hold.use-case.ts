@@ -20,17 +20,18 @@ import { BookingRealtimeNotifier } from '@/application/services/booking/booking-
 import { AvailabilityUpdateEventDto } from '@/application/dto/availability-update-event.dto';
 
 /**
- * Use Case: Crear un "hold" temporal de 15 minutos
+ * Use Case: Crear un "hold" temporal de 5 minutos
  * 
  * PROPÓSITO:
- * Cuando un cliente selecciona un horario y va a pagar, necesitamos "reservar"
- * ese horario temporalmente para evitar que otro usuario lo tome mientras
- * completa el pago.
+ * Cuando un cliente selecciona un horario y va a completar el proceso de checkout,
+ * necesitamos "reservar" ese horario temporalmente para evitar que otro usuario
+ * lo tome mientras completa todo el proceso (puede pagar o no).
  * 
  * FLUJO:
- * 1. Cliente selecciona horario → Se crea HOLD (15 min)
- * 2. Cliente completa pago → HOLD se convierte a CONFIRMED
- * 3. Cliente abandona → Cron limpia el HOLD después de 15 min
+ * 1. Cliente selecciona horario → Se crea HOLD (5 min)
+ * 2. Cliente completa proceso de checkout → HOLD se convierte a PENDING (via confirm-hold)
+ * 3. Si el pago se confirma → PENDING se convierte a CONFIRMED (via webhook)
+ * 4. Cliente abandona → Cron limpia el HOLD después de 5 min
  * 
  * INTEGRACIÓN CON WEBSOCKETS:
  * Cuando se crea/libera un hold, se emite evento para actualizar disponibilidad

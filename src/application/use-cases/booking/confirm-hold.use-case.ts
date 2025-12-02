@@ -14,15 +14,18 @@ import { AvailabilityUpdateEventDto } from '@/application/dto/availability-updat
  * Use Case: Confirmar un hold y convertirlo en reserva PENDING
  * 
  * PROPÓSITO:
- * Cuando el cliente avanza en el flujo de pago, necesitamos convertir el HOLD
- * temporal en una reserva PENDING permanente.
+ * Cuando el cliente completa todo el proceso de checkout (independientemente
+ * de si pagó o no), necesitamos convertir el HOLD temporal en una reserva
+ * PENDING permanente.
  * 
  * FLUJO:
- * 1. Verificar que el hold existe y no ha expirado (validación crítica)
- * 2. Actualizar status de HOLD a PENDING
- * 3. Limpiar expiresAt (ya no es temporal)
- * 4. Crear historial y activity log (atomicidad ACID)
- * 5. Emitir evento (opcional, con try-catch)
+ * 1. Verificar que el hold existe
+ * 2. Validar que el customerId coincide con el que creó el hold (seguridad)
+ * 3. Verificar que es un HOLD y no ha expirado (validación crítica)
+ * 4. Actualizar status de HOLD a PENDING
+ * 5. Limpiar expiresAt (ya no es temporal)
+ * 6. Crear historial y activity log (atomicidad ACID)
+ * 7. Emitir evento (opcional, con try-catch)
  * 
  * NOTA ARQUITECTÓNICA:
  * Accede directamente a PrismaService para validar 'expiresAt' (campo no
@@ -41,7 +44,7 @@ export class ConfirmHold {
     private readonly bookingRealtimeNotifier: BookingRealtimeNotifier,
   ) {}
 
-  async execute(holdId: number) {
+  async execute(holdId: number, customerId: number) {
     //* 1) Buscar el hold y verificar expiración en una sola query
     const holdData = await this.prisma.booking.findUnique({
       where: { id: holdId },
@@ -73,7 +76,19 @@ export class ConfirmHold {
       );
     }
 
-    //* 2) Verificar que es un HOLD
+    //* 2) Verificar que el customerId coincide (validación de seguridad)
+    if (holdData.customerId !== customerId) {
+      this.logger.warn(`Intento de confirmar prereserva de otro cliente: ${holdId}`, {
+        holdCustomerId: holdData.customerId,
+        requestCustomerId: customerId,
+      });
+      throw new HttpException(
+        'No tiene permisos para confirmar esta prereserva. Solo el cliente que la creó puede confirmarla.',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    //* 3) Verificar que es un HOLD
     if (holdData.status !== BookingStatus.HOLD) {
       throw new HttpException(
         `Esta reserva tiene status ${holdData.status}, no puede ser confirmada desde prereserva`,
@@ -81,7 +96,7 @@ export class ConfirmHold {
       );
     }
 
-    //* 3) Verificar que no ha expirado (validación crítica de negocio)
+    //* 4) Verificar que no ha expirado (validación crítica de negocio)
     if (holdData.expiresAt && holdData.expiresAt < new Date()) {
       this.logger.warn(`Intento de confirmar prereserva expirada: ${holdId}`, {
         expiresAt: holdData.expiresAt,
@@ -93,7 +108,7 @@ export class ConfirmHold {
       );
     }
 
-    //* 4) Persistir cambios (transacción atómica)
+    //* 5) Persistir cambios (transacción atómica)
     let result: Booking;
 
     try {
@@ -125,7 +140,7 @@ export class ConfirmHold {
       });
     }
 
-    //* 5) Emitir actualización en tiempo real (NO crítico)
+    //* 7) Emitir actualización en tiempo real (NO crítico)
     try {
       await this.bookingRealtimeNotifier.emitAvailabilityUpdate(
         new AvailabilityUpdateEventDto({
