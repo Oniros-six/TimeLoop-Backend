@@ -3,6 +3,7 @@ import { BOOKING_EVENTS } from '@/domain/services/notifications/notifications.se
 import { HttpException, HttpStatus, Injectable, Logger, Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import { BookingStatus } from '@/domain/dbEnums/BookingStatus.enum';
 import { BookingCreatedEvent } from '@/domain/common/booking.events';
 import { BookingPersistenceService } from '@/application/services/booking/booking-persistence.service';
@@ -22,7 +23,8 @@ import { AvailabilityUpdateEventDto } from '@/application/dto/availability-updat
  * 1. Verificar que el hold existe
  * 2. Validar que el customerId coincide con el que creó el hold (seguridad)
  * 3. Verificar que es un HOLD y no ha expirado (validación crítica)
- * 4. Actualizar status de HOLD a PENDING
+ * 4. Actualizar status de HOLD a PENDING (en transacción con isolation Serializable)
+ *    - El constraint de exclusión GIST previene solapamientos automáticamente
  * 5. Limpiar expiresAt (ya no es temporal)
  * 6. Crear historial y activity log (atomicidad ACID)
  * 7. Emitir evento (opcional, con try-catch)
@@ -108,7 +110,8 @@ export class ConfirmHold {
       );
     }
 
-    //* 5) Persistir cambios (transacción atómica)
+    //* 5) Persistir cambios (transacción atómica con isolation Serializable)
+    // El constraint de exclusión GIST previene solapamientos automáticamente
     let result: Booking;
 
     try {
@@ -121,6 +124,31 @@ export class ConfirmHold {
         activityLogDetail: 'Reserva confirmada (convertida desde prereserva)',
       });
     } catch (error) {
+      // Manejar error de constraint de exclusión (previene solapamientos)
+      const isOverlapError =
+        (error instanceof Prisma.PrismaClientKnownRequestError &&
+          (error.code === 'P2034' || error.message?.includes('unique_user_booking_range'))) ||
+        (error instanceof Prisma.PrismaClientUnknownRequestError &&
+          error.message?.includes('unique_user_booking_range')) ||
+        (typeof error === 'object' &&
+          error !== null &&
+          'message' in error &&
+          typeof error.message === 'string' &&
+          error.message.includes('unique_user_booking_range'));
+
+      if (isOverlapError) {
+        this.logger.warn('Solapamiento detectado por constraint al confirmar hold', {
+          holdId,
+          userId: holdData.userId,
+          timeStart: holdData.timeStart,
+          timeEnd: holdData.timeEnd,
+        });
+        throw new HttpException(
+          'El horario ya no está disponible. Otro usuario ha reservado este horario.',
+          HttpStatus.CONFLICT,
+        );
+      }
+
       this.logger.error('Error confirming hold', error);
       throw new HttpException(
         'Error al confirmar la reserva',
