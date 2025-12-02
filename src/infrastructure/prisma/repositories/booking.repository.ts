@@ -313,42 +313,6 @@ export class PrismaBookingRepository implements IBookingRepository {
     return result.map((booking) => this.toDomain(booking));
   }
 
-  async findBusySlots(data: {
-    userId: number;
-    timeStart: Date;
-  }): Promise<DomainClient[] | null> {
-    // PostgreSQL con TIMESTAMPTZ maneja UTC automáticamente
-    const startOfDay = new Date(data.timeStart);
-    startOfDay.setUTCHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(data.timeStart);
-    endOfDay.setUTCHours(23, 59, 59, 999);
-
-    const result = await this.prisma.booking.findMany({
-      where: {
-        timeStart: {
-          gte: startOfDay,
-          lte: endOfDay,
-        },
-        userId: data.userId,
-        status: {
-          in: [
-            BookingStatus.CONFIRMED,
-            BookingStatus.PENDING,
-            BookingStatus.RESCHEDULED,
-          ],
-        },
-      },
-      include: {
-        bookingServices: true,
-      },
-    });
-
-    if (!result || result.length === 0) return null;
-
-    return result.map((booking) => this.toDomain(booking));
-  }
-
   async findOne(data: { id: number }): Promise<DomainClient | null> {
     const result = await this.prisma.booking.findUnique({
       where: { id: data.id },

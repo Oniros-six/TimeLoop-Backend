@@ -27,12 +27,6 @@ export interface IBookingRepository {
     hasNextPage: boolean;
   }>;
 
-  //* findBusySlots repository methods
-  findBusySlots(data: {
-    userId: number;
-    timeStart: Date;
-  }): Promise<Booking[] | null>;
-
   //* findAllByDateAndUser repository methods
   findAllByDateAndUser(data: {
     userId: number;

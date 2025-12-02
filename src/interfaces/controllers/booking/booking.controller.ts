@@ -20,7 +20,6 @@ import {
 } from '@nestjs/swagger';
 import { CreateBooking } from '@/application/use-cases/booking/create.use-case';
 import { UpdateBooking } from '@/application/use-cases/booking/update.use-case';
-import { FindBusySlots } from '@/application/use-cases/booking/find-busy-slots.use-case';
 import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-commerce.use-case';
 import { FindAllByUserAndDate } from '@/application/use-cases/booking/find-all-by-date-user.use-case';
 import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
@@ -39,7 +38,6 @@ export class BookingController {
     private readonly createBookingUseCase: CreateBooking,
     private readonly updateBookingUseCase: UpdateBooking,
     private readonly findAllByUserAndDateUseCase: FindAllByUserAndDate,
-    private readonly findBusySlotsUseCase: FindBusySlots,
     private readonly findAllByCommerceUseCase: FindAllByCommerce,
     private readonly findAllByUserUseCase: FindAllByUser,
     private readonly cancelBookingUseCase: CancelBooking,
@@ -87,19 +85,6 @@ export class BookingController {
   @Get('slots')
   findAllByDateAndCommerce(@Query() dto: FindByDateAndUserDto) {
     return this.findAllByUserAndDateUseCase.execute(dto);
-  }
-
-  //*==================================== FIND ALL BUSY SLOTS ====================================
-  @ApiOperation({
-    summary:
-      'Obtener todas las reservas ocupadas de un usuario/empleado, con base en su ID',
-  })
-  @ApiQuery({ name: 'date', required: true, type: String })
-  @ApiQuery({ name: 'userId', required: true, type: Number })
-  @UsePipes(new ValidationPipe({ transform: true }))
-  @Get('busy-slots')
-  findBusySlots(@Query() dto: FindByDateAndUserDto) {
-    return this.findBusySlotsUseCase.execute(dto);
   }
 
   //*==================================== CANCEL ====================================

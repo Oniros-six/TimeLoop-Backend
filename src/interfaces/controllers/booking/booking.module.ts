@@ -9,7 +9,6 @@ import { BookingGatewayModule } from '@/interfaces/gateways/booking/booking-gate
 import { CreateBooking } from '@/application/use-cases/booking/create.use-case';
 import { UpdateBooking } from '@/application/use-cases/booking/update.use-case';
 import { FindAllByUserAndDate } from '@/application/use-cases/booking/find-all-by-date-user.use-case';
-import { FindBusySlots } from '@/application/use-cases/booking/find-busy-slots.use-case';
 import { FindAllByCommerce } from '@/application/use-cases/booking/find-all-by-commerce.use-case';
 import { FindAllByUser } from '@/application/use-cases/booking/find-all-by-user.use-case';
 import { CancelBooking } from '@/application/use-cases/booking/cancel.use-case';
@@ -70,7 +69,6 @@ import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/reposito
     CreateBooking,
     UpdateBooking,
     FindAllByUserAndDate,
-    FindBusySlots,
     FindAllByCommerce,
     FindAllByUser,
     CancelBooking,
