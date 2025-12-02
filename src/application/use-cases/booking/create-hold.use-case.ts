@@ -39,7 +39,7 @@ import { AvailabilityUpdateEventDto } from '@/application/dto/availability-updat
 @Injectable()
 export class CreateHold {
   private readonly logger = new Logger(CreateHold.name);
-  private readonly HOLD_EXPIRATION_MINUTES = 15;
+  private readonly HOLD_EXPIRATION_MINUTES = 5;
 
   constructor(
     @Inject(BOOKING_REPOSITORY)
