@@ -155,25 +155,6 @@ export class PrismaBookingRepository implements IBookingRepository {
     }
   }
 
-  async findBusy(data: {
-    timeStart: Date;
-    userId: number;
-  }): Promise<DomainClient | null> {
-    const result = await this.prisma.booking.findFirst({
-      where: {
-        timeStart: data.timeStart,
-        userId: data.userId,
-        status: BookingStatus.CONFIRMED,
-      },
-      include: {
-        bookingServices: true,
-      },
-    });
-    if (!result) return null;
-
-    return this.toDomain(result);
-  }
-
   async findAllByUser(data: { userId: number; limit?: number; cursor?: number }): Promise<{
     items: BookingDetail[];
     nextCursor: number | null;

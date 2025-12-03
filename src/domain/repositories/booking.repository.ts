@@ -4,11 +4,6 @@ import { BookingUpdateData } from '../common/BookingUpdateData';
 import { Booking } from '../entities/booking.entity';
 
 export interface IBookingRepository {
-  //* Create repository methods
-  findBusy(data: {
-    timeStart: Date;
-    userId: number;
-  }): Promise<Booking | null>;
 
   createSchedule(data: Booking, idempotencyKey?: string): Promise<Booking | null>;
 
