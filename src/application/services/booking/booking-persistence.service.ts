@@ -97,6 +97,17 @@ export class BookingPersistenceService {
     input: UpdateBookingTransactionInput,
   ): Promise<Booking> {
     const result = await this.prisma.$transaction(async (tx) => {
+      // Revalidar que el booking existe antes de actualizar
+      // Esto previene race conditions (ej: cron eliminó el hold)
+      const existingBooking = await tx.booking.findUnique({
+        where: { id: input.bookingId },
+        select: { id: true, status: true },
+      });
+
+      if (!existingBooking) {
+        throw new Error(`Booking ${input.bookingId} not found`);
+      }
+
       if (input.resetServices) {
         await tx.bookingService.deleteMany({ where: { bookingId: input.bookingId } });
       }

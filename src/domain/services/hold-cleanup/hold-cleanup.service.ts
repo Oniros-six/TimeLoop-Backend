@@ -17,12 +17,9 @@ import { AvailabilityUpdateEventDto } from '@/application/dto/availability-updat
  * FUNCIONAMIENTO:
  * - Se ejecuta cada 1 minuto (configurable)
  * - Busca bookings con status HOLD y expiresAt < now()
+ * - Emite evento WebSocket para notificar expiración (status: CANCELED)
  * - Los elimina en batch (máximo 100 por ejecución)
  * - Loguea para monitoreo
- * 
- * FUTURO (con WebSockets):
- * Cuando se elimina un hold, emitir evento para actualizar disponibilidad
- * en tiempo real para usuarios viendo ese día.
  */
 @Injectable()
 export class HoldCleanupService {
@@ -135,21 +132,52 @@ export class HoldCleanupService {
 
   /**
    * Método manual para limpiar holds (útil para testing o admin)
+   * También emite eventos WebSocket para notificar expiración
    */
   async manualCleanup(): Promise<number> {
+    const now = new Date();
     const expiredHolds = await this.prisma.booking.findMany({
       where: {
         status: BookingStatus.HOLD,
         expiresAt: {
-          lt: new Date(),
+          lt: now,
         },
       },
-      select: { id: true },
+      select: {
+        id: true,
+        customerId: true,
+        userId: true,
+        timeStart: true,
+        timeEnd: true,
+        commerceId: true,
+        expiresAt: true,
+      },
     });
 
     if (expiredHolds.length === 0) {
       this.logger.debug('Manual cleanup: no expired holds to remove');
       return 0;
+    }
+
+    // Emitir eventos WebSocket antes de eliminar
+    for (const hold of expiredHolds) {
+      try {
+        await this.bookingRealtimeNotifier.emitAvailabilityUpdate(
+          new AvailabilityUpdateEventDto({
+            bookingId: hold.id,
+            status: BookingStatus.CANCELED,
+            timeStart: hold.timeStart,
+            timeEnd: hold.timeEnd,
+            employeeId: hold.userId,
+            commerceId: hold.commerceId,
+          })
+        );
+      } catch (error) {
+        this.logger.error('Failed to emit realtime update for expired hold (manual cleanup)', {
+          holdId: hold.id,
+          error: error instanceof Error ? error.message : error,
+        });
+      }
     }
 
     const holdIds = expiredHolds.map((hold) => hold.id);

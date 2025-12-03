@@ -124,6 +124,21 @@ export class ConfirmHold {
         activityLogDetail: 'Reserva confirmada (convertida desde prereserva)',
       });
     } catch (error) {
+      // Manejar error si el hold fue eliminado (ej: por cron)
+      if (
+        error instanceof Error &&
+        error.message.includes('not found')
+      ) {
+        this.logger.warn('Intento de confirmar hold que ya no existe', {
+          holdId,
+          userId: holdData.userId,
+        });
+        throw new HttpException(
+          'La prereserva ya no está disponible. Por favor, seleccione el horario nuevamente.',
+          HttpStatus.GONE,
+        );
+      }
+
       // Manejar error de constraint de exclusión (previene solapamientos)
       const isOverlapError =
         (error instanceof Prisma.PrismaClientKnownRequestError &&
