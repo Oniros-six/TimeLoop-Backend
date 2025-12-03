@@ -28,6 +28,12 @@ export interface IBookingRepository {
     timeStart: Date;
   }): Promise<Booking[] | null>;
 
+  //* Find active bookings for availability calculation
+  findActiveBookingsForAvailability(data: {
+    userId: number;
+    timeStart: Date;
+  }): Promise<Booking[]>;
+
   //* Cancel a schedule
   cancelSchedule(data: { id: number }): Promise<Booking | null>;
 

@@ -268,8 +268,6 @@ export class PrismaBookingRepository implements IBookingRepository {
     userId: number;
     timeStart: Date;
   }): Promise<DomainClient[] | null> {
-    // PostgreSQL con TIMESTAMPTZ maneja UTC automáticamente
-    // Solo necesitamos definir el rango del día en UTC
     const startOfDay = new Date(data.timeStart);
     startOfDay.setUTCHours(0, 0, 0, 0);
 
@@ -290,6 +288,44 @@ export class PrismaBookingRepository implements IBookingRepository {
     });
 
     if (!result || result.length === 0) return null;
+
+    return result.map((booking) => this.toDomain(booking));
+  }
+
+  async findActiveBookingsForAvailability(data: {
+    userId: number;
+    timeStart: Date;
+  }): Promise<DomainClient[]> {
+    const startOfDay = new Date(data.timeStart);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(data.timeStart);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
+    // Filtrar solo bookings activos que bloquean disponibilidad
+    // HOLD: activos (los expirados ya fueron eliminados por cron)
+    // PENDING, CONFIRMED, RESCHEDULED: activos
+    // Excluir: CANCELED, NO_SHOW, COMPLETED (no bloquean disponibilidad)
+    const result = await this.prisma.booking.findMany({
+      where: {
+        timeStart: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+        userId: data.userId,
+        status: {
+          in: [
+            BookingStatus.HOLD,
+            BookingStatus.PENDING,
+            BookingStatus.CONFIRMED,
+            BookingStatus.RESCHEDULED,
+          ],
+        },
+      },
+      include: {
+        bookingServices: true,
+      },
+    });
 
     return result.map((booking) => this.toDomain(booking));
   }

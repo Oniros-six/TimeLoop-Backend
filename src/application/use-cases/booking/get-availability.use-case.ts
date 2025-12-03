@@ -28,8 +28,6 @@ import {
   hasAvailablePatterns,
   createNoAvailabilityResponse,
 } from '@/domain/utils/booking/availability.utils';
-import { CommerceWorkingPattern } from '@/domain/entities/commerceWorkingPattern.entity';
-import { UserWorkingPattern } from '@/domain/entities/userWorkingPattern.entity';
 
 @Injectable()
 export class GetAvailability {
@@ -89,7 +87,7 @@ export class GetAvailability {
           this.userWorkingPatternRepository.findUserWorkingPattern({
             userId: data.userId,
           }),
-          this.bookingRepository.findAllByDateAndUser({
+          this.bookingRepository.findActiveBookingsForAvailability({
             userId: data.userId,
             timeStart: data.date,
           }),
@@ -114,7 +112,7 @@ export class GetAvailability {
         commercePattern: commercePattern!,
         userPattern: userPattern!,
         totalDuration,
-        existingBookings: existingBookings || [],
+        existingBookings: existingBookings,
       });
 
       return {
