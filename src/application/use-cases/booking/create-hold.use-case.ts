@@ -2,6 +2,7 @@ import {
   BOOKING_REPOSITORY,
   SERVICE_REPOSITORY,
   USER_REPOSITORY,
+  CUSTOMER_REPOSITORY,
   BOOKING_REALTIME_NOTIFIER,
 } from '@/application/providers';
 import { Booking } from '@/domain/entities/booking.entity';
@@ -9,6 +10,7 @@ import { BookingService } from '@/domain/entities/bookingService.entity';
 import { IBookingRepository } from '@/domain/repositories/booking.repository';
 import { IServiceRepository } from '@/domain/repositories/services.repository';
 import { IUserRepository } from '@/domain/repositories/user.repository';
+import { ICustomerRepository } from '@/domain/repositories/customer.repository';
 import { ensureNotPast } from '@/domain/value-objects/booking/validations';
 import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
@@ -51,6 +53,9 @@ export class CreateHold {
 
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+
+    @Inject(CUSTOMER_REPOSITORY)
+    private readonly customerRepository: ICustomerRepository,
 
     @Inject(BOOKING_REALTIME_NOTIFIER)
     private readonly bookingRealtimeNotifier: BookingRealtimeNotifier,
@@ -108,7 +113,19 @@ export class CreateHold {
       );
     }
 
-    //* 4) Crear booking como entidad de dominio con status HOLD
+    //* 4) Validar existencia del cliente
+    const customer = await this.customerRepository.findCustomer({
+      id: data.customerId,
+    });
+
+    if (!customer) {
+      throw new HttpException(
+        'El cliente no existe',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    //* 5) Crear booking como entidad de dominio con status HOLD
     const booking = Booking.createPending(
       data.customerId,
       data.commerceId,
@@ -125,11 +142,11 @@ export class CreateHold {
       timeEnd: booking.timeEnd,
     });
 
-    //* 5) Calcular expiración (5 minutos desde ahora)
+    //* 6) Calcular expiración (5 minutos desde ahora)
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + this.HOLD_EXPIRATION_MINUTES);
 
-    //* 6) Crear HOLD en BD (validación de solapamiento via exclusion constraint)
+    //* 7) Crear HOLD en BD (validación de solapamiento via exclusion constraint)
     let result: Booking;
 
     try {
@@ -213,7 +230,7 @@ export class CreateHold {
 
     this.logger.log(`Hold created: ${result.id}, expires at ${expiresAt.toISOString()}`);
 
-    //* 7) Emitir actualización en tiempo real (NO crítico)
+    //* 8) Emitir actualización en tiempo real (NO crítico)
     try {
       await this.bookingRealtimeNotifier.emitAvailabilityUpdate(
         new AvailabilityUpdateEventDto({

@@ -27,6 +27,7 @@ import {
   COMMERCE_CONFIG_REPOSITORY,
   SERVICE_REPOSITORY,
   USER_REPOSITORY,
+  CUSTOMER_REPOSITORY,
   BOOKING_REALTIME_NOTIFIER,
   COMMERCE_WORKING_PATTERN_REPOSITORY,
   USER_WORKING_PATTERN_REPOSITORY,
@@ -36,6 +37,7 @@ import {
 import { PrismaBookingRepository } from '@/infrastructure/prisma/repositories/booking.repository';
 import { PrismaServicesRepository } from '@/infrastructure/prisma/repositories/services.repository';
 import { PrismaUserRepository } from '@/infrastructure/prisma/repositories/user.repository';
+import { PrismaCustomerRepository } from '@/infrastructure/prisma/repositories/customer.repository';
 import { PrismaBookingHistoryRepository } from '@/infrastructure/prisma/repositories/bookingHistory.repository';
 import { PrismaCommerceConfigRepository } from '@/infrastructure/prisma/repositories/commerceConfig.repository';
 import { PrismaCommerceWorkingPatternRepository } from '@/infrastructure/prisma/repositories/commerceWorkingPattern.repository';
@@ -56,6 +58,10 @@ import { PrismaUserWorkingPatternRepository } from '@/infrastructure/prisma/repo
     {
       provide: USER_REPOSITORY,
       useClass: PrismaUserRepository,
+    },
+    {
+      provide: CUSTOMER_REPOSITORY,
+      useClass: PrismaCustomerRepository,
     },
     {
       provide: BOOKING_HISTORY_REPOSITORY,

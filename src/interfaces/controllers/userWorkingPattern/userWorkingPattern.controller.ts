@@ -20,6 +20,7 @@ import { CreateUserPatternDto } from './dto/create-userPattern.dto';
 import { UpdateUserPatternDto } from './dto/update-userPattern.dto';
 
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+import { Public } from '@/infrastructure/auth/public.decorator';
 
 @ApiTags('User Working Pattern')
 @UseGuards(AuthGuard)
@@ -43,7 +44,7 @@ export class UserWorkingPatternController {
 
   //*==================================== FIND ALL ====================================
 
-  @UseGuards(AuthGuard)
+  @Public()
   @ApiOperation({
     summary: 'Obtener todos los patrones de trabajo de un usuario',
   })

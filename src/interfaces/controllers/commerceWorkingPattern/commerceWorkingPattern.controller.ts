@@ -22,6 +22,7 @@ import { UpdateCommercePatternDto } from './dto/update-commercePattern.dto';
 import { Roles } from '@/infrastructure/auth/roles.decorator';
 import { RolesGuard } from '@/infrastructure/auth/roles.guard';
 import { AuthGuard } from '@/infrastructure/auth/auth.guard';
+import { Public } from '@/infrastructure/auth/public.decorator';
 
 @ApiTags('Commerce Working Pattern')
 @UseGuards(AuthGuard)
@@ -45,7 +46,7 @@ export class CommerceWorkingPatternController {
 
   //*==================================== FIND ALL ====================================
 
-  @UseGuards(AuthGuard)
+  @Public()
   @ApiOperation({
     summary: 'Obtener todos los patrones de trabajo de un comercio',
   })
